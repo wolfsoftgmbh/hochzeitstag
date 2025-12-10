@@ -196,6 +196,57 @@
             color: #c2185b; /* Darker pink */
         }
 
+        /* 
+         * MILESTONE BOX
+         */
+        .milestone-box {
+            background-color: #fff;
+            border: 2px solid var(--soft-pink);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+            text-align: left;
+        }
+
+        .milestone-title {
+            color: var(--primary-pink);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .milestone-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .milestone-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .milestone-item:last-child {
+            border-bottom: none;
+        }
+
+        .milestone-label {
+            font-weight: 600;
+            color: #d81b60;
+            margin-right: 10px;
+        }
+
+        .milestone-date {
+            color: #666;
+            text-align: right;
+        }
+
         /*
          * QUOTE BOX
          */
@@ -257,6 +308,16 @@
             .stats-row {
                 grid-template-columns: 1fr; /* Stack total stats vertically */
             }
+
+            .milestone-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .milestone-date {
+                text-align: left;
+                margin-top: 2px;
+            }
         }
     </style>
 </head>
@@ -309,6 +370,14 @@
                 </div>
             </div>
 
+            <!-- Milestone Box -->
+            <div class="milestone-box">
+                <div class="milestone-title">Besondere Tage</div>
+                <div id="milestone-list" class="milestone-list">
+                    <!-- Milestones will be inserted here by JavaScript -->
+                </div>
+            </div>
+
             <!-- Quote Block -->
             <div id="quote-display" class="quote-box">
                 <!-- Quote will be inserted here by JavaScript -->
@@ -345,6 +414,7 @@
     const elNextAnniversary = document.getElementById('next-anniversary');
     const elQuoteDisplay = document.getElementById('quote-display');
     const elWeddingDateDisplay = document.getElementById('wedding-date-display');
+    const elMilestoneList = document.getElementById('milestone-list');
 
     // List of humorous and affectionate German quotes
     const quotes = [
@@ -377,6 +447,66 @@
         const randomIndex = Math.floor(Math.random() * quotes.length);
         // Replace newline characters with HTML line breaks for display
         elQuoteDisplay.innerHTML = quotes[randomIndex].replace(/\n/g, "<br>");
+    }
+
+    /**
+     * Formats a date object to German string: "Weekday, DD. Month YYYY"
+     */
+    function formatMilestoneDate(date) {
+        return date.toLocaleDateString('de-DE', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+
+    /**
+     * Calculates and displays special milestone dates.
+     */
+    function calculateMilestones() {
+        const weddingDate = new Date(WEDDING_DATE_STR);
+        
+        // Define milestones: Label and calculation function
+        const milestones = [
+            { 
+                label: "100. Tag", 
+                date: new Date(weddingDate.getTime() + (100 * 24 * 60 * 60 * 1000)) 
+            },
+            { 
+                label: "200. Tag", 
+                date: new Date(weddingDate.getTime() + (200 * 24 * 60 * 60 * 1000)) 
+            },
+            { 
+                label: "300. Tag", 
+                date: new Date(weddingDate.getTime() + (300 * 24 * 60 * 60 * 1000)) 
+            },
+            { 
+                label: "1/4 Jahr", 
+                // 3 months approx, but precisely adding months is better for "Year" milestones
+                date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 3)) 
+            },
+            { 
+                label: "2/4 Jahr", 
+                date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 6)) 
+            },
+            { 
+                label: "3/4 Jahr", 
+                date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 9)) 
+            }
+        ];
+
+        let html = '';
+        milestones.forEach(m => {
+            html += `
+                <div class="milestone-item">
+                    <span class="milestone-label">${m.label}:</span>
+                    <span class="milestone-date">${formatMilestoneDate(m.date)}</span>
+                </div>
+            `;
+        });
+
+        elMilestoneList.innerHTML = html;
     }
 
     function updateTimer() {
@@ -473,8 +603,9 @@
         elNextAnniversary.innerText = `Noch ${nextDays} Tage und ${nextHours} Stunden bis zum nächsten Hochzeitstag (${nextAnniversaryWeekday}, ${nextAnniversaryDateFormatted} Uhr)`;
     }
 
-    // Initialize the quote on load
+    // Initialize components
     displayRandomQuote();
+    calculateMilestones();
 
     // Run timer immediately then every second
     updateTimer();
