@@ -316,7 +316,7 @@
 
             <!-- Footer Section -->
             <div class="footer-info">
-                <span class="start-date">Start: 6. September 2025, 11:02 Uhr</span>
+                <span class="start-date" id="wedding-date-display"></span>
                 <div class="countdown-pill" id="next-anniversary">
                     Berechne...
                 </div>
@@ -344,6 +344,7 @@
     const elTotalSeconds = document.getElementById('total-seconds');
     const elNextAnniversary = document.getElementById('next-anniversary');
     const elQuoteDisplay = document.getElementById('quote-display');
+    const elWeddingDateDisplay = document.getElementById('wedding-date-display');
 
     // List of humorous and affectionate German quotes
     const quotes = [
@@ -358,7 +359,7 @@
         "Echte Liebe ist,\nwenn man sich gegenseitig beim Schnarchen erträgt.",
         "Du bist mein Anker im Sturm\nund mein Konfetti im Alltag.",
         "Zuhause ist da,\nwo du bist (und wo das WLAN funktioniert).",
-        "Wir zwei gegen den Rest der Welt\n(und gegen den Abwasch).",
+        "Wir sind ein perfektes Team:\nIch sorge für das Chaos, du für die Ordnung.",
         "Liebe heißt nicht, dass man sich nie streitet,\nsondern dass man sich immer wieder verträgt.",
         "Mit dir an meiner Seite\nist jeder Tag ein kleiner Feiertag.",
         "Du bist der Grund,\nwarum ich öfter auf mein Handy schaue und lächle.",
@@ -381,6 +382,16 @@
     function updateTimer() {
         const now = new Date();
         const weddingDate = new Date(WEDDING_DATE_STR);
+
+        // Display formatted wedding date (Start date)
+        const weddingDateFormatted = weddingDate.toLocaleDateString('de-DE', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        elWeddingDateDisplay.innerText = `Start: ${weddingDateFormatted} Uhr`;
 
         // 1. Calculate Time Since Wedding
         // Get difference in milliseconds
