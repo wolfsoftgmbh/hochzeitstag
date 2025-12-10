@@ -330,6 +330,11 @@
             <h1>Unser Hochzeitstag</h1>
             <div class="subtitle">Zeit seit dem schönsten Tag unseres Lebens!</div>
 
+            <!-- Quote Block -->
+            <div id="quote-display" class="quote-box">
+                <!-- Quote will be inserted here by JavaScript -->
+            </div>
+
             <!-- Row 1: Years, Days, Hours, Minutes -->
             <div class="row-grid">
                 <div class="box">
@@ -376,11 +381,6 @@
                 <div id="milestone-list" class="milestone-list">
                     <!-- Milestones will be inserted here by JavaScript -->
                 </div>
-            </div>
-
-            <!-- Quote Block -->
-            <div id="quote-display" class="quote-box">
-                <!-- Quote will be inserted here by JavaScript -->
             </div>
 
             <!-- Footer Section -->
@@ -469,28 +469,28 @@
         
         // Define milestones: Label and calculation function
         const milestones = [
-            { 
+            {
                 label: "100. Tag", 
                 date: new Date(weddingDate.getTime() + (100 * 24 * 60 * 60 * 1000)) 
             },
-            { 
+            {
                 label: "200. Tag", 
                 date: new Date(weddingDate.getTime() + (200 * 24 * 60 * 60 * 1000)) 
             },
-            { 
+            {
                 label: "300. Tag", 
                 date: new Date(weddingDate.getTime() + (300 * 24 * 60 * 60 * 1000)) 
             },
-            { 
+            {
                 label: "1/4 Jahr", 
                 // 3 months approx, but precisely adding months is better for "Year" milestones
                 date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 3)) 
             },
-            { 
+            {
                 label: "2/4 Jahr", 
                 date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 6)) 
             },
-            { 
+            {
                 label: "3/4 Jahr", 
                 date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 9)) 
             }
