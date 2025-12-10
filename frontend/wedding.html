@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unser Hochzeitstag</title>
+    
+    <!-- Import Google Font "Baloo 2" -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* 
+         * GLOBAL STYLES 
+         */
+        :root {
+            --primary-pink: #e91e63;
+            --soft-pink: #f8bbd0;
+            --light-pink: #ffc1e3;
+            --bg-gradient-start: #fff0f5; /* Lavender Blush */
+            --bg-gradient-end: #f48fb1;   /* Pink */
+            --card-bg-overlay: rgba(255, 255, 255, 0.85);
+            --text-color: #4a4a4a;
+            --box-shadow: 0 4px 15px rgba(233, 30, 99, 0.2);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Baloo 2', cursive, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Full page pink gradient background */
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-color);
+        }
+
+        /* 
+         * CARD CONTAINER 
+         */
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .card {
+            position: relative;
+            background-color: white;
+            border-radius: 30px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            overflow: hidden; /* Ensures background image stays inside rounded corners */
+        }
+
+        /* 
+         * BACKGROUND IMAGE CONFIGURATION
+         * Replace the URL below with your actual wedding photo.
+         */
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Placeholder image - Replace url(...) with your photo */
+            background-image: url('https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: blur(8px); /* Blur effect */
+            z-index: 0;
+        }
+
+        /* White/Pink Overlay to make text readable */
+        .card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--card-bg-overlay);
+            z-index: 1;
+        }
+
+        /* Ensures content sits above the background and overlay */
+        .content-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 
+         * TYPOGRAPHY 
+         */
+        h1 {
+            color: var(--primary-pink);
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+
+        .subtitle {
+            color: #757575;
+            margin-top: 5px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* 
+         * COUNTER BOXES 
+         */
+        .row-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .box {
+            background-color: #fff;
+            border: 2px solid var(--soft-pink);
+            border-radius: 15px;
+            padding: 15px 5px;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .box:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-pink);
+        }
+
+        .box .number {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-pink);
+            line-height: 1;
+        }
+
+        .box .label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Seconds centered box */
+        .seconds-container {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .box-large {
+            min-width: 120px;
+            background-color: var(--primary-pink);
+            color: white;
+            border: none;
+        }
+        
+        .box-large .number {
+            color: white;
+            font-size: 2.2rem;
+        }
+        
+        .box-large .label {
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Total Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stats-box {
+            background-color: #fce4ec; /* Very light pink */
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
+        }
+
+        .stats-box .number {
+            font-size: 1.4rem;
+            color: #c2185b; /* Darker pink */
+        }
+
+        /* 
+         * FOOTER INFO 
+         */
+        .footer-info {
+            margin-top: 20px;
+            border-top: 1px dashed #ccc;
+            padding-top: 20px;
+        }
+
+        .start-date {
+            font-size: 0.95rem;
+            color: #888;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .countdown-pill {
+            background-color: var(--primary-pink);
+            color: white;
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(233, 30, 99, 0.4);
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* 
+         * RESPONSIVE ADJUSTMENTS 
+         */
+        @media (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            
+            /* Wrap the 4 top boxes into 2 rows of 2 */
+            .row-grid {
+                grid-template-columns: 1fr 1fr; 
+            }
+            
+            .box .number { font-size: 1.5rem; }
+            
+            .stats-row {
+                grid-template-columns: 1fr; /* Stack total stats vertically */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="content-wrapper">
+            <!-- Header -->
+            <h1>Unser Hochzeitstag</h1>
+            <div class="subtitle">Zeit seit dem schönsten Tag unseres Lebens!</div>
+
+            <!-- Row 1: Years, Days, Hours, Minutes -->
+            <div class="row-grid">
+                <div class="box">
+                    <span class="number" id="val-years">0</span>
+                    <span class="label">Jahre</span>
+                </div>
+                <div class="box">
+                    <span class="number" id="val-days">0</span>
+                    <span class="label">Tage</span>
+                </div>
+                <div class="box">
+                    <span class="number" id="val-hours">0</span>
+                    <span class="label">Stunden</span>
+                </div>
+                <div class="box">
+                    <span class="number" id="val-minutes">0</span>
+                    <span class="label">Minuten</span>
+                </div>
+            </div>
+
+            <!-- Row 2: Seconds (Centered) -->
+            <div class="seconds-container">
+                <div class="box box-large">
+                    <span class="number" id="val-seconds">0</span>
+                    <span class="label">Sekunden</span>
+                </div>
+            </div>
+
+            <!-- Row 3: Total Stats -->
+            <div class="stats-row">
+                <div class="box stats-box">
+                    <span class="number" id="total-hours">0</span>
+                    <span class="label">Gesamte Stunden</span>
+                </div>
+                <div class="box stats-box">
+                    <span class="number" id="total-seconds">0</span>
+                    <span class="label">Gesamte Sekunden</span>
+                </div>
+            </div>
+
+            <!-- Footer Section -->
+            <div class="footer-info">
+                <span class="start-date">Start: 6. September 2025, 11:02 Uhr</span>
+                <div class="countdown-pill" id="next-anniversary">
+                    Berechne...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * CONFIGURATION
+     * Set the wedding date here. 
+     * Month is 0-indexed in JS Date constructor (0=Jan, 8=Sept), 
+     * but standard string parsing "YYYY-MM-DDTHH:mm:ss" is easier/safer.
+     */
+    const WEDDING_DATE_STR = "2025-09-06T11:02:00"; 
+    
+    // DOM Elements
+    const elYears = document.getElementById('val-years');
+    const elDays = document.getElementById('val-days');
+    const elHours = document.getElementById('val-hours');
+    const elMinutes = document.getElementById('val-minutes');
+    const elSeconds = document.getElementById('val-seconds');
+    const elTotalHours = document.getElementById('total-hours');
+    const elTotalSeconds = document.getElementById('total-seconds');
+    const elNextAnniversary = document.getElementById('next-anniversary');
+
+    function updateTimer() {
+        const now = new Date();
+        const weddingDate = new Date(WEDDING_DATE_STR);
+
+        // 1. Calculate Time Since Wedding
+        // Get difference in milliseconds
+        let diff = now - weddingDate;
+
+        // If wedding is in the future relative to system time, handle gracefully (show 0)
+        // Although prompt context says it's Dec 2025, so wedding is past.
+        if (diff < 0) diff = 0;
+
+        // Calculate Totals
+        const totalSeconds = Math.floor(diff / 1000);
+        const totalHours = Math.floor(totalSeconds / 3600);
+
+        // Calculate Breakdown (Years, Days, Hours, Minutes, Seconds)
+        // We calculate "Years" based on full calendar years to be accurate
+        let tempDate = new Date(weddingDate);
+        let years = 0;
+        
+        // Add years until we go past 'now'
+        while(true) {
+            tempDate.setFullYear(tempDate.getFullYear() + 1);
+            if(tempDate > now) {
+                tempDate.setFullYear(tempDate.getFullYear() - 1);
+                break;
+            }
+            years++;
+        }
+
+        // Remaining difference after removing years
+        const diffAfterYears = now - tempDate;
+        
+        // Constants for time conversion
+        const oneDay = 1000 * 60 * 60 * 24;
+        const oneHour = 1000 * 60 * 60;
+        const oneMinute = 1000 * 60;
+        const oneSecond = 1000;
+
+        const days = Math.floor(diffAfterYears / oneDay);
+        const hours = Math.floor((diffAfterYears % oneDay) / oneHour);
+        const minutes = Math.floor((diffAfterYears % oneHour) / oneMinute);
+        const seconds = Math.floor((diffAfterYears % oneMinute) / oneSecond);
+
+        // Update DOM for "Time Since"
+        elYears.innerText = years;
+        elDays.innerText = days;
+        elHours.innerText = hours;
+        elMinutes.innerText = minutes;
+        elSeconds.innerText = seconds;
+
+        // Format totals with German thousands separator
+        elTotalHours.innerText = totalHours.toLocaleString('de-DE');
+        elTotalSeconds.innerText = totalSeconds.toLocaleString('de-DE');
+
+        // 2. Calculate Countdown to Next Anniversary
+        let currentYear = now.getFullYear();
+        let nextAnniversary = new Date(currentYear, 8, 6, 11, 2, 0); // Month 8 is September
+        
+        // If the anniversary for this year has passed, look to next year
+        if (now > nextAnniversary) {
+            nextAnniversary = new Date(currentYear + 1, 8, 6, 11, 2, 0);
+        }
+
+        const diffNext = nextAnniversary - now;
+        
+        // Calculate days and hours remaining
+        const nextDays = Math.floor(diffNext / oneDay);
+        const nextHours = Math.floor((diffNext % oneDay) / oneHour);
+
+        // Format the next anniversary date for display
+        const nextAnniversaryWeekday = nextAnniversary.toLocaleDateString('de-DE', { weekday: 'long' });
+        const nextAnniversaryDateFormatted = nextAnniversary.toLocaleDateString('de-DE', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        elNextAnniversary.innerText = `Noch ${nextDays} Tage und ${nextHours} Stunden bis zum nächsten Hochzeitstag (${nextAnniversaryWeekday}, ${nextAnniversaryDateFormatted} Uhr)`;
+    }
+
+    // Run immediately then every second
+    updateTimer();
+    setInterval(updateTimer, 1000);
+
+</script>
+</body>
+</html>
