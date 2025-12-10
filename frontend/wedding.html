@@ -196,6 +196,22 @@
             color: #c2185b; /* Darker pink */
         }
 
+        /*
+         * QUOTE BOX
+         */
+        .quote-box {
+            background-color: var(--bg-gradient-start);
+            border: 2px solid var(--soft-pink);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--box-shadow);
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #d81b60;
+            line-height: 1.4;
+        }
+
         /* 
          * FOOTER INFO 
          */
@@ -293,6 +309,11 @@
                 </div>
             </div>
 
+            <!-- Quote Block -->
+            <div id="quote-display" class="quote-box">
+                <!-- Quote will be inserted here by JavaScript -->
+            </div>
+
             <!-- Footer Section -->
             <div class="footer-info">
                 <span class="start-date">Start: 6. September 2025, 11:02 Uhr</span>
@@ -309,7 +330,7 @@
      * CONFIGURATION
      * Set the wedding date here. 
      * Month is 0-indexed in JS Date constructor (0=Jan, 8=Sept), 
-     * but standard string parsing "YYYY-MM-DDTHH:mm:ss" is easier/safer.
+     * but standard string parsing "YYYY-MM-DDTHH:mm:ss" is easier/safer. 
      */
     const WEDDING_DATE_STR = "2025-09-06T11:02:00"; 
     
@@ -322,6 +343,40 @@
     const elTotalHours = document.getElementById('total-hours');
     const elTotalSeconds = document.getElementById('total-seconds');
     const elNextAnniversary = document.getElementById('next-anniversary');
+    const elQuoteDisplay = document.getElementById('quote-display');
+
+    // List of humorous and affectionate German quotes
+    const quotes = [
+        "Liebe ist, wenn man sich auch ohne Worte versteht,\naber trotzdem stundenlang quatschen kann.",
+        "Wir sind wie zwei Puzzleteile:\nUnterschiedlich, aber wir passen perfekt zusammen.",
+        "Ehe ist, wenn man sich streitet, wer recht hat,\nund am Ende beide lachen müssen.",
+        "Zusammen sind wir einfach besser.\nWie Kaffee und Kuchen am Sonntagnachmittag.",
+        "Du bist mein Lieblingsmensch,\nauch wenn du mir manchmal den letzten Keks klaust.",
+        "Liebe ist das einzige,\nwas mehr wird, wenn wir es verschwenden.",
+        "Mit dir wird sogar der Einkauf im Supermarkt\nzu einem kleinen Abenteuer.",
+        "Wir passen zusammen wie\nTopf und Deckel (auch wenn es manchmal klappert).",
+        "Echte Liebe ist,\nwenn man sich gegenseitig beim Schnarchen erträgt.",
+        "Du bist mein Anker im Sturm\nund mein Konfetti im Alltag.",
+        "Zuhause ist da,\nwo du bist (und wo das WLAN funktioniert).",
+        "Wir zwei gegen den Rest der Welt\n(und gegen den Abwasch).",
+        "Liebe heißt nicht, dass man sich nie streitet,\nsondern dass man sich immer wieder verträgt.",
+        "Mit dir an meiner Seite\nist jeder Tag ein kleiner Feiertag.",
+        "Du bist der Grund,\nwarum ich öfter auf mein Handy schaue und lächle.",
+        "Unsere Liebe ist wie guter Wein:\nSie wird mit den Jahren immer besser.",
+        "Danke, dass du meine Macken nicht nur erträgst,\nsondern sie sogar ein bisschen magst.",
+        "Wir zwei gegen den Rest der Welt\n(und gegen den Abwasch).",
+        "Du bringst mich zum Lachen,\nselbst wenn ich eigentlich grummelig sein will.",
+        "Glück ist, jemanden zu haben,\nmit dem man auch mal herrlich albern sein kann."
+    ];
+
+    /**
+     * Selects a random quote and displays it.
+     */
+    function displayRandomQuote() {
+        const randomIndex = Math.floor(Math.random() * quotes.length);
+        // Replace newline characters with HTML line breaks for display
+        elQuoteDisplay.innerHTML = quotes[randomIndex].replace(/\n/g, "<br>");
+    }
 
     function updateTimer() {
         const now = new Date();
@@ -407,7 +462,10 @@
         elNextAnniversary.innerText = `Noch ${nextDays} Tage und ${nextHours} Stunden bis zum nächsten Hochzeitstag (${nextAnniversaryWeekday}, ${nextAnniversaryDateFormatted} Uhr)`;
     }
 
-    // Run immediately then every second
+    // Initialize the quote on load
+    displayRandomQuote();
+
+    // Run timer immediately then every second
     updateTimer();
     setInterval(updateTimer, 1000);
 
