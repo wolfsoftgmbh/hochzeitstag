@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const elMinutes = document.getElementById('val-minutes');
     const elTotalHours = document.getElementById('total-hours');
     const elTotalSeconds = document.getElementById('total-seconds');
+    const elTotalDays = document.getElementById('total-days');
     const elNextAnniversary = document.getElementById('next-anniversary');
     const elQuoteDisplay = document.getElementById('quote-display');
     const elWeddingDateDisplay = document.getElementById('wedding-date-display');
@@ -63,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const totalSeconds = Math.floor(diff / 1000);
         const totalHours = Math.floor(totalSeconds / 3600);
+        const totalDays = Math.floor(totalSeconds / (3600 * 24));
 
         let tempDate = new Date(startDate);
         let years = 0;
@@ -87,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const minutes = Math.floor((diffAfterYears % oneHour) / oneMinute);
         const seconds = Math.floor((diffAfterYears % oneMinute) / oneSecond);
 
-        return { years, days, hours, minutes, seconds, totalHours, totalSeconds };
+        return { years, days, hours, minutes, seconds, totalHours, totalSeconds, totalDays };
     }
 
     /**
@@ -131,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elMinutes) elMinutes.innerText = time.minutes;
         if (elTotalHours) elTotalHours.innerText = time.totalHours.toLocaleString('de-DE');
         if (elTotalSeconds) elTotalSeconds.innerText = time.totalSeconds.toLocaleString('de-DE');
+        if (elTotalDays) elTotalDays.innerText = time.totalDays.toLocaleString('de-DE');
 
         // Update History Table
         if (elHistoryList) {
