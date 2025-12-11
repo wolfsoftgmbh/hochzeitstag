@@ -88,8 +88,22 @@ function hochzeitstag_render_shortcode() {
                     <!-- Milestone Box -->
                     <div class="milestone-box">
                         <div class="milestone-title">Besondere Tage</div>
-                        <div id="milestone-list" class="milestone-list">
-                            <!-- Milestones will be inserted here by JavaScript -->
+                        <div class="history-table-container">
+                            <table class="history-table" id="milestone-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ereignis</th>
+                                        <th>Datum</th>
+                                        <th>Mon</th>
+                                        <th>Tage</th>
+                                        <th>Std</th>
+                                        <th>Min</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="milestone-list">
+                                    <!-- Milestones will be inserted here by JavaScript -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 

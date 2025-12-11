@@ -166,31 +166,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Calculates and displays special milestone dates.
+     * Calculates remaining time (Months, Days, Hours, Min) to a target date.
      */
-    function calculateMilestones() {
-        if (!elMilestoneList) return;
-        const weddingDate = new Date(WEDDING_DATE_STR);
+    function calculateRemainingTime(targetDate) {
+        const now = new Date();
+        let diff = targetDate - now;
         
-        const milestones = [
-            { label: "100. Tag", date: new Date(weddingDate.getTime() + (100 * 24 * 60 * 60 * 1000)) },
-            { label: "200. Tag", date: new Date(weddingDate.getTime() + (200 * 24 * 60 * 60 * 1000)) },
-            { label: "300. Tag", date: new Date(weddingDate.getTime() + (300 * 24 * 60 * 60 * 1000)) },
-            { label: "1/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 3)) },
-            { label: "2/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 6)) },
-            { label: "3/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 9)) }
-        ];
+        if (diff <= 0) return null; // Date passed
 
-        let html = '';
-        milestones.forEach(m => {
-            html += `
-                <div class="milestone-item">
-                    <span class="milestone-label">${m.label}:</span>
-                    <span class="milestone-date">${formatMilestoneDate(m.date)}</span>
-                </div>
-            `;
-        });
-        elMilestoneList.innerHTML = html;
+        // Calculate Months
+        let tempDate = new Date(now);
+        let months = 0;
+        while (true) {
+            // Add 1 month safely
+            let nextMonth = new Date(tempDate);
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            
+            // Handle month overflow (e.g. Jan 31 -> Feb 28/29) automatically handled by Date, 
+            // but we want to ensure we don't overshoot target
+            if (nextMonth > targetDate) break;
+            
+            tempDate = nextMonth;
+            months++;
+        }
+
+        // Calculate remaining diff after months
+        let remainingDiff = targetDate - tempDate;
+        
+        const oneDay = 1000 * 60 * 60 * 24;
+        const oneHour = 1000 * 60 * 60;
+        const oneMinute = 1000 * 60;
+
+        const days = Math.floor(remainingDiff / oneDay);
+        const hours = Math.floor((remainingDiff % oneDay) / oneHour);
+        const minutes = Math.floor((remainingDiff % oneHour) / oneMinute);
+
+        return { months, days, hours, minutes };
     }
 
     function updateTimer() {
@@ -234,7 +245,57 @@ document.addEventListener('DOMContentLoaded', () => {
             elHistoryList.innerHTML = historyHtml;
         }
 
-        // Calculate Countdown to Next Anniversary
+        // Update Milestones (Besondere Tage) Table
+        if (elMilestoneList) {
+            const milestones = [
+                { label: "100. Tag", date: new Date(weddingDate.getTime() + (100 * 24 * 60 * 60 * 1000)) },
+                { label: "200. Tag", date: new Date(weddingDate.getTime() + (200 * 24 * 60 * 60 * 1000)) },
+                { label: "300. Tag", date: new Date(weddingDate.getTime() + (300 * 24 * 60 * 60 * 1000)) },
+                { label: "1/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 3)) },
+                { label: "1/2 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 6)) },
+                { label: "3/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 9)) },
+                { label: "1. Jahr", date: new Date(new Date(weddingDate).setFullYear(weddingDate.getFullYear() + 1)) }
+            ];
+
+            // Sort milestones by date
+            milestones.sort((a, b) => a.date - b.date);
+
+            let milestoneHtml = '';
+            milestones.forEach(m => {
+                const remaining = calculateRemainingTime(m.date);
+                let rowStyle = '';
+                let remainingText = '';
+                
+                if (remaining) {
+                    milestoneHtml += `
+                        <tr>
+                            <td>${m.label}</td>
+                            <td>${formatMilestoneDate(m.date)}</td>
+                            <td>${remaining.months}</td>
+                            <td>${remaining.days}</td>
+                            <td>${remaining.hours}</td>
+                            <td>${remaining.minutes}</td>
+                        </tr>
+                    `;
+                } else {
+                    // Option: Show passed events differently or skip?
+                    // Request says "Restlaufzeit" (remaining time). 
+                    // Showing passed events with "0" or "Vergangen" might be clutter.
+                    // For now, I'll list them at the bottom or greyed out?
+                    // Let's list them with "Check" or "-"
+                    milestoneHtml += `
+                        <tr style="opacity: 0.5; text-decoration: line-through;">
+                            <td>${m.label}</td>
+                            <td>${formatMilestoneDate(m.date)}</td>
+                            <td colspan="4">Vergangen</td>
+                        </tr>
+                    `;
+                }
+            });
+            elMilestoneList.innerHTML = milestoneHtml;
+        }
+
+        // Calculate Countdown to Next Anniversary (Footer)
         let currentYear = now.getFullYear();
         let nextAnniversary = new Date(currentYear, 8, 6, 11, 2, 0); // Month 8 is September
         
@@ -261,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize components
     displayRandomQuote();
-    calculateMilestones();
+    // Milestones are now updated in updateTimer
 
     // Run timer immediately then every second
     updateTimer();
