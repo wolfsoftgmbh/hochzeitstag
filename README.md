@@ -14,6 +14,58 @@ A charming and responsive single-page HTML application, now also available as a 
 *   **Localization**: All displayed text is in German, while the code and comments are in English.
 *   **Self-hosted Fonts**: Utilizes locally hosted Google Fonts (`Baloo 2`) for enhanced privacy and performance, adhering to DSGVO regulations.
 
+## 🏛️ Architecture
+
+*   **Type:** Single-Page Application (SPA) / Static Site.
+*   **Frontend Technology Stack:**
+    *   **HTML5:** Semantic structure (`frontend/wedding.html`).
+    *   **CSS3:** Custom styling with CSS Variables (`:root`) for easy theming (gradients, colors), Flexbox and Grid for layout (`frontend/style.css`, `frontend/fonts/fonts.css`).
+    *   **JavaScript (ES6+):** Vanilla JS for date calculations, DOM manipulation, and random quote generation (`frontend/script.js`). No external frameworks or libraries are used.
+*   **Backend (WordPress Plugin):** The `backend/hochzeitstag-plugin/hochzeitstag-plugin.php` file integrates the standalone frontend into WordPress. It enqueues all necessary frontend assets (copied to `backend/hochzeitstag-plugin/assets/`) and provides a `[hochzeitstag]` shortcode to embed the application's HTML structure directly into WordPress pages.
+
+## ⚙️ Key Configurations
+
+Configuration is primarily handled within the `frontend/config.js` file for the standalone version, which is then bundled with the WordPress plugin.
+
+### 1. Wedding and Other Significant Dates
+
+The main dates are configured in `frontend/config.js` within the `HOCHZEITSTAG_CONFIG` object:
+
+```javascript
+const HOCHZEITSTAG_CONFIG = {
+    weddingDate: "YYYY-MM-DDTHH:mm:ss",     // Your wedding date (e.g., "2025-09-06T11:02:00")
+    firstContactDate: "YYYY-MM-DDTHH:mm:ss",// Optional: Date of first contact
+    firstMeetDate: "YYYY-MM-DDTHH:mm:ss",   // Optional: Date of first meeting
+    // ... other configurations
+};
+```
+Replace `YYYY-MM-DDTHH:mm:ss` with your specific dates and times.
+
+### 2. Visual Theme & Background Image
+
+*   **CSS Variables:** Customize colors and gradients by modifying CSS variables in `:root` within `frontend/style.css` (e.g., `--bg-gradient-start`, `--primary-pink`).
+*   **Background Image:** The background image for the main card is defined in `frontend/config.js` and referenced in `frontend/style.css`.
+    *   To change the image, update `backgroundImage` in `frontend/config.js`:
+        ```javascript
+        backgroundImage: 'url("kiss.jpeg")', // Path relative to the CSS file
+        ```
+    *   Ensure the image file (e.g., `kiss.jpeg`) is located in the same directory as `frontend/wedding.html` (for standalone) or `backend/hochzeitstag-plugin/assets/` (for WordPress plugin).
+
+### 3. Quotes
+
+A JavaScript array `quotes` in `frontend/config.js` contains localized (German) strings:
+
+```javascript
+const HOCHZEITSTAG_CONFIG = {
+    // ...
+    quotes: [
+        "Ein Leben ohne Liebe ist wie ein Garten ohne Sonne, in dem die Blumen gestorben sind.",
+        "Liebe ist nicht das, was man erwartet zu bekommen, sondern das, was man bereit ist zu geben.",
+        // ... more quotes
+    ],
+};
+```
+
 ## 🚀 Getting Started (Standalone HTML)
 
 To view the standalone HTML application, simply clone the repository and open the `wedding.html` file in your web browser.
@@ -29,40 +81,15 @@ To view the standalone HTML application, simply clone the repository and open th
 3.  **Open in your browser:**
     Open `wedding.html` with your preferred web browser (e.g., `file:///path/to/hochzeitstag/frontend/wedding.html`).
 
-## ⚙️ Configuration (Standalone HTML)
-
-You can easily customize the wedding date and background image for the standalone version:
-
-### Wedding Date
-
-Edit the `WEDDING_DATE_STR` constant in `frontend/script.js`:
-
-```javascript
-const WEDDING_DATE_STR = "YYYY-MM-DDTHH:mm:ss"; 
-```
-Replace `YYYY-MM-DDTHH:mm:ss` with your specific wedding date and time (e.g., "2025-09-06T11:02:00").
-
-### Background Image
-
-The background image for the main card can be changed by replacing `frontend/kiss.jpeg` with your desired image. Make sure the new image is also named `kiss.jpeg` or update the `background-image` URL in `frontend/style.css`:
-
-```css
-.card::before {
-    /* ... other styles ... */
-    background-image: url('your-image-name.jpeg'); /* Update this line */
-    /* ... other styles ... */
-}
-```
-
 ## 🚀 WordPress Plugin
 
 A dedicated WordPress plugin is now available to easily integrate the wedding countdown into your WordPress site using a shortcode.
 
-### ✨ Features
+### ✨ Features (Plugin Specific)
 
 *   **Shortcode Integration**: Use `[hochzeitstag]` to display the countdown on any page, post, or widget.
 *   **Self-contained Assets**: Includes all necessary CSS, JavaScript, and font files within the plugin for easy deployment and consistent styling.
-*   **Configurable**: The `WEDDING_DATE_STR` can be updated directly within the plugin's `hochzeitstag-plugin.php` file for now (future versions might include admin settings).
+*   **Configurable**: The plugin uses the `config.js` from the frontend, making it easy to configure dates and content by modifying the `config.js` in the plugin's `assets` folder after installation (or before packaging).
 
 ### 📦 Installation
 
@@ -75,32 +102,33 @@ A dedicated WordPress plugin is now available to easily integrate the wedding co
     *   Click **"Choose File"**, select `backend/hochzeitstag-plugin.zip` from your cloned repository, and click **"Install Now"**.
     *   After installation, click **"Activate Plugin"**.
 
-### 💡 Usage
+### 💡 Usage (Plugin)
 
 Once activated, simply add the shortcode `[hochzeitstag]` to any post, page, or text widget where you want the countdown to appear.
 
 ### ⚙️ Configuration (WordPress Plugin)
 
-For now, the wedding date for the WordPress plugin needs to be edited directly in the plugin file.
+For the WordPress plugin, the `config.js` file is located within the plugin's `assets` folder after installation. To modify the wedding date or other configurations:
 
-Edit the `hochzeitstag_render_shortcode` function in `backend/hochzeitstag-plugin/hochzeitstag-plugin.php` to adjust the `WEDDING_DATE_STR` within the script block. (Note: Future versions might offer admin settings for easier configuration.)
+1.  **Locate the plugin files:** Access your WordPress installation files (via FTP or hosting file manager).
+2.  **Navigate to the plugin's assets folder:** `wp-content/plugins/hochzeitstag-plugin/assets/`
+3.  **Edit `config.js`:** Open `config.js` and update the `HOCHZEITSTAG_CONFIG` variables as described in the "Wedding and Other Significant Dates" section above.
 
-```php
-// Inside hochzeitstag_render_shortcode function
-<script>
-    const WEDDING_DATE_STR = "YYYY-MM-DDTHH:mm:ss"; // Adjust this line
-    // ... rest of the script ...
-</script>
-```
+**Note:** If you are packaging the plugin yourself, you should modify `frontend/config.js` before zipping `hochzeitstag-plugin/` to ensure your desired default configuration is included.
 
-Replace `YYYY-MM-DDTHH:mm:ss` with your specific wedding date and time.
+## 💻 Development & Usage
 
-## 💻 Technologies Used
+*   **Running:** To run the standalone version, open `frontend/wedding.html` directly in a modern web browser. A simple HTTP server is recommended for better asset loading behavior in some browsers.
+*   **Conventions:**
+    *   **Localization:** UI text is in **German**. Code comments and variable names are in **English**.
+    *   **Formatting:** Standard indentation (4 spaces), clear separation of CSS, HTML, and JS blocks.
+
+## 🌍 Technologies Used
 
 *   HTML5
-*   CSS3
-*   JavaScript (ES6+)
-*   WordPress (PHP)
+*   CSS3 (with CSS Variables, Flexbox, Grid)
+*   JavaScript (ES6+, Vanilla JS)
+*   WordPress (PHP for plugin integration)
 
 ## 🤝 Contributing
 
