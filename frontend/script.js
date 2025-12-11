@@ -267,4 +267,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run timer immediately then every second
     updateTimer();
     setInterval(updateTimer, 1000);
+
+    // Smooth scroll to anchor if hash is present in URL, after content is rendered
+    window.addEventListener('load', () => {
+        if (window.location.hash) {
+            setTimeout(() => {
+                const element = document.querySelector(window.location.hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100); // Give a small delay for content to fully settle
+        }
+    });
 });
