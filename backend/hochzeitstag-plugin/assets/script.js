@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const WEDDING_DATE_STR = "2025-09-06T11:02:00"; 
     
+    // History Events Configuration
+    const historyEvents = [
+        { name: "Erster Kontakt", date: "2014-01-11T19:02:00" },
+        { name: "Zusammen", date: "2014-04-01T21:02:00" },
+        { name: "Hochzeit", date: WEDDING_DATE_STR }
+    ];
+
     // DOM Elements
     const elYears = document.getElementById('val-years');
     const elDays = document.getElementById('val-days');
@@ -18,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const elQuoteDisplay = document.getElementById('quote-display');
     const elWeddingDateDisplay = document.getElementById('wedding-date-display');
     const elMilestoneList = document.getElementById('milestone-list');
+    const elHistoryList = document.getElementById('history-list');
 
     // List of humorous and affectionate German quotes
     const quotes = [
@@ -109,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayRandomQuote() {
         if (!elQuoteDisplay) return;
         const randomIndex = Math.floor(Math.random() * quotes.length);
-        // Replace newline characters with HTML line breaks for display
         elQuoteDisplay.innerHTML = quotes[randomIndex].replace(/\n/g, "<br>");
     }
 
@@ -123,39 +130,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * Calculates time difference breakdown.
+     */
+    function calculateTimeComponents(startDate, endDate) {
+        let diff = endDate - startDate;
+        if (diff < 0) diff = 0;
+
+        const totalSeconds = Math.floor(diff / 1000);
+        const totalHours = Math.floor(totalSeconds / 3600);
+
+        let tempDate = new Date(startDate);
+        let years = 0;
+        
+        while(true) {
+            tempDate.setFullYear(tempDate.getFullYear() + 1);
+            if(tempDate > endDate) {
+                tempDate.setFullYear(tempDate.getFullYear() - 1);
+                break;
+            }
+            years++;
+        }
+
+        const diffAfterYears = endDate - tempDate;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const oneHour = 1000 * 60 * 60;
+        const oneMinute = 1000 * 60;
+        const oneSecond = 1000;
+
+        const days = Math.floor(diffAfterYears / oneDay);
+        const hours = Math.floor((diffAfterYears % oneDay) / oneHour);
+        const minutes = Math.floor((diffAfterYears % oneHour) / oneMinute);
+        const seconds = Math.floor((diffAfterYears % oneMinute) / oneSecond);
+
+        return { years, days, hours, minutes, seconds, totalHours, totalSeconds };
+    }
+
+    /**
      * Calculates and displays special milestone dates.
      */
     function calculateMilestones() {
         if (!elMilestoneList) return;
         const weddingDate = new Date(WEDDING_DATE_STR);
         
-        // Define milestones: Label and calculation function
         const milestones = [
-            {
-                label: "100. Tag", 
-                date: new Date(weddingDate.getTime() + (100 * 24 * 60 * 60 * 1000)) 
-            },
-            {
-                label: "200. Tag", 
-                date: new Date(weddingDate.getTime() + (200 * 24 * 60 * 60 * 1000)) 
-            },
-            {
-                label: "300. Tag", 
-                date: new Date(weddingDate.getTime() + (300 * 24 * 60 * 60 * 1000)) 
-            },
-            {
-                label: "1/4 Jahr", 
-                // 3 months approx, but precisely adding months is better for "Year" milestones
-                date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 3)) 
-            },
-            {
-                label: "2/4 Jahr", 
-                date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 6)) 
-            },
-            {
-                label: "3/4 Jahr", 
-                date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 9)) 
-            }
+            { label: "100. Tag", date: new Date(weddingDate.getTime() + (100 * 24 * 60 * 60 * 1000)) },
+            { label: "200. Tag", date: new Date(weddingDate.getTime() + (200 * 24 * 60 * 60 * 1000)) },
+            { label: "300. Tag", date: new Date(weddingDate.getTime() + (300 * 24 * 60 * 60 * 1000)) },
+            { label: "1/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 3)) },
+            { label: "2/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 6)) },
+            { label: "3/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 9)) }
         ];
 
         let html = '';
@@ -167,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
         });
-
         elMilestoneList.innerHTML = html;
     }
 
@@ -175,91 +197,61 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         const weddingDate = new Date(WEDDING_DATE_STR);
 
-        // Display formatted wedding date (Start date)
+        // Update Main Wedding Timer
         if (elWeddingDateDisplay) {
             const weddingDateFormatted = weddingDate.toLocaleDateString('de-DE', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
             });
             elWeddingDateDisplay.innerText = `Start: ${weddingDateFormatted} Uhr`;
         }
 
-        // 1. Calculate Time Since Wedding
-        // Get difference in milliseconds
-        let diff = now - weddingDate;
+        const time = calculateTimeComponents(weddingDate, now);
 
-        // If wedding is in the future relative to system time, handle gracefully (show 0)
-        // Although prompt context says it's Dec 2025, so wedding is past.
-        if (diff < 0) diff = 0;
+        if (elYears) elYears.innerText = time.years;
+        if (elDays) elDays.innerText = time.days;
+        if (elHours) elHours.innerText = time.hours;
+        if (elMinutes) elMinutes.innerText = time.minutes;
+        if (elTotalHours) elTotalHours.innerText = time.totalHours.toLocaleString('de-DE');
+        if (elTotalSeconds) elTotalSeconds.innerText = time.totalSeconds.toLocaleString('de-DE');
 
-        // Calculate Totals
-        const totalSeconds = Math.floor(diff / 1000);
-        const totalHours = Math.floor(totalSeconds / 3600);
-
-        // Calculate Breakdown (Years, Days, Hours, Minutes, Seconds)
-        // We calculate "Years" based on full calendar years to be accurate
-        let tempDate = new Date(weddingDate);
-        let years = 0;
-        
-        // Add years until we go past 'now'
-        while(true) {
-            tempDate.setFullYear(tempDate.getFullYear() + 1);
-            if(tempDate > now) {
-                tempDate.setFullYear(tempDate.getFullYear() - 1);
-                break;
-            }
-            years++;
+        // Update History Table
+        if (elHistoryList) {
+            let historyHtml = '';
+            historyEvents.forEach(event => {
+                const eventDate = new Date(event.date);
+                const eventTime = calculateTimeComponents(eventDate, now);
+                historyHtml += `
+                    <tr>
+                        <td>${event.name}</td>
+                        <td>${eventTime.years}</td>
+                        <td>${eventTime.days}</td>
+                        <td>${eventTime.hours}</td>
+                        <td>${eventTime.minutes}</td>
+                        <td>${eventTime.seconds}</td>
+                    </tr>
+                `;
+            });
+            elHistoryList.innerHTML = historyHtml;
         }
 
-        // Remaining difference after removing years
-        const diffAfterYears = now - tempDate;
-        
-        // Constants for time conversion
-        const oneDay = 1000 * 60 * 60 * 24;
-        const oneHour = 1000 * 60 * 60;
-        const oneMinute = 1000 * 60;
-        const oneSecond = 1000;
-
-        const days = Math.floor(diffAfterYears / oneDay);
-        const hours = Math.floor((diffAfterYears % oneDay) / oneHour);
-        const minutes = Math.floor((diffAfterYears % oneHour) / oneMinute);
-
-        // Update DOM for "Time Since"
-        if (elYears) elYears.innerText = years;
-        if (elDays) elDays.innerText = days;
-        if (elHours) elHours.innerText = hours;
-        if (elMinutes) elMinutes.innerText = minutes;
-
-        // Format totals with German thousands separator
-        if (elTotalHours) elTotalHours.innerText = totalHours.toLocaleString('de-DE');
-        if (elTotalSeconds) elTotalSeconds.innerText = totalSeconds.toLocaleString('de-DE');
-
-        // 2. Calculate Countdown to Next Anniversary
+        // Calculate Countdown to Next Anniversary
         let currentYear = now.getFullYear();
         let nextAnniversary = new Date(currentYear, 8, 6, 11, 2, 0); // Month 8 is September
         
-        // If the anniversary for this year has passed, look to next year
         if (now > nextAnniversary) {
             nextAnniversary = new Date(currentYear + 1, 8, 6, 11, 2, 0);
         }
 
         const diffNext = nextAnniversary - now;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const oneHour = 1000 * 60 * 60;
         
-        // Calculate days and hours remaining
         const nextDays = Math.floor(diffNext / oneDay);
         const nextHours = Math.floor((diffNext % oneDay) / oneHour);
 
-        // Format the next anniversary date for display
         const nextAnniversaryWeekday = nextAnniversary.toLocaleDateString('de-DE', { weekday: 'short' });
         const nextAnniversaryDateFormatted = nextAnniversary.toLocaleDateString('de-DE', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
         if (elNextAnniversary) {

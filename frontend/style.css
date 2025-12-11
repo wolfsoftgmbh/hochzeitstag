@@ -140,8 +140,6 @@ h1 {
     display: block;
 }
 
-
-
 /* Total Stats Row */
 .stats-row {
     display: grid;
@@ -258,6 +256,33 @@ h1 {
     box-sizing: border-box;
 }
 
+/* History Table Styles */
+.history-table-container {
+    overflow-x: auto;
+}
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+.history-table th, .history-table td {
+    padding: 8px 4px; /* Reduced padding for mobile */
+    text-align: center;
+    border-bottom: 1px dashed #eee;
+}
+.history-table th {
+    color: var(--primary-pink);
+    font-weight: 700;
+}
+.history-table td {
+    color: #666;
+}
+.history-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+    color: #d81b60;
+}
+
 /* 
  * RESPONSIVE ADJUSTMENTS 
  */
@@ -283,5 +308,10 @@ h1 {
     .milestone-date {
         text-align: left;
         margin-top: 2px;
+    }
+    
+    .history-table th, .history-table td {
+        font-size: 0.8rem;
+        padding: 6px 2px;
     }
 }
