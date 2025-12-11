@@ -241,10 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Calculate Countdown to Next Anniversary (Footer)
         let currentYear = now.getFullYear();
-        let nextAnniversary = new Date(currentYear, 8, 6, 11, 2, 0); // Month 8 is September
+        let nextAnniversary = new Date(currentYear, weddingDate.getMonth(), weddingDate.getDate(), weddingDate.getHours(), weddingDate.getMinutes(), weddingDate.getSeconds());
         
         if (now > nextAnniversary) {
-            nextAnniversary = new Date(currentYear + 1, 8, 6, 11, 2, 0);
+            nextAnniversary.setFullYear(currentYear + 1);
         }
 
         const diffNext = nextAnniversary - now;
