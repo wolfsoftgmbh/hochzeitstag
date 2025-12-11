@@ -246,52 +246,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update Milestones (Besondere Tage) Table
         if (elMilestoneList) {
-            let baseDate = new Date(weddingDate);
-            if (now > baseDate) {
-                let currentYear = now.getFullYear();
-                let annivThisYear = new Date(baseDate);
-                annivThisYear.setFullYear(currentYear);
-                
-                if (now >= annivThisYear) {
-                    baseDate = annivThisYear;
-                } else {
-                    let annivLastYear = new Date(baseDate);
-                    annivLastYear.setFullYear(currentYear - 1);
-                    baseDate = annivLastYear;
-                }
+            const milestones = [];
+
+            // 1. Calculate Day Multiples (every 100 days)
+            const oneDayMs = 1000 * 60 * 60 * 24;
+            const diffDays = (now - weddingDate) / oneDayMs;
+            let startMultiple100 = Math.floor(diffDays / 100) + 1;
+            // If strictly negative (future wedding), start at 1
+            if (startMultiple100 < 1) startMultiple100 = 1;
+
+            // Generate next 3 100-day milestones
+            for (let i = 0; i < 3; i++) {
+                const multiple = startMultiple100 + i;
+                milestones.push({
+                    label: `${multiple * 100}. Tag`,
+                    date: new Date(weddingDate.getTime() + (multiple * 100 * oneDayMs))
+                });
             }
+
+            // 2. Calculate Quarter-Year Multiples (every 3 months)
+            // Calculate total months passed roughly
+            let diffMonths = (now.getFullYear() - weddingDate.getFullYear()) * 12 + (now.getMonth() - weddingDate.getMonth());
+            // Check day to be precise
+            if (now.getDate() < weddingDate.getDate()) diffMonths--;
             
-            function getNextOccurrence(base, offsetFn) {
-                let date = offsetFn(new Date(base));
-                if (date < now) {
-                    let nextBase = new Date(base);
-                    nextBase.setFullYear(base.getFullYear() + 1);
-                    date = offsetFn(nextBase);
+            let startQuarter = Math.floor(diffMonths / 3) + 1;
+            if (startQuarter < 1) startQuarter = 1;
+
+            // Generate next 4 quarter milestones
+            for (let i = 0; i < 4; i++) {
+                const q = startQuarter + i;
+                const targetDate = new Date(weddingDate);
+                targetDate.setMonth(weddingDate.getMonth() + (q * 3));
+                
+                let years = Math.floor((q * 3) / 12);
+                let remainder = (q * 3) % 12;
+                
+                let label = "";
+                if (remainder === 0) {
+                    label = `${years}. Hochzeitstag`;
+                    // First year is usually "1. Jahr" or "1. Hochzeitstag"
+                    if (years === 1) label = "1. Hochzeitstag";
+                } else {
+                    let fraction = "";
+                    if (remainder === 3) fraction = "1/4";
+                    else if (remainder === 6) fraction = "1/2";
+                    else if (remainder === 9) fraction = "3/4";
+                    
+                    if (years > 0) label = `${years} ${fraction} Jahre`;
+                    else label = `${fraction} Jahr`;
                 }
-                return date;
+
+                milestones.push({
+                    label: label,
+                    date: targetDate
+                });
             }
 
-            const milestoneDefinitions = [
-                { label: "100. Tag", offset: d => new Date(d.getTime() + (100 * 24 * 60 * 60 * 1000)) },
-                { label: "1/2 Jahr", offset: d => new Date(new Date(d).setMonth(d.getMonth() + 6)) },
-                { label: "200. Tag", offset: d => new Date(d.getTime() + (200 * 24 * 60 * 60 * 1000)) },
-                { label: "3/4 Jahr", offset: d => new Date(new Date(d).setMonth(d.getMonth() + 9)) },
-                { label: "300. Tag", offset: d => new Date(d.getTime() + (300 * 24 * 60 * 60 * 1000)) },
-                { label: "Hochzeitstag", offset: d => new Date(new Date(d).setFullYear(d.getFullYear() + 1)) }
-            ];
+            // Filter out any past dates (just in case logic was slightly off)
+            const futureMilestones = milestones.filter(m => m.date > now);
 
-            const milestones = milestoneDefinitions.map(def => {
-                return {
-                    label: def.label,
-                    date: getNextOccurrence(baseDate, def.offset)
-                };
-            });
+            // Sort by date
+            futureMilestones.sort((a, b) => a.date - b.date);
 
-            // Sort milestones by date
-            milestones.sort((a, b) => a.date - b.date);
+            // Take top 6
+            const displayMilestones = futureMilestones.slice(0, 6);
 
             let milestoneHtml = '';
-            milestones.forEach(m => {
+            displayMilestones.forEach(m => {
                 const remaining = calculateRemainingTime(m.date);
                 if (remaining) {
                     milestoneHtml += `
@@ -326,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nextAnniversaryWeekday = nextAnniversary.toLocaleDateString('de-DE', { weekday: 'short' });
         const nextAnniversaryDateFormatted = nextAnniversary.toLocaleDateString('de-DE', {
-            day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
         if (elNextAnniversary) {
