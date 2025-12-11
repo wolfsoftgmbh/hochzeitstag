@@ -1,6 +1,6 @@
 # Hochzeitstag Countdown
 
-A charming and responsive single-page HTML application designed to celebrate a wedding anniversary. It beautifully displays the time elapsed since the wedding day and counts down to the next anniversary, all within a soft, romantic theme.
+A charming and responsive single-page HTML application, now also available as a WordPress plugin, designed to celebrate a wedding anniversary. It beautifully displays the time elapsed since the wedding day and counts down to the next anniversary, all within a soft, romantic theme. **Google Fonts are now self-hosted for improved privacy and DSGVO compliance.**
 
 ## ✨ Features
 
@@ -12,10 +12,11 @@ A charming and responsive single-page HTML application designed to celebrate a w
 *   **Responsive Design**: Adapts beautifully to various screen sizes, from desktop to mobile.
 *   **Themable**: Soft pink gradient background, rounded info boxes, and custom background image for a personal touch.
 *   **Localization**: All displayed text is in German, while the code and comments are in English.
+*   **Self-hosted Fonts**: Utilizes locally hosted Google Fonts (`Baloo 2`) for enhanced privacy and performance, adhering to DSGVO regulations.
 
-## 🚀 Getting Started
+## 🚀 Getting Started (Standalone HTML)
 
-To view this application, simply clone the repository and open the `wedding.html` file in your web browser.
+To view the standalone HTML application, simply clone the repository and open the `wedding.html` file in your web browser.
 
 1.  **Clone the repository:**
     ```bash
@@ -28,13 +29,13 @@ To view this application, simply clone the repository and open the `wedding.html
 3.  **Open in your browser:**
     Open `wedding.html` with your preferred web browser (e.g., `file:///path/to/hochzeitstag/frontend/wedding.html`).
 
-## 🛠️ Configuration
+## ⚙️ Configuration (Standalone HTML)
 
-You can easily customize the wedding date and background image:
+You can easily customize the wedding date and background image for the standalone version:
 
 ### Wedding Date
 
-Edit the `WEDDING_DATE_STR` constant in `frontend/wedding.html`:
+Edit the `WEDDING_DATE_STR` constant in `frontend/script.js`:
 
 ```javascript
 const WEDDING_DATE_STR = "YYYY-MM-DDTHH:mm:ss"; 
@@ -43,7 +44,7 @@ Replace `YYYY-MM-DDTHH:mm:ss` with your specific wedding date and time (e.g., "2
 
 ### Background Image
 
-The background image for the main card can be changed by replacing `frontend/kiss.jpeg` with your desired image. Make sure the new image is also named `kiss.jpeg` or update the `background-image` URL in the `<style>` block of `frontend/wedding.html`:
+The background image for the main card can be changed by replacing `frontend/kiss.jpeg` with your desired image. Make sure the new image is also named `kiss.jpeg` or update the `background-image` URL in `frontend/style.css`:
 
 ```css
 .card::before {
@@ -53,11 +54,53 @@ The background image for the main card can be changed by replacing `frontend/kis
 }
 ```
 
+## 🚀 WordPress Plugin
+
+A dedicated WordPress plugin is now available to easily integrate the wedding countdown into your WordPress site using a shortcode.
+
+### ✨ Features
+
+*   **Shortcode Integration**: Use `[hochzeitstag]` to display the countdown on any page, post, or widget.
+*   **Self-contained Assets**: Includes all necessary CSS, JavaScript, and font files within the plugin for easy deployment and consistent styling.
+*   **Configurable**: The `WEDDING_DATE_STR` can be updated directly within the plugin's `hochzeitstag-plugin.php` file for now (future versions might include admin settings).
+
+### 📦 Installation
+
+1.  **Download the plugin:**
+    *   The plugin is available as `backend/hochzeitstag-plugin.zip` in this repository.
+2.  **Upload via WordPress Admin:**
+    *   Log in to your WordPress admin dashboard.
+    *   Navigate to **Plugins > Add New**.
+    *   Click the **"Upload Plugin"** button at the top of the page.
+    *   Click **"Choose File"**, select `backend/hochzeitstag-plugin.zip` from your cloned repository, and click **"Install Now"**.
+    *   After installation, click **"Activate Plugin"**.
+
+### 💡 Usage
+
+Once activated, simply add the shortcode `[hochzeitstag]` to any post, page, or text widget where you want the countdown to appear.
+
+### ⚙️ Configuration (WordPress Plugin)
+
+For now, the wedding date for the WordPress plugin needs to be edited directly in the plugin file.
+
+Edit the `hochzeitstag_render_shortcode` function in `backend/hochzeitstag-plugin/hochzeitstag-plugin.php` to adjust the `WEDDING_DATE_STR` within the script block. (Note: Future versions might offer admin settings for easier configuration.)
+
+```php
+// Inside hochzeitstag_render_shortcode function
+<script>
+    const WEDDING_DATE_STR = "YYYY-MM-DDTHH:mm:ss"; // Adjust this line
+    // ... rest of the script ...
+</script>
+```
+
+Replace `YYYY-MM-DDTHH:mm:ss` with your specific wedding date and time.
+
 ## 💻 Technologies Used
 
 *   HTML5
 *   CSS3
 *   JavaScript (ES6+)
+*   WordPress (PHP)
 
 ## 🤝 Contributing
 
