@@ -1,141 +1,116 @@
 <?php
 /**
- * Plugin Name: Hochzeitstag Countdown & Notifier
- * Description: Displays your wedding countdown at /hochzeitstag/ and sends email notifications 1 day before special milestones.
+ * Plugin Name: Hochzeitstag Countdown
+ * Description: A romantic countdown to your wedding anniversary. Use shortcode [hochzeitstag] to display.
  * Version: 1.0
- * Author: Wolfsoft GmbH
+ * Author: Gemini
  */
 
-// Prevent direct access
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // Exit if accessed directly
 }
-
-// Configuration
-define('HOCHZEITSTAG_WEDDING_DATE', '2025-09-06 11:02:00');
-define('HOCHZEITSTAG_EMAIL_TO', 'klaus@wolfsoft.de');
-define('HOCHZEITSTAG_SLUG', 'hochzeitstag');
 
 /**
- * 1. DISPLAY LOGIC
- * Intercept requests to /hochzeitstag/ and serve the static HTML file.
+ * Enqueue scripts and styles.
  */
-function hochzeitstag_rewrite_rule() {
-    add_rewrite_rule('^' . HOCHZEITSTAG_SLUG . '/?$', 'index.php?hochzeitstag_page=1', 'top');
+function hochzeitstag_enqueue_assets() {
+    // Only load assets if the shortcode is present (optional optimization, but good practice)
+    // For simplicity, we load globally or check for post content. 
+    // Here we load globally to ensure it works, but in production, conditional loading is better.
+    
+    // Enqueue Local Fonts
+    wp_enqueue_style( 'hochzeitstag-fonts', plugins_url( 'assets/fonts/fonts.css', __FILE__ ), array(), '1.0' );
+
+    // Enqueue Main Styles
+    wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.0' );
+
+    // Enqueue Script
+    wp_enqueue_script( 'hochzeitstag-script', plugins_url( 'assets/script.js', __FILE__ ), array(), '1.0', true );
 }
-add_action('init', 'hochzeitstag_rewrite_rule');
-
-function hochzeitstag_query_vars($vars) {
-    $vars[] = 'hochzeitstag_page';
-    return $vars;
-}
-add_filter('query_vars', 'hochzeitstag_query_vars');
-
-function hochzeitstag_template_include($template) {
-    if (get_query_var('hochzeitstag_page')) {
-        $plugin_dir = plugin_dir_path(__FILE__);
-        $html_file = $plugin_dir . 'index.html';
-
-        if (file_exists($html_file)) {
-            // We serve the file directly. 
-            // We need to fix the image path because the HTML expects 'kiss.jpeg' to be relative.
-            // We can read the content and replace the image URL with the full plugin URL.
-            $content = file_get_contents($html_file);
-            $image_url = plugins_url('kiss.jpeg', __FILE__);
-            
-            // Replace 'kiss.jpeg' with the full URL to the image in the plugin folder
-            $content = str_replace("url('kiss.jpeg')", "url('$image_url')", $content);
-            $content = str_replace('url("kiss.jpeg")', "url('$image_url')", $content);
-
-            echo $content;
-            exit;
-        }
-    }
-    return $template;
-}
-add_action('template_include', 'hochzeitstag_template_include');
-
+add_action( 'wp_enqueue_scripts', 'hochzeitstag_enqueue_assets' );
 
 /**
- * 2. EMAIL NOTIFICATION LOGIC
- * Schedule a daily event to check for milestones.
+ * Shortcode callback to render the countdown.
  */
+function hochzeitstag_render_shortcode() {
+    ob_start();
+    ?>
+    <!-- Wrapper to potentially isolate styles if needed, though scoped CSS is hard without Shadow DOM. 
+         The styles in style.css are quite specific (.card, .container) but might conflict with themes. 
+         For now, we use the provided structure. -->
+    <div class="hochzeitstag-plugin-container">
+        <div class="container">
+            <div class="card">
+                <div class="content-wrapper">
+                    <!-- Header -->
+                    <h1>Unser Hochzeitstag</h1>
+                    <div class="subtitle">Zeit seit dem schönsten Tag unseres Lebens!</div>
 
-// Add a custom schedule interval if needed (daily is default in WP, but let's be sure)
-function hochzeitstag_cron_schedules($schedules) {
-    if (!isset($schedules['daily'])) {
-        $schedules['daily'] = array(
-            'interval' => 86400,
-            'display'  => __('Once Daily')
-        );
-    }
-    return $schedules;
+                    <!-- Quote Block -->
+                    <div id="quote-display" class="quote-box">
+                        <!-- Quote will be inserted here by JavaScript -->
+                    </div>
+
+                    <!-- Row 1: Years, Days, Hours, Minutes -->
+                    <div class="row-grid">
+                        <div class="box">
+                            <span class="number" id="val-years">0</span>
+                            <span class="label">Jahre</span>
+                        </div>
+                        <div class="box">
+                            <span class="number" id="val-days">0</span>
+                            <span class="label">Tage</span>
+                        </div>
+                        <div class="box">
+                            <span class="number" id="val-hours">0</span>
+                            <span class="label">Stunden</span>
+                        </div>
+                        <div class="box">
+                            <span class="number" id="val-minutes">0</span>
+                            <span class="label">Minuten</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Seconds (Centered) -->
+                    <div class="seconds-container">
+                        <div class="box box-large">
+                            <span class="number" id="val-seconds">0</span>
+                            <span class="label">Sekunden</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Total Stats -->
+                    <div class="stats-row">
+                        <div class="box stats-box">
+                            <span class="number" id="total-hours">0</span>
+                            <span class="label">Gesamte Stunden</span>
+                        </div>
+                        <div class="box stats-box">
+                            <span class="number" id="total-seconds">0</span>
+                            <span class="label">Gesamte Sekunden</span>
+                        </div>
+                    </div>
+
+                    <!-- Milestone Box -->
+                    <div class="milestone-box">
+                        <div class="milestone-title">Besondere Tage</div>
+                        <div id="milestone-list" class="milestone-list">
+                            <!-- Milestones will be inserted here by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Footer Section -->
+                    <div class="footer-info">
+                        <span class="start-date" id="wedding-date-display"></span>
+                        <div class="countdown-pill" id="next-anniversary">
+                            Berechne...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
 }
-add_filter('cron_schedules', 'hochzeitstag_cron_schedules');
-
-// Schedule the event on plugin activation
-register_activation_hook(__FILE__, 'hochzeitstag_activate');
-function hochzeitstag_activate() {
-    if (!wp_next_scheduled('hochzeitstag_daily_event')) {
-        wp_schedule_event(time(), 'daily', 'hochzeitstag_daily_event');
-    }
-    // Flush rewrite rules so the /hochzeitstag/ link works immediately
-    hochzeitstag_rewrite_rule();
-    flush_rewrite_rules();
-}
-
-// Clear the schedule on deactivation
-register_deactivation_hook(__FILE__, 'hochzeitstag_deactivate');
-function hochzeitstag_deactivate() {
-    $timestamp = wp_next_scheduled('hochzeitstag_daily_event');
-    wp_unschedule_event($timestamp, 'hochzeitstag_daily_event');
-}
-
-// The core logic to check dates and send mail
-add_action('hochzeitstag_daily_event', 'hochzeitstag_check_dates');
-function hochzeitstag_check_dates() {
-    $wedding_date = new DateTime(HOCHZEITSTAG_WEDDING_DATE);
-    
-    // We want to notify 1 day BEFORE the event.
-    // So if Tomorrow == EventDate, we send mail today.
-    $tomorrow = new DateTime('tomorrow'); 
-
-    // Define Milestones (Must match the JS logic)
-    $milestones = array();
-
-    // Days: 100, 200, 300
-    foreach ([100, 200, 300] as $days) {
-        $date = clone $wedding_date;
-        $date->modify("+$days days");
-        $milestones["$days. Tag"] = $date;
-    }
-
-    // Months: 3 (1/4 Jahr), 6 (2/4 Jahr), 9 (3/4 Jahr)
-    $quarter_map = [3 => '1/4 Jahr', 6 => '2/4 Jahr', 9 => '3/4 Jahr'];
-    foreach ($quarter_map as $months => $label) {
-        $date = clone $wedding_date;
-        $date->modify("+$months months");
-        $milestones[$label] = $date;
-    }
-
-    // Check matches
-    foreach ($milestones as $label => $date) {
-        // Compare Y-m-d format
-        if ($date->format('Y-m-d') === $tomorrow->format('Y-m-d')) {
-            hochzeitstag_send_mail($label, $date);
-        }
-    }
-}
-
-function hochzeitstag_send_mail($label, $date) {
-    $to = HOCHZEITSTAG_EMAIL_TO;
-    $subject = "Erinnerung: Morgen ist ein besonderer Hochzeitstag-Meilenstein!";
-    $message = "Hallo Klaus,\n\n";
-    $message .= "Nur zur Erinnerung: Morgen erreichen wir einen besonderen Meilenstein!\n\n";
-    $message .= "Meilenstein: " . $label . "\n";
-    $message .= "Datum: " . $date->format('d.m.Y') . "\n\n";
-    $message .= "Vergiss nicht, morgen auf die Countdown-Seite zu schauen!\n";
-    $message .= site_url('/' . HOCHZEITSTAG_SLUG . '/');
-    
-    wp_mail($to, $subject, $message);
-}
+add_shortcode( 'hochzeitstag', 'hochzeitstag_render_shortcode' );
