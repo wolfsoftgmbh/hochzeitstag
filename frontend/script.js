@@ -29,26 +29,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // List of humorous and affectionate German quotes
     const quotes = [
-        "Liebe ist, wenn man sich auch ohne Worte versteht,\naber trotzdem stundenlang quatschen kann.",
+        "Liebe ist, wenn man sich auch ohne Worte versteht,
+aber trotzdem stundenlang quatschen kann.",
         "Wir sind wie zwei Puzzleteile:\nUnterschiedlich, aber wir passen perfekt zusammen.",
-        "Ehe ist, wenn man sich streitet, wer recht hat,\nund am Ende beide lachen müssen.",
+        "Ehe ist, wenn man sich streitet, wer recht hat,
+und am Ende beide lachen müssen.",
         "Zusammen sind wir einfach besser.\nWie Kaffee und Kuchen am Sonntagnachmittag.",
-        "Du bist mein Lieblingsmensch,\nauch wenn du mir manchmal den letzten Keks klaust.",
-        "Liebe ist das einzige,\nwas mehr wird, wenn wir es verschwenden.",
+        "Du bist mein Lieblingsmensch,
+auch wenn du mir manchmal den letzten Keks klaust.",
+        "Liebe ist das einzige,
+was mehr wird, wenn wir es verschwenden.",
         "Mit dir wird sogar der Einkauf im Supermarkt\nzu einem kleinen Abenteuer.",
         "Wir passen zusammen wie\nTopf und Deckel (auch wenn es manchmal klappert).",
-        "Echte Liebe ist,\nwenn man sich gegenseitig beim Schnarchen erträgt.",
+        "Echte Liebe ist,
+wenn man sich gegenseitig beim Schnarchen erträgt.",
         "Du bist mein Anker im Sturm\nund mein Konfetti im Alltag.",
-        "Zuhause ist da,\nwo du bist (und wo das WLAN funktioniert).",
+        "Zuhause ist da,
+wo du bist (und wo das WLAN funktioniert).",
         "Wir sind ein perfektes Team:\nIch sorge für das Chaos, du für die Ordnung.",
-        "Liebe heißt nicht, dass man sich nie streitet,\nsondern dass man sich immer wieder verträgt.",
+        "Liebe heißt nicht, dass man sich nie streitet,
+sondern dass man sich immer wieder verträgt.",
         "Mit dir an meiner Seite\nist jeder Tag ein kleiner Feiertag.",
-        "Du bist der Grund,\nwarum ich öfter auf mein Handy schaue und lächle.",
+        "Du bist der Grund,
+warum ich öfter auf mein Handy schaue und lächle.",
         "Unsere Liebe ist wie guter Wein:\nSie wird mit den Jahren immer besser.",
-        "Danke, dass du meine Macken nicht nur erträgst,\nsondern sie sogar ein bisschen magst.",
+        "Danke, dass du meine Macken nicht nur erträgst,
+sondern sie sogar ein bisschen magst.",
         "Wir zwei gegen den Rest der Welt\n(und gegen den Abwasch).",
-        "Du bringst mich zum Lachen,\nselbst wenn ich eigentlich grummelig sein will.",
-        "Glück ist, jemanden zu haben,\nmit dem man auch mal herrlich albern sein kann.",
+        "Du bringst mich zum Lachen,
+selbst wenn ich eigentlich grummelig sein will.",
+        "Glück ist, jemanden zu haben,
+mit dem man auch mal herrlich albern sein kann.",
         "Du bist der Zucker in meinem Kaffee.",
         "Egal wohin wir gehen, Hauptsache zusammen.",
         "Mit dir macht sogar Nichtstun Spaß.",
@@ -182,8 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let nextMonth = new Date(tempDate);
             nextMonth.setMonth(nextMonth.getMonth() + 1);
             
-            // Handle month overflow (e.g. Jan 31 -> Feb 28/29) automatically handled by Date, 
-            // but we want to ensure we don't overshoot target
+            // Handle month overflow
             if (nextMonth > targetDate) break;
             
             tempDate = nextMonth;
@@ -247,15 +257,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update Milestones (Besondere Tage) Table
         if (elMilestoneList) {
-            const milestones = [
-                { label: "100. Tag", date: new Date(weddingDate.getTime() + (100 * 24 * 60 * 60 * 1000)) },
-                { label: "200. Tag", date: new Date(weddingDate.getTime() + (200 * 24 * 60 * 60 * 1000)) },
-                { label: "300. Tag", date: new Date(weddingDate.getTime() + (300 * 24 * 60 * 60 * 1000)) },
-                { label: "1/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 3)) },
-                { label: "1/2 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 6)) },
-                { label: "3/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 9)) },
-                { label: "1. Jahr", date: new Date(new Date(weddingDate).setFullYear(weddingDate.getFullYear() + 1)) }
+            // Determine the "current base year" for milestones.
+            // Milestones repeat every year (anniversary).
+            // We want to show the NEXT occurrence of: 100 days, 200 days, 300 days, 1/2 year, 3/4 year, Anniversary.
+            // These are technically: Anniversary + 100d, Anniversary + 200d, etc.
+            
+            // Find the most recent anniversary (or wedding date if not yet passed 1st year)
+            let baseDate = new Date(weddingDate);
+            if (now > baseDate) {
+                let currentYear = now.getFullYear();
+                let annivThisYear = new Date(baseDate);
+                annivThisYear.setFullYear(currentYear);
+                
+                if (now >= annivThisYear) {
+                    baseDate = annivThisYear;
+                } else {
+                    let annivLastYear = new Date(baseDate);
+                    annivLastYear.setFullYear(currentYear - 1);
+                    baseDate = annivLastYear;
+                }
+            }
+            
+            // Helper to generate a candidate date
+            // If date < now, add 1 year to base (move to next cycle)
+            function getNextOccurrence(base, offsetFn) {
+                let date = offsetFn(new Date(base));
+                if (date < now) {
+                    // Try next year's base
+                    let nextBase = new Date(base);
+                    nextBase.setFullYear(base.getFullYear() + 1);
+                    date = offsetFn(nextBase);
+                }
+                return date;
+            }
+
+            const milestoneDefinitions = [
+                { label: "100. Tag", offset: d => new Date(d.getTime() + (100 * 24 * 60 * 60 * 1000)) },
+                { label: "1/2 Jahr", offset: d => new Date(new Date(d).setMonth(d.getMonth() + 6)) },
+                { label: "200. Tag", offset: d => new Date(d.getTime() + (200 * 24 * 60 * 60 * 1000)) },
+                { label: "3/4 Jahr", offset: d => new Date(new Date(d).setMonth(d.getMonth() + 9)) },
+                { label: "300. Tag", offset: d => new Date(d.getTime() + (300 * 24 * 60 * 60 * 1000)) },
+                { label: "Hochzeitstag", offset: d => new Date(new Date(d).setFullYear(d.getFullYear() + 1)) }
             ];
+
+            const milestones = milestoneDefinitions.map(def => {
+                return {
+                    label: def.label,
+                    date: getNextOccurrence(baseDate, def.offset)
+                };
+            });
 
             // Sort milestones by date
             milestones.sort((a, b) => a.date - b.date);
@@ -263,9 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let milestoneHtml = '';
             milestones.forEach(m => {
                 const remaining = calculateRemainingTime(m.date);
-                let rowStyle = '';
-                let remainingText = '';
-                
                 if (remaining) {
                     milestoneHtml += `
                         <tr>
@@ -275,19 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${remaining.days}</td>
                             <td>${remaining.hours}</td>
                             <td>${remaining.minutes}</td>
-                        </tr>
-                    `;
-                } else {
-                    // Option: Show passed events differently or skip?
-                    // Request says "Restlaufzeit" (remaining time). 
-                    // Showing passed events with "0" or "Vergangen" might be clutter.
-                    // For now, I'll list them at the bottom or greyed out?
-                    // Let's list them with "Check" or "-"
-                    milestoneHtml += `
-                        <tr style="opacity: 0.5; text-decoration: line-through;">
-                            <td>${m.label}</td>
-                            <td>${formatMilestoneDate(m.date)}</td>
-                            <td colspan="4">Vergangen</td>
                         </tr>
                     `;
                 }
@@ -322,8 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize components
     displayRandomQuote();
-    // Milestones are now updated in updateTimer
-
+    
     // Run timer immediately then every second
     updateTimer();
     setInterval(updateTimer, 1000);

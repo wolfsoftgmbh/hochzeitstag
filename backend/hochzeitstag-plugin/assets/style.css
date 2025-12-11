@@ -283,6 +283,10 @@ h1 {
     color: #d81b60;
 }
 
+.history-table th:first-child {
+    text-align: left;
+}
+
 /* 
  * RESPONSIVE ADJUSTMENTS 
  */

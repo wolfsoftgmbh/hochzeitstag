@@ -182,8 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let nextMonth = new Date(tempDate);
             nextMonth.setMonth(nextMonth.getMonth() + 1);
             
-            // Handle month overflow (e.g. Jan 31 -> Feb 28/29) automatically handled by Date, 
-            // but we want to ensure we don't overshoot target
+            // Handle month overflow
             if (nextMonth > targetDate) break;
             
             tempDate = nextMonth;
@@ -247,15 +246,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update Milestones (Besondere Tage) Table
         if (elMilestoneList) {
-            const milestones = [
-                { label: "100. Tag", date: new Date(weddingDate.getTime() + (100 * 24 * 60 * 60 * 1000)) },
-                { label: "200. Tag", date: new Date(weddingDate.getTime() + (200 * 24 * 60 * 60 * 1000)) },
-                { label: "300. Tag", date: new Date(weddingDate.getTime() + (300 * 24 * 60 * 60 * 1000)) },
-                { label: "1/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 3)) },
-                { label: "1/2 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 6)) },
-                { label: "3/4 Jahr", date: new Date(new Date(weddingDate).setMonth(weddingDate.getMonth() + 9)) },
-                { label: "1. Jahr", date: new Date(new Date(weddingDate).setFullYear(weddingDate.getFullYear() + 1)) }
+            let baseDate = new Date(weddingDate);
+            if (now > baseDate) {
+                let currentYear = now.getFullYear();
+                let annivThisYear = new Date(baseDate);
+                annivThisYear.setFullYear(currentYear);
+                
+                if (now >= annivThisYear) {
+                    baseDate = annivThisYear;
+                } else {
+                    let annivLastYear = new Date(baseDate);
+                    annivLastYear.setFullYear(currentYear - 1);
+                    baseDate = annivLastYear;
+                }
+            }
+            
+            function getNextOccurrence(base, offsetFn) {
+                let date = offsetFn(new Date(base));
+                if (date < now) {
+                    let nextBase = new Date(base);
+                    nextBase.setFullYear(base.getFullYear() + 1);
+                    date = offsetFn(nextBase);
+                }
+                return date;
+            }
+
+            const milestoneDefinitions = [
+                { label: "100. Tag", offset: d => new Date(d.getTime() + (100 * 24 * 60 * 60 * 1000)) },
+                { label: "1/2 Jahr", offset: d => new Date(new Date(d).setMonth(d.getMonth() + 6)) },
+                { label: "200. Tag", offset: d => new Date(d.getTime() + (200 * 24 * 60 * 60 * 1000)) },
+                { label: "3/4 Jahr", offset: d => new Date(new Date(d).setMonth(d.getMonth() + 9)) },
+                { label: "300. Tag", offset: d => new Date(d.getTime() + (300 * 24 * 60 * 60 * 1000)) },
+                { label: "Hochzeitstag", offset: d => new Date(new Date(d).setFullYear(d.getFullYear() + 1)) }
             ];
+
+            const milestones = milestoneDefinitions.map(def => {
+                return {
+                    label: def.label,
+                    date: getNextOccurrence(baseDate, def.offset)
+                };
+            });
 
             // Sort milestones by date
             milestones.sort((a, b) => a.date - b.date);
@@ -263,9 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let milestoneHtml = '';
             milestones.forEach(m => {
                 const remaining = calculateRemainingTime(m.date);
-                let rowStyle = '';
-                let remainingText = '';
-                
                 if (remaining) {
                     milestoneHtml += `
                         <tr>
@@ -275,14 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${remaining.days}</td>
                             <td>${remaining.hours}</td>
                             <td>${remaining.minutes}</td>
-                        </tr>
-                    `;
-                } else {
-                    milestoneHtml += `
-                        <tr style="opacity: 0.5; text-decoration: line-through;">
-                            <td>${m.label}</td>
-                            <td>${formatMilestoneDate(m.date)}</td>
-                            <td colspan="4">Vergangen</td>
                         </tr>
                     `;
                 }
@@ -307,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nextAnniversaryWeekday = nextAnniversary.toLocaleDateString('de-DE', { weekday: 'short' });
         const nextAnniversaryDateFormatted = nextAnniversary.toLocaleDateString('de-DE', {
-            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
         if (elNextAnniversary) {
@@ -317,8 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize components
     displayRandomQuote();
-    // Milestones are now updated in updateTimer
-
+    
     // Run timer immediately then every second
     updateTimer();
     setInterval(updateTimer, 1000);
