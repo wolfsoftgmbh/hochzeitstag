@@ -94,7 +94,6 @@ function hochzeitstag_render_shortcode() {
                                     <tr>
                                         <th>Ereignis</th>
                                         <th>Datum</th>
-                                        <th>Mon</th>
                                         <th>Tage</th>
                                         <th>Std</th>
                                         <th>Min</th>

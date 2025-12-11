@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Calculates remaining time (Months, Days, Hours, Min) to a target date.
+     * Calculates remaining time (Total Days, Hours, Min) to a target date.
      */
     function calculateRemainingTime(targetDate) {
         const now = new Date();
@@ -174,33 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (diff <= 0) return null; // Date passed
 
-        // Calculate Months
-        let tempDate = new Date(now);
-        let months = 0;
-        while (true) {
-            // Add 1 month safely
-            let nextMonth = new Date(tempDate);
-            nextMonth.setMonth(nextMonth.getMonth() + 1);
-            
-            // Handle month overflow
-            if (nextMonth > targetDate) break;
-            
-            tempDate = nextMonth;
-            months++;
-        }
-
-        // Calculate remaining diff after months
-        let remainingDiff = targetDate - tempDate;
-        
         const oneDay = 1000 * 60 * 60 * 24;
         const oneHour = 1000 * 60 * 60;
         const oneMinute = 1000 * 60;
 
-        const days = Math.floor(remainingDiff / oneDay);
-        const hours = Math.floor((remainingDiff % oneDay) / oneHour);
-        const minutes = Math.floor((remainingDiff % oneHour) / oneMinute);
+        // "Summiert Tage" means we don't extract months/years. Just total days.
+        const days = Math.floor(diff / oneDay);
+        const hours = Math.floor((diff % oneDay) / oneHour);
+        const minutes = Math.floor((diff % oneHour) / oneMinute);
 
-        return { months, days, hours, minutes };
+        return { days, hours, minutes };
     }
 
     function updateTimer() {
@@ -320,7 +303,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <tr>
                             <td>${m.label}</td>
                             <td>${formatMilestoneDate(m.date)}</td>
-                            <td>${remaining.months}</td>
                             <td>${remaining.days}</td>
                             <td>${remaining.hours}</td>
                             <td>${remaining.minutes}</td>
