@@ -140,20 +140,7 @@ h1 {
     display: block;
 }
 
-/* Seconds centered box */
-.seconds-container {
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: center;
-}
 
-.box-large {
-    min-width: 120px;
-}
-
-.box-large .number {
-    font-size: 2.2rem;
-}
 
 /* Total Stats Row */
 .stats-row {

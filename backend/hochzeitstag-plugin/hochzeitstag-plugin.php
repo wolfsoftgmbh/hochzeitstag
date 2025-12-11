@@ -71,13 +71,7 @@ function hochzeitstag_render_shortcode() {
                         </div>
                     </div>
 
-                    <!-- Row 2: Seconds (Centered) -->
-                    <div class="seconds-container">
-                        <div class="box box-large">
-                            <span class="number" id="val-seconds">0</span>
-                            <span class="label">Sekunden</span>
-                        </div>
-                    </div>
+
 
                     <!-- Row 3: Total Stats -->
                     <div class="stats-row">

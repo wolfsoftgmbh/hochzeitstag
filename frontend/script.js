@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const elDays = document.getElementById('val-days');
     const elHours = document.getElementById('val-hours');
     const elMinutes = document.getElementById('val-minutes');
-    const elSeconds = document.getElementById('val-seconds');
     const elTotalHours = document.getElementById('total-hours');
     const elTotalSeconds = document.getElementById('total-seconds');
     const elNextAnniversary = document.getElementById('next-anniversary');
@@ -230,14 +229,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const days = Math.floor(diffAfterYears / oneDay);
         const hours = Math.floor((diffAfterYears % oneDay) / oneHour);
         const minutes = Math.floor((diffAfterYears % oneHour) / oneMinute);
-        const seconds = Math.floor((diffAfterYears % oneMinute) / oneSecond);
 
         // Update DOM for "Time Since"
         if (elYears) elYears.innerText = years;
         if (elDays) elDays.innerText = days;
         if (elHours) elHours.innerText = hours;
         if (elMinutes) elMinutes.innerText = minutes;
-        if (elSeconds) elSeconds.innerText = seconds;
 
         // Format totals with German thousands separator
         if (elTotalHours) elTotalHours.innerText = totalHours.toLocaleString('de-DE');
