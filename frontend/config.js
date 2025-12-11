@@ -13,7 +13,7 @@ const HOCHZEITSTAG_CONFIG = {
     // Notification Settings (Placeholder for future functionality)
     emailReminderDays: 7, // Days before event to send email
     emailAddresses: {
-        wife: "wife@example.com",
-        husband: "husband@example.com"
+        wife: "klaus@wolfsoft.de",
+        husband: "klaus@wolfsoft.de"
     }
 };

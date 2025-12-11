@@ -142,3 +142,43 @@ function hochzeitstag_render_shortcode() {
     return ob_get_clean();
 }
 add_shortcode( 'hochzeitstag', 'hochzeitstag_render_shortcode' );
+
+/**
+ * Temporary shortcode to send a test email.
+ * Remove this once email functionality is confirmed.
+ */
+function hochzeitstag_send_test_email_shortcode() {
+    if ( ! function_exists( 'wp_mail' ) ) {
+        return 'WordPress mail function (wp_mail) not available.';
+    }
+
+    // Attempt to read config variables
+    $to_email = '';
+    // This assumes HOCHZEITSTAG_CONFIG is loaded as a global JS var.
+    // In PHP, we can't directly read client-side JS vars.
+    // For a quick test, we'll hardcode or use a placeholder here.
+    // If a config file existed in PHP, we'd read from it.
+    // For now, let's use a placeholder.
+    $to_email = 'test@example.com'; // IMPORTANT: REPLACE WITH A REAL EMAIL FOR TESTING!
+    
+    // Fallback if no specific email is configured for PHP-side testing
+    if (defined('HOCHZEITSTAG_TEST_EMAIL')) {
+        $to_email = HOCHZEITSTAG_TEST_EMAIL;
+    } else {
+        // As a fallback, try to get admin email
+        $to_email = get_option( 'admin_email' );
+    }
+
+    $subject = 'Hochzeitstag Countdown - Test E-Mail';
+    $message = 'Dies ist eine Test-E-Mail vom Hochzeitstag Countdown Plugin. Wenn Sie diese E-Mail erhalten, funktioniert der Mailversand in WordPress.';
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+
+    $sent = wp_mail( $to_email, $subject, $message, $headers );
+
+    if ( $sent ) {
+        return "Test E-Mail wurde an <strong>{$to_email}</strong> gesendet. Bitte überprüfen Sie Ihren Posteingang (und Spam-Ordner).";
+    } else {
+        return "Fehler beim Senden der Test E-Mail an <strong>{$to_email}</strong>.";
+    }
+}
+add_shortcode( 'hochzeitstag_test_email', 'hochzeitstag_send_test_email_shortcode' );
