@@ -13,8 +13,8 @@ const HOCHZEITSTAG_CONFIG = {
     // Notification Settings (Placeholder for future functionality)
     emailReminderDays: 7, // Days before event to send email
     emailAddresses: {
-        wife: { email: "wife@example.com", name: "Liebe Frau" },
-        husband: { email: "husband@example.com", name: "Lieber Mann" }
+        wife: { email: "tanja-risse@gmx.de", name: "Tanja" },
+        husband: { email: "klaus@wolfsoft.de", name: "Klaus" }
     },
 
     // List of humorous and affectionate German quotes
