@@ -18,6 +18,8 @@ const HOCHZEITSTAG_CONFIG = {
         husband: { email: "klaus@wolfsoft.de", name: "Klaus" }
     },
 
+    enableEmailTestButton: true,
+
     // List of humorous and affectionate German quotes/poems (total 120, shorter version)
     quotes: [
         "Liebe ist: zu zweit albern sein.",

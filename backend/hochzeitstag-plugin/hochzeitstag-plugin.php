@@ -31,6 +31,9 @@ function hochzeitstag_enqueue_assets() {
     // Enqueue Script
     wp_enqueue_script( 'hochzeitstag-config', plugins_url( 'assets/config.js', __FILE__ ), array(), '1.0', true );
     wp_enqueue_script( 'hochzeitstag-script', plugins_url( 'assets/script.js', __FILE__ ), array('hochzeitstag-config'), '1.0', true );
+
+    // Pass ajaxurl to our script
+    wp_localize_script( 'hochzeitstag-script', 'hochzeitstag_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
 add_action( 'wp_enqueue_scripts', 'hochzeitstag_enqueue_assets' );
 
@@ -148,199 +151,98 @@ function hochzeitstag_render_shortcode() {
 add_shortcode( 'hochzeitstag', 'hochzeitstag_render_shortcode' );
 
 /**
- * Temporary shortcode to send a test email.
- * Remove this once email functionality is confirmed.
+ * Helper function to prepare and send an email based on wedding configuration.
  *
- * @param array $atts Shortcode attributes.
- * @return string Message indicating email status.
+ * @param array $atts Optional attributes to override config values for testing.
+ * @return array Result of the email attempt (success/failure message).
  */
-function hochzeitstag_send_test_email_shortcode( $atts ) {
+function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     if ( ! function_exists( 'wp_mail' ) ) {
-        return 'WordPress Mail-Funktion (wp_mail) nicht verfügbar.';
+        return array( 'success' => false, 'message' => 'WordPress Mail-Funktion (wp_mail) nicht verfügbar.' );
     }
 
-        // Read config.js content
+    // Read config.js content
+    $config_js_path = plugin_dir_path( __FILE__ ) . 'assets/config.js';
+    $config_js_content = file_get_contents( $config_js_path );
 
-        $config_js_path = plugin_dir_path( __FILE__ ) . 'assets/config.js';
+    // Extract HOCHZEITSTAG_CONFIG object using regex
+    preg_match( '/const HOCHZEITSTAG_CONFIG = (\{[^;]+\});/s', $config_js_content, $matches );
+    $hochzeitstag_config_json = isset( $matches[1] ) ? $matches[1] : '{}';
 
-        $config_js_content = file_get_contents( $config_js_path );
+    // Convert to valid JSON (replace single quotes with double quotes for keys/values)
+    $hochzeitstag_config_json = preg_replace( "/(\w+):/", "\"$1\":", $hochzeitstag_config_json ); // keys
+    $hochzeitstag_config_json = str_replace( "'", "\"", $hochzeitstag_config_json ); // string values
 
+    // Decode JSON into PHP array
+    $hochzeitstag_config = json_decode( $hochzeitstag_config_json, true );
+
+    if ( ! $hochzeitstag_config ) {
+        return array( 'success' => false, 'message' => 'Fehler: Konfiguration konnte nicht geladen oder geparst werden.' );
+    }
+
+    $wedding_date_str = $hochzeitstag_config['weddingDate'];
+    $reminder_days_first = defined( 'HOCHZEITSTAG_REMINDER_DAYS_FIRST' ) ? HOCHZEITSTAG_REMINDER_DAYS_FIRST : ( isset( $hochzeitstag_config['emailReminderDaysFirst'] ) ? $hochzeitstag_config['emailReminderDaysFirst'] : 7 );
+    $reminder_days_second = defined( 'HOCHZEITSTAG_REMINDER_DAYS_SECOND' ) ? HOCHZEITSTAG_REMINDER_DAYS_SECOND : ( isset( $hochzeitstag_config['emailReminderDaysSecond'] ) ? $hochzeitstag_config['emailReminderDaysSecond'] : 1 );
+    $quotes = $hochzeitstag_config['quotes'];
+    $email_addresses = $hochzeitstag_config['emailAddresses'];
+
+    $today = new DateTime();
+    $wedding_date_config = new DateTime( $wedding_date_str );
     
+    // Find the next upcoming anniversary based on the wedding date from config
+    $next_anniversary = new DateTime( $wedding_date_str );
+    while ($next_anniversary < $today) {
+        $next_anniversary->modify('+1 year');
+    }
 
-        // Extract HOCHZEITSTAG_CONFIG object using regex
+    $diff_to_anniversary = $today->diff($next_anniversary);
+    $days_to_anniversary = (int)$diff_to_anniversary->days;
 
-        // This regex is basic and might need refinement for more complex JS objects
+    $send_first_reminder = false;
+    $send_second_reminder = false;
 
-        preg_match( '/const HOCHZEITSTAG_CONFIG = (\{[^;]+\});/s', $config_js_content, $matches );
-
-        $hochzeitstag_config_json = isset( $matches[1] ) ? $matches[1] : '{}';
-
+    if ( $days_to_anniversary == $reminder_days_first ) {
+        $send_first_reminder = true;
+    }
+    if ( $days_to_anniversary == $reminder_days_second ) {
+        $send_second_reminder = true;
+    }
     
+    if ( ! $send_first_reminder && ! $send_second_reminder && ! (isset($atts['force_send']) && $atts['force_send']) ) {
+        return array( 'success' => false, 'message' => 'Keine Erinnerung heute fällig.' );
+    }
 
-        // Convert to valid JSON (replace single quotes with double quotes for keys/values)
+    $event_label_suffix = '';
+    if ( $send_first_reminder ) {
+        $event_label_suffix = ' (7-Tage-Erinnerung)';
+    } elseif ( $send_second_reminder ) {
+        $event_label_suffix = ' (1-Tag-Erinnerung)';
+    }
 
-        // This is a simplistic approach; a proper JS parser would be more robust.
+    $defaults = array(
+        'to'            => isset( $email_addresses['husband']['email'] ) ? $email_addresses['husband']['email'] : '',
+        'event_label'   => 'Euer Hochzeitstag' . $event_label_suffix,
+        'event_date'    => $next_anniversary->format( 'd.m.Y H:i' ),
+        'recipient_name'=> isset( $email_addresses['husband']['name'] ) ? $email_addresses['husband']['name'] : 'Liebe/r',
+        'send_to_wife'  => false,
+    );
 
-        $hochzeitstag_config_json = preg_replace( "/(\w+):/", "\"
-    \":", $hochzeitstag_config_json ); // keys
+    $parsed_atts = shortcode_atts( $defaults, $atts, 'hochzeitstag_email' );
 
-        $hochzeitstag_config_json = str_replace( "'", "\"", $hochzeitstag_config_json ); // string values
-
+    // Override recipient if send_to_wife is true
+    if ( filter_var( $parsed_atts['send_to_wife'], FILTER_VALIDATE_BOOLEAN ) && isset( $email_addresses['wife'] ) ) {
+        $parsed_atts['to'] = $email_addresses['wife']['email'];
+        $parsed_atts['recipient_name'] = $email_addresses['wife']['name'];
+    }
     
+    $to_email    = sanitize_email( $parsed_atts['to'] );
+    $event_label = sanitize_text_field( $parsed_atts['event_label'] );
+    $event_date  = sanitize_text_field( $parsed_atts['event_date'] );
+    $recipient_name = sanitize_text_field( $parsed_atts['recipient_name'] );
 
-        // Decode JSON into PHP array
+    $greeting = empty($recipient_name) ? 'Hallo!' : "Hallo {$recipient_name}!";
 
-        $hochzeitstag_config = json_decode( $hochzeitstag_config_json, true );
-
-    
-
-        if ( ! $hochzeitstag_config ) {
-
-            return 'Fehler: Konfiguration konnte nicht geladen oder geparst werden.';
-
-        }
-
-    
-
-        $wedding_date_str = $hochzeitstag_config['weddingDate'];
-
-        $reminder_days_first = defined( 'HOCHZEITSTAG_REMINDER_DAYS_FIRST' ) ? HOCHZEITSTAG_REMINDER_DAYS_FIRST : ( isset( $hochzeitstag_config['emailReminderDaysFirst'] ) ? $hochzeitstag_config['emailReminderDaysFirst'] : 7 );
-
-        $reminder_days_second = defined( 'HOCHZEITSTAG_REMINDER_DAYS_SECOND' ) ? HOCHZEITSTAG_REMINDER_DAYS_SECOND : ( isset( $hochzeitstag_config['emailReminderDaysSecond'] ) ? $hochzeitstag_config['emailReminderDaysSecond'] : 1 );
-
-        $quotes = $hochzeitstag_config['quotes'];
-
-        $email_addresses = $hochzeitstag_config['emailAddresses'];
-
-    
-
-        $today = new DateTime();
-
-        $wedding_date_config = new DateTime( $wedding_date_str );
-
-        
-
-        // Find the next upcoming anniversary based on the wedding date from config
-
-        $next_anniversary = new DateTime( $wedding_date_str );
-
-        // Adjust year to ensure it's the next upcoming anniversary
-
-        while ($next_anniversary < $today) {
-
-            $next_anniversary->modify('+1 year');
-
-        }
-
-    
-
-        $diff_to_anniversary = $today->diff($next_anniversary);
-
-        $days_to_anniversary = (int)$diff_to_anniversary->days;
-
-    
-
-        $send_first_reminder = false;
-
-        $send_second_reminder = false;
-
-    
-
-        // Check if it's the day for the first reminder
-
-        if ( $days_to_anniversary == $reminder_days_first ) {
-
-            $send_first_reminder = true;
-
-        }
-
-    
-
-        // Check if it's the day for the second reminder
-
-        if ( $days_to_anniversary == $reminder_days_second ) {
-
-            $send_second_reminder = true;
-
-        }
-
-        
-
-        // If no reminder is due, exit
-
-        if ( ! $send_first_reminder && ! $send_second_reminder ) {
-
-            return 'Keine Erinnerung heute fällig.';
-
-        }
-
-    
-
-        $event_label_suffix = '';
-
-        if ( $send_first_reminder ) {
-
-            $event_label_suffix = ' (7-Tage-Erinnerung)';
-
-        } elseif ( $send_second_reminder ) {
-
-            $event_label_suffix = ' (1-Tag-Erinnerung)';
-
-        }
-
-    
-
-        $atts = shortcode_atts(
-
-            array(
-
-                'to'            => isset( $email_addresses['husband']['email'] ) ? $email_addresses['husband']['email'] : '',
-
-                'event_label'   => 'Euer Hochzeitstag' . $event_label_suffix,
-
-                'event_date'    => $next_anniversary->format( 'd.m.Y H:i' ),
-
-                'recipient_name'=> isset( $email_addresses['husband']['name'] ) ? $email_addresses['husband']['name'] : 'Liebe/r',
-
-                'send_to_wife'  => false, // Option to send to wife instead
-
-            ),
-
-            $atts,
-
-            'hochzeitstag_test_email'
-
-        );
-
-    
-
-        // Override recipient if send_to_wife is true
-
-        if ( filter_var( $atts['send_to_wife'], FILTER_VALIDATE_BOOLEAN ) && isset( $email_addresses['wife'] ) ) {
-
-            $atts['to'] = $email_addresses['wife']['email'];
-
-            $atts['recipient_name'] = $email_addresses['wife']['name'];
-
-        }
-
-        
-
-        $to_email    = sanitize_email( $atts['to'] );
-
-        $event_label = sanitize_text_field( $atts['event_label'] );
-
-        $event_date  = sanitize_text_field( $atts['event_date'] );
-
-        $recipient_name = sanitize_text_field( $atts['recipient_name'] );
-
-    
-
-        $greeting = empty($recipient_name) ? 'Hallo!' : "Hallo {$recipient_name}!";
-
-    
-
-        $random_quote = $quotes[ array_rand( $quotes ) ];
+    $random_quote = $quotes[ array_rand( $quotes ) ];
 
     $subject = 'Erinnerung: Ihr besonderes Ereignis mit Hochzeitstag Countdown';
     $message = "
@@ -390,9 +292,46 @@ function hochzeitstag_send_test_email_shortcode( $atts ) {
     $sent = wp_mail( $to_email, $subject, $message, $headers );
 
     if ( $sent ) {
-        return "Test E-Mail wurde an <strong>{$to_email}</strong> gesendet. Bitte überprüfen Sie Ihren Posteingang (und Spam-Ordner).";
+        return array( 'success' => true, 'message' => "E-Mail wurde an <strong>{$to_email}</strong> gesendet." );
     } else {
-        return "Fehler beim Senden der Test E-Mail an <strong>{$to_email}</strong>. Bitte prüfen Sie das Fehlerprotokoll Ihres Servers.";
+        return array( 'success' => false, 'message' => "Fehler beim Senden der E-Mail an <strong>{$to_email}</strong>. Bitte prüfen Sie das Fehlerprotokoll Ihres Servers." );
+    }
+}
+
+/**
+ * Shortcode to trigger a test email.
+ * This will now call the shared helper function.
+ *
+ * @param array $atts Shortcode attributes.
+ * @return string Message indicating email status.
+ */
+function hochzeitstag_send_test_email_shortcode( $atts ) {
+    $result = _hochzeitstag_prepare_and_send_email( array_merge($atts, ['force_send' => true]) ); // Force send for shortcode test
+    if ( $result['success'] ) {
+        return $result['message'] . ' Bitte überprüfen Sie Ihren Posteingang (und Spam-Ordner).';
+    } else {
+        return $result['message'];
     }
 }
 add_shortcode( 'hochzeitstag_test_email', 'hochzeitstag_send_test_email_shortcode' );
+
+/**
+ * AJAX handler to send a test email.
+ */
+function hochzeitstag_ajax_send_test_email() {
+    // Check for capabilities if this should be restricted
+    // if ( ! current_user_can( 'manage_options' ) ) {
+    //     wp_send_json_error( array( 'message' => 'Sie haben keine Berechtigung, diese Aktion auszuführen.' ) );
+    // }
+
+    $result = _hochzeitstag_prepare_and_send_email( $_POST ); // Pass POST data as attributes
+    
+    if ( $result['success'] ) {
+        wp_send_json_success( array( 'message' => $result['message'] ) );
+    } else {
+        wp_send_json_error( array( 'message' => $result['message'] ) );
+    }
+    wp_die(); // Always include this to terminate script execution
+}
+add_action( 'wp_ajax_hochzeitstag_send_test_email', 'hochzeitstag_ajax_send_test_email' );
+add_action( 'wp_ajax_nopriv_hochzeitstag_send_test_email', 'hochzeitstag_ajax_send_test_email' );

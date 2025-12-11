@@ -268,6 +268,49 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTimer();
     setInterval(updateTimer, 1000);
 
+    // Email Test Button Logic
+    const testEmailButton = document.getElementById('test-email-button');
+    if (testEmailButton && typeof HOCHZEITSTAG_CONFIG !== 'undefined' && HOCHZEITSTAG_CONFIG.enableEmailTestButton) {
+        testEmailButton.style.display = 'block'; // Make button visible
+
+        testEmailButton.addEventListener('click', async () => {
+            testEmailButton.disabled = true;
+            testEmailButton.innerText = 'Sende Test-E-Mail...';
+
+            try {
+                // Determine the correct AJAX URL for standalone vs. WordPress
+                // In WordPress, ajaxurl is defined globally. For standalone, it's a fallback that won't work.
+                const ajaxUrl = (typeof hochzeitstag_ajax_object !== 'undefined' && typeof hochzeitstag_ajax_object.ajax_url !== 'undefined') ? hochzeitstag_ajax_object.ajax_url : './admin-ajax.php';
+
+                const response = await fetch(ajaxUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'hochzeitstag_send_test_email',
+                        // You can add other parameters here if needed for specific testing scenarios
+                        // e.g., to_email: 'test@example.com', send_to_wife: true
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Test E-Mail erfolgreich gesendet: ' + data.data.message);
+                } else {
+                    alert('Fehler beim Senden der Test E-Mail: ' + (data.data && data.data.message ? data.data.message : 'Unbekannter Fehler'));
+                }
+            } catch (error) {
+                console.error('Error sending test email:', error);
+                alert('Ein Fehler ist aufgetreten: ' + error.message);
+            } finally {
+                testEmailButton.disabled = false;
+                testEmailButton.innerText = 'Test E-Mail senden';
+            }
+        });
+    }
+
     // Smooth scroll to anchor if hash is present in URL, after content is rendered
     // Implement a retry mechanism in case the element isn't immediately available
     window.addEventListener('load', () => {
