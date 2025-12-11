@@ -118,9 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function formatMilestoneDate(date) {
         return date.toLocaleDateString('de-DE', {
-            weekday: 'long',
+            weekday: 'short',
             day: '2-digit',
-            month: 'long',
+            month: 'short',
             year: 'numeric'
         });
     }
@@ -256,10 +256,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextHours = Math.floor((diffNext % oneDay) / oneHour);
 
         // Format the next anniversary date for display
-        const nextAnniversaryWeekday = nextAnniversary.toLocaleDateString('de-DE', { weekday: 'long' });
+        const nextAnniversaryWeekday = nextAnniversary.toLocaleDateString('de-DE', { weekday: 'short' });
         const nextAnniversaryDateFormatted = nextAnniversary.toLocaleDateString('de-DE', {
             day: 'numeric',
-            month: 'long',
+            month: 'short',
             year: 'numeric',
             hour: '2-digit',
             minute: '2-digit'
