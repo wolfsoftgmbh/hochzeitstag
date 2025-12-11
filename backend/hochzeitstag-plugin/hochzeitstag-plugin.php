@@ -44,7 +44,7 @@ function hochzeitstag_render_shortcode() {
             <div class="card">
                 <div class="content-wrapper">
                     <!-- Header -->
-                    <h1>Unser Hochzeitstag</h1>
+                    <h1 id="hochzeitstag-heading">Unser Hochzeitstag</h1>
                     <div class="subtitle">Zeit seit dem schönsten Tag unseres Lebens!</div>
 
                     <!-- Quote Block -->
