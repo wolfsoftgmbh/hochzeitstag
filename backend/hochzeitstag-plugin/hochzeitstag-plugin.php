@@ -157,9 +157,10 @@ function hochzeitstag_send_test_email_shortcode( $atts ) {
 
     $atts = shortcode_atts(
         array(
-            'to'          => 'klaus@wolfsoft.de', // Default to admin email
-            'event_label' => 'Nächstes Ereignis',
-            'event_date'  => date( 'd.m.Y H:i', strtotime( '+7 days' ) ), // Default to 7 days from now
+            'to'            => 'klaus@wolfsoft.de',
+            'event_label'   => 'Nächstes Ereignis',
+            'event_date'    => date( 'd.m.Y H:i', strtotime( '+7 days' ) ),
+            'recipient_name'=> 'Liebe/r', // Default generic greeting
         ),
         $atts,
         'hochzeitstag_test_email'
@@ -168,6 +169,9 @@ function hochzeitstag_send_test_email_shortcode( $atts ) {
     $to_email    = sanitize_email( $atts['to'] );
     $event_label = sanitize_text_field( $atts['event_label'] );
     $event_date  = sanitize_text_field( $atts['event_date'] );
+    $recipient_name = sanitize_text_field( $atts['recipient_name'] );
+
+    $greeting = empty($recipient_name) ? 'Hallo!' : "Hallo {$recipient_name}!";
 
     // Funny German Poems (50 different ones)
     $poems = array(
@@ -242,7 +246,7 @@ function hochzeitstag_send_test_email_shortcode( $atts ) {
         </head>
         <body>
             <div class=\"email-container\">
-                <h2>Hallo!</h2>
+                <h2>{$greeting}</h2>
                 <p>Dies ist eine freundliche Erinnerung an Ihr bevorstehendes besonderes Ereignis:</p>
                 <div class=\"event-details\">
                     <p><strong>Ereignis:</strong> {$event_label}</p>
