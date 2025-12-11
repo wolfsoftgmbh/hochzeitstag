@@ -95,8 +95,6 @@ function hochzeitstag_render_shortcode() {
                                         <th>Ereignis</th>
                                         <th>Datum</th>
                                         <th>Tage</th>
-                                        <th>Std</th>
-                                        <th>Min</th>
                                     </tr>
                                 </thead>
                                 <tbody id="milestone-list">

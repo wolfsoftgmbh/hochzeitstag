@@ -304,8 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <td>${m.label}</td>
                             <td>${formatMilestoneDate(m.date)}</td>
                             <td>${remaining.days}</td>
-                            <td>${remaining.hours}</td>
-                            <td>${remaining.minutes}</td>
                         </tr>
                     `;
                 }
