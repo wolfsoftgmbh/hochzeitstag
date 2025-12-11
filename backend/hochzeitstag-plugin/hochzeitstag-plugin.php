@@ -157,7 +157,7 @@ function hochzeitstag_send_test_email_shortcode( $atts ) {
 
     $atts = shortcode_atts(
         array(
-            'to'          => get_option( 'admin_email' ), // Default to admin email
+            'to'          => 'klaus@wolfsoft.de', // Default to admin email
             'event_label' => 'Nächstes Ereignis',
             'event_date'  => date( 'd.m.Y H:i', strtotime( '+7 days' ) ), // Default to 7 days from now
         ),
