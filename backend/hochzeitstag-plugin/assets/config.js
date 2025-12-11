@@ -1,5 +1,5 @@
 /**
- * GLOBAL CONFIGURATION FOR HOCHZEITSTAG APP (PLUGIN)
+ * GLOBAL CONFIGURATION FOR HOCHZEITSTAG APP
  */
 const HOCHZEITSTAG_CONFIG = {
     // Dates (ISO Format: YYYY-MM-DDTHH:mm:ss)
@@ -11,11 +11,14 @@ const HOCHZEITSTAG_CONFIG = {
     backgroundImage: "kiss.jpeg", // Filename in the same directory (or URL)
 
     // Notification Settings (Placeholder for future functionality)
-    emailReminderDays: 7, // Days before event to send email
+    emailReminderDaysFirst: 7, // Days before event to send email (First reminder)
+    emailReminderDaysSecond: 1, // Days before event to send email (Second reminder)
     emailAddresses: {
         wife: { email: "tanja-risse@gmx.de", name: "Tanja" },
         husband: { email: "klaus@wolfsoft.de", name: "Klaus" }
     },
+
+    enableEmailTestButton: true,
 
     // List of humorous and affectionate German quotes/poems (total 120, shorter version)
     quotes: [
@@ -39,7 +42,7 @@ const HOCHZEITSTAG_CONFIG = {
         "Du bringst mich zum Lachen, auch mürrisch.",
         "Glück ist: herrlich albern sein.",
         "Du bist der Zucker in meinem Kaffee.",
-        "Egal wohin wir gehen, Hauptsache zusammen.",
+        "Egal wohin, Hauptsache zusammen.",
         "Mit dir macht sogar Nichtstun Spaß.",
         "Du bist mein Happy Place.",
         "Liebe ist: blind verstehen.",
