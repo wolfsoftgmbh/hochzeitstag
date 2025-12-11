@@ -11,7 +11,8 @@ const HOCHZEITSTAG_CONFIG = {
     backgroundImage: "kiss.jpeg", // Filename in the same directory (or URL)
 
     // Notification Settings (Placeholder for future functionality)
-    emailReminderDays: 7, // Days before event to send email
+    emailReminderDaysFirst: 7, // Days before event to send email (First reminder)
+    emailReminderDaysSecond: 1, // Days before event to send email (Second reminder)
     emailAddresses: {
         wife: { email: "tanja-risse@gmx.de", name: "Tanja" },
         husband: { email: "klaus@wolfsoft.de", name: "Klaus" }

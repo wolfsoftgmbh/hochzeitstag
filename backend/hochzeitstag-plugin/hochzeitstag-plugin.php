@@ -10,6 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
+// Define reminder days for email notifications
+define( 'HOCHZEITSTAG_REMINDER_DAYS_FIRST', 7 ); // First reminder 7 days before
+define( 'HOCHZEITSTAG_REMINDER_DAYS_SECOND', 1 ); // Second reminder 1 day before
+
 /**
  * Enqueue scripts and styles.
  */
@@ -155,169 +159,188 @@ function hochzeitstag_send_test_email_shortcode( $atts ) {
         return 'WordPress Mail-Funktion (wp_mail) nicht verfügbar.';
     }
 
-    $atts = shortcode_atts(
-        array(
-            'to'            => 'klaus@wolfsoft.de',
-            'event_label'   => 'Nächstes Ereignis',
-            'event_date'    => date( 'd.m.Y H:i', strtotime( '+7 days' ) ),
-            'recipient_name'=> 'Liebe/r', // Default generic greeting
-        ),
-        $atts,
-        'hochzeitstag_test_email'
-    );
+        // Read config.js content
 
-    $to_email    = sanitize_email( $atts['to'] );
-    $event_label = sanitize_text_field( $atts['event_label'] );
-    $event_date  = sanitize_text_field( $atts['event_date'] );
-    $recipient_name = sanitize_text_field( $atts['recipient_name'] );
+        $config_js_path = plugin_dir_path( __FILE__ ) . 'assets/config.js';
 
-    $greeting = empty($recipient_name) ? 'Hallo!' : "Hallo {$recipient_name}!";
+        $config_js_content = file_get_contents( $config_js_path );
 
-    // List of humorous and affectionate German quotes/poems (total 120, from config.js)
-    $quotes = array(
-        "Liebe ist, wenn man sich auch ohne Worte versteht,\naber trotzdem stundenlang quatschen kann.",
-        "Wir sind wie zwei Puzzleteile:\nUnterschiedlich, aber wir passen perfekt zusammen.",
-        "Ehe ist, wenn man sich streitet, wer recht hat,\nund am Ende beide lachen müssen.",
-        "Zusammen sind wir einfach besser.\\nWie Kaffee und Kuchen am Sonntagnachmittag.",
-        "Du bist mein Lieblingsmensch,\\nauch wenn du mir manchmal den letzten Keks klaust.",
-        "Liebe ist das einzige,\nwas mehr wird, wenn wir es verschwenden.",
-        "Mit dir wird sogar der Einkauf im Supermarkt\\nzu einem kleinen Abenteuer.",
-        "Wir passen zusammen wie\\nTopf und Deckel (auch wenn es manchmal klappert).",
-        "Echte Liebe ist,\\nwenn man sich gegenseitig beim Schnarchen erträgt.",
-        "Du bist mein Anker im Sturm\\nund mein Konfetti im Alltag.",
-        "Zuhause ist da,\\nwo du bist (und wo das WLAN funktioniert).",
-        "Wir sind ein perfektes Team:\\nIch sorge für das Chaos, du für die Ordnung.",
-        "Liebe heißt nicht, dass man sich nie streitet,\\nsondern dass man sich immer wieder verträgt.",
-        "Mit dir an meiner Seite\\nist jeder Tag ein kleiner Feiertag.",
-        "Du bist der Grund,\\nwarum ich öfter auf mein Handy schaue und lächle.",
-        "Unsere Liebe ist wie guter Wein:\\nSie wird mit den Jahren immer besser.",
-        "Danke, dass du meine Macken nicht nur erträgst,\\nsondern sie sogar ein bisschen magst.",
-        "Wir zwei gegen den Rest der Welt\\n(und gegen den Abwasch).",
-        "Du bringst mich zum Lachen,\\nselbst wenn ich eigentlich grummelig sein will.",
-        "Glück ist, jemanden zu haben,\\nmit dem man auch mal herrlich albern sein kann.",
-        "Du bist der Zucker in meinem Kaffee.",
-        "Egal wohin wir gehen, Hauptsache zusammen.",
-        "Mit dir macht sogar Nichtstun Spaß.",
-        "Du bist mein Happy Place.",
-        "Liebe ist, wenn wir uns blind verstehen.",
-        "Ich mag dich ein bisschen mehr als Pizza.",
-        "Du und ich – das passt einfach.",
-        "Mein Herz schlägt im Takt von deinem.",
-        "Deine Umarmung ist mein Lieblingsort.",
-        "Zusammen ist man weniger allein.",
-        "Du bist mein Lieblings-Nervzwerg.",
-        "Ich liebe dich mehr als Kaffee (aber sag es dem Kaffee nicht).",
-        "Wir sind wie Pech und Schwefel, nur hübscher.",
-        "Du hast den Schlüssel zu meinem Herzen (und zum Kühlschrank).",
-        "Liebe ist, wenn du mir das letzte Stück Schokolade überlässt.",
-        "Du bist der Grund, warum ich morgens aufstehe (meistens).",
-        "Mit dir ist sogar der Abwasch erträglich.",
-        "Wir sind das perfekte Chaos.",
-        "Du bist mein liebster Zeitvertreib.",
-        "Ich liebe dich, auch wenn du hungrig bist.",
-        "Du bist mein persönlicher Superheld (ohne Umhang).",
-        "Zusammen sind wir unschlagbar (im Faulenzen).",
-        "Du bist mein Lieblingsmensch, Punkt.",
-        "Liebe ist, wenn man sich auch schweigend anschreien kann.",
-        "Du bist süßer als Zuckerwatte.",
-        "Ich würde mein Handy für dich weglegen.",
-        "Du bist der Käse auf meiner Pizza.",
-        "Wir passen zusammen wie Pommes und Ketchup.",
-        "Du bist mein Einhorn in einer Herde von Pferden.",
-        "Liebe ist, wenn man gemeinsam dick wird.",
-        "Du bist der Grund für mein Dauergrinsen.",
-        "Ich liebe dich mehr als gestern (und weniger als morgen).",
-        "Du bist meine bessere Hälfte (die vernünftigere).",
-        "Mit dir kann man Pferde stehlen (und Ponys).",
-        "Du bist mein Lieblings-Kuscheltier.",
-        "Liebe ist, wenn man sich die Decke teilt (widerwillig).",
-        "Du bist der Hit in meinen Charts.",
-        "Ich folge dir überall hin (außer aufs Klo).",
-        "Du bist mein Highlight des Tages.",
-        "Wir sind wie Bonnie und Clyde, nur ohne Banküberfall.",
-        "Du bist mein 6er im Lotto.",
-        "Ich liebe dich bis zur Unendlichkeit und viel weiter.",
-        "Du bist mein Fels in der Brandung (und mein Kissen).",
-        "Mit dir wird es nie langweilig.",
-        "Du bist mein Lieblings-Abenteuer.",
-        "Liebe ist, wenn man sich blind vertraut (aber trotzdem Google Maps checkt).",
-        "Du bist mein Sternenhimmel.",
-        "Ich hab dich zum Fressen gern.",
-        "Du bist mein Lieblings-Gedanke vor dem Einschlafen.",
-        "Wir sind ein Dream-Team.",
-        "Du bist mein Sonnenschein, auch nachts.",
-        "Ich liebe dich mehr als Schokolade (und das heißt was).",
-        "Du bist mein Herzblatt.",
-        "Mit dir ist das Leben ein Ponyhof.",
-        "Du bist mein allerliebster Lieblingsmensch.",
-        "Liebe ist, wenn man sich gegenseitig die Sätze beendet.",
-        "Du bist der Grund, warum ich so glücklich bin.",
-        "Ich bin süchtig nach dir.",
-        "Du bist mein Zuhause.",
-        "Wir sind einfach füreinander gemacht.",
-        "Zwei Seelen im gleichen Boot, mal laut, mal leise, immer auf dem richtigen Kurs, egal wie die Reise.",
-        "Liebe ist, wenn man auch nach Jahren noch schmunzelt, wenn der andere schnarcht – oder heimlich furzt.",
-        "Manchmal ist das größte Abenteuer, den Fernseher zu teilen, ohne sich zu streiten, welche Serie besser ist, die alten oder die neuen Seiten.",
-        "Ein Ehegelübde ist wie WLAN: Man hofft, dass es überall reicht und die Verbindung nicht abbricht, egal, wie weit man streicht.",
-        "Gemeinsam alt werden? Gerne! Aber wer holt dann die Brille, wenn die andere vom Schrank fällt, und wer flucht lauter, wenn man sich verstellt?",
-        "Liebe ist, wenn man den anderen so akzeptiert, wie er ist, auch wenn er seine Socken unter dem Bett vermisst.",
-        "Ein Kuss am Morgen vertreibt alle Kummer und Sorgen, außer, man hat noch nicht Kaffee getrunken, dann muss man es verschieben auf morgen.",
-        "Partnerschaft heißt: Man teilt Freud und Leid, und die letzte Pizza – meistens mit Streit.",
-        "Das Geheimnis einer langen Beziehung? Genug Humor, um über die eigenen Fehler zu lachen, und genug Liebe, um den anderen glücklich zu machen.",
-        "Wir sind wie zwei Legosteine: Perfekt zusammengefügt, aber wehe, man tritt nachts auf den anderen, dann ist der Hausfrieden verrückt!",
-        "Liebe ist, wenn man sich gegenseitig die Macken vorhält und trotzdem die beste Zeit hat, die man sich wünscht und erhellt.",
-        "Manchmal braucht man nur eine Umarmung, ein gutes Wort und die Gewissheit, dass man den besten Partner der Welt hat, an jedem Ort.",
-        "Zwei Köpfe, ein Gedanke, ein Herzschlag im Takt, unsere Liebe ist einfach magisch, und das ist ein Fakt.",
-        "Ein Leben ohne dich? Undenkbar! Wie ein Kühlschrank ohne Bier, oder ein Sonntagmorgen ohne Brötchen hier.",
-        "Liebe ist: zusammen schweigen können und trotzdem alles wissen, wie die Sterne am Himmel, die man nicht will missen.",
-        "Manchmal ist es ein Wunder, dass wir uns nicht schon längst erwürgt haben, bei all dem Chaos und den Launen, die wir uns tragen.",
-        "Du bist mein Anker im Sturm, mein Sonnenschein im Regen, mein bester Freund und Liebhaber, einfach ein Segen.",
-        "Zwei Herzen schlagen im Gleichklang, eine Melodie erklingt, unsere Liebe ist das schönste Lied, das man singt.",
-        "Das Leben ist eine Reise, mal holprig, mal sanft, aber mit dir an meiner Seite, da ist es ganz charmant.",
-        "Liebe ist, wenn man auch nach Jahren noch Schmetterlinge im Bauch hat, besonders, wenn der andere heimlich Schokolade hat.",
-        "Ein Lächeln von dir vertreibt alle Wolken, ein Blick von dir lässt mein Herz höher schlagen, wie die Glocken.",
-        "Wir sind wie Yin und Yang, Gegensätze ziehen sich an, und zusammen sind wir unschlagbar, Hand in Hand.",
-        "Das Glück ist kein Zufall, es ist eine Entscheidung, und ich habe mich für dich entschieden, ohne jede Scheidung.",
-        "Liebe ist, wenn man auch nach dem größten Streit noch weiß, dass man zusammengehört, wie der warme Wind und das sanfte Meereswort.",
-        "Du bist mein sicherer Hafen, mein Leuchtturm im Nebel, mein Zuhause, mein Glück, mein Seelen-Rebel.",
-        "Zwei Herzen, eine Flamme, ein ewiges Licht, unsere Liebe ist unendlich, sie erlischt nicht.",
-        "Das Leben ist bunt mit dir an meiner Seite, wie ein Regenbogen nach dem Regen, so weit.",
-        "Liebe ist, wenn man dem anderen auch mal die letzte Praline gönnt, ohne zu murren, auch wenn man sie selbst brennt.",
-        "Du bist mein bester Freund, mein Vertrauter, mein Held, mit dir ist die Welt einfach viel schöner und erhellt.",
-        "Ein Leben lang mit dir, das ist mein größter Wunsch, wie ein Sommerregen, der erfrischt und kein Punsch.",
-        "Liebe ist, wenn man auch mal über sich selbst lacht, und der andere lacht mit, das ist die wahre Macht.",
-        "Du bist mein Sonnenschein, mein Mondlicht, mein Stern, mit dir ist jeder Tag ein Gewinn, mein lieber Herrn.",
-        "Zwei Menschen, ein Schicksal, ein gemeinsamer Weg, unsere Liebe ist ein Versprechen, ein ewiger Steg.",
-        "Das Glück ist leise, die Liebe ist laut, mit dir hab ich alles, was mein Herz ergraut.",
-        "Liebe ist, wenn man dem anderen auch mal die letzte Scheibe Brot lässt, auch wenn man selbst Hunger hat, dann ist der Test bestanden, nicht bloß ein Prost.",
-        "Du bist mein Kompass im Leben, mein Wegweiser im Dunkeln, mein Licht, meine Liebe, mein strahlendes Funkeln.",
-        "Ein Leben lang Hand in Hand, das ist unser Traum, unsere Liebe ist ein unendlicher Raum.",
-        "Liebe ist, wenn man auch mal ohne Worte versteht, was der andere denkt, und die Zeit mit dir einfach so schnell verschenkt.",
-        "Du bist mein Fels in der Brandung, mein Anker im Meer, meine Liebe zu dir wird immer mehr.",
-        "Zwei Herzen, ein Beat, eine ewige Melodie, unsere Liebe, sie hört niemals auf, früh bis spät, nie.",
-        "Das Leben ist schön, aber mit dir ist es schöner, wie ein Sommertag, der niemals trübe, sondern klarer.",
-        "Liebe ist, wenn man auch nach Jahren noch kribbeln spürt, wenn der andere in der Nähe ist, und das Herz berührt.",
-        "Du bist mein Ein und Alles, mein größter Schatz, meine Liebe zu dir ist unendlich, ohne jeden Platz.",
-        "Ein Kuss von dir ist wie ein Sonnenstrahl, der wärmt, unsere Liebe, sie hat uns für immer gelehrt.",
-        "Das Glück ist da, wo du bist, mein lieber Schatz, mit dir ist jeder Ort der schönste Platz.",
-        "Liebe ist, wenn man auch mal über sich selbst lacht, und der andere lacht mit, das ist die wahre Macht.",
-        "Du bist mein Sonnenschein, mein Mondlicht, mein Stern, mit dir ist jeder Tag ein Gewinn, mein lieber Herrn.",
-        "Zwei Menschen, ein Schicksal, ein gemeinsamer Weg, unsere Liebe ist ein Versprechen, ein ewiger Steg.",
-        "Das Glück ist leise, die Liebe ist laut, mit dir hab ich alles, was mein Herz ergraut.",
-        "Liebe ist, wenn man dem anderen auch mal die letzte Scheibe Brot lässt, auch wenn man selbst Hunger hat, dann ist der Test bestanden, nicht bloß ein Prost.",
-        "Du bist mein Kompass im Leben, mein Wegweiser im Dunkeln, mein Licht, meine Liebe, mein strahlendes Funkeln.",
-        "Ein Leben lang Hand in Hand, das ist unser Traum, unsere Liebe ist ein unendlicher Raum.",
-        "Liebe ist, wenn man auch mal ohne Worte versteht, was der andere denkt, und die Zeit mit dir einfach so schnell verschenkt.",
-        "Du bist mein Fels in der Brandung, mein Anker im Meer, meine Liebe zu dir wird immer mehr.",
-        "Zwei Herzen, ein Beat, eine ewige Melodie, unsere Liebe, sie hört niemals auf, früh bis spät, nie.",
-        "Das Leben ist schön, aber mit dir ist es schöner, wie ein Sommertag, der niemals trübe, sondern klarer.",
-        "Liebe ist, wenn man auch nach Jahren noch kribbeln spürt, wenn der andere in der Nähe ist, und das Herz berührt.",
-        "Du bist mein Ein und Alles, mein größter Schatz, meine Liebe zu dir ist unendlich, ohne jeden Platz.",
-        "Ein Kuss von dir ist wie ein Sonnenstrahl, der wärmt, unsere Liebe, sie hat uns für immer gelehrt.",
-        "Das Glück ist da, wo du bist, mein lieber Schatz, mit dir ist jeder Ort der schönste Platz."
-    );
+    
 
-    $random_quote = $quotes[ array_rand( $quotes ) ];
+        // Extract HOCHZEITSTAG_CONFIG object using regex
+
+        // This regex is basic and might need refinement for more complex JS objects
+
+        preg_match( '/const HOCHZEITSTAG_CONFIG = (\{[^;]+\});/s', $config_js_content, $matches );
+
+        $hochzeitstag_config_json = isset( $matches[1] ) ? $matches[1] : '{}';
+
+    
+
+        // Convert to valid JSON (replace single quotes with double quotes for keys/values)
+
+        // This is a simplistic approach; a proper JS parser would be more robust.
+
+        $hochzeitstag_config_json = preg_replace( "/(\w+):/", "\"
+    \":", $hochzeitstag_config_json ); // keys
+
+        $hochzeitstag_config_json = str_replace( "'", "\"", $hochzeitstag_config_json ); // string values
+
+    
+
+        // Decode JSON into PHP array
+
+        $hochzeitstag_config = json_decode( $hochzeitstag_config_json, true );
+
+    
+
+        if ( ! $hochzeitstag_config ) {
+
+            return 'Fehler: Konfiguration konnte nicht geladen oder geparst werden.';
+
+        }
+
+    
+
+        $wedding_date_str = $hochzeitstag_config['weddingDate'];
+
+        $reminder_days_first = defined( 'HOCHZEITSTAG_REMINDER_DAYS_FIRST' ) ? HOCHZEITSTAG_REMINDER_DAYS_FIRST : ( isset( $hochzeitstag_config['emailReminderDaysFirst'] ) ? $hochzeitstag_config['emailReminderDaysFirst'] : 7 );
+
+        $reminder_days_second = defined( 'HOCHZEITSTAG_REMINDER_DAYS_SECOND' ) ? HOCHZEITSTAG_REMINDER_DAYS_SECOND : ( isset( $hochzeitstag_config['emailReminderDaysSecond'] ) ? $hochzeitstag_config['emailReminderDaysSecond'] : 1 );
+
+        $quotes = $hochzeitstag_config['quotes'];
+
+        $email_addresses = $hochzeitstag_config['emailAddresses'];
+
+    
+
+        $today = new DateTime();
+
+        $wedding_date_config = new DateTime( $wedding_date_str );
+
+        
+
+        // Find the next upcoming anniversary based on the wedding date from config
+
+        $next_anniversary = new DateTime( $wedding_date_str );
+
+        // Adjust year to ensure it's the next upcoming anniversary
+
+        while ($next_anniversary < $today) {
+
+            $next_anniversary->modify('+1 year');
+
+        }
+
+    
+
+        $diff_to_anniversary = $today->diff($next_anniversary);
+
+        $days_to_anniversary = (int)$diff_to_anniversary->days;
+
+    
+
+        $send_first_reminder = false;
+
+        $send_second_reminder = false;
+
+    
+
+        // Check if it's the day for the first reminder
+
+        if ( $days_to_anniversary == $reminder_days_first ) {
+
+            $send_first_reminder = true;
+
+        }
+
+    
+
+        // Check if it's the day for the second reminder
+
+        if ( $days_to_anniversary == $reminder_days_second ) {
+
+            $send_second_reminder = true;
+
+        }
+
+        
+
+        // If no reminder is due, exit
+
+        if ( ! $send_first_reminder && ! $send_second_reminder ) {
+
+            return 'Keine Erinnerung heute fällig.';
+
+        }
+
+    
+
+        $event_label_suffix = '';
+
+        if ( $send_first_reminder ) {
+
+            $event_label_suffix = ' (7-Tage-Erinnerung)';
+
+        } elseif ( $send_second_reminder ) {
+
+            $event_label_suffix = ' (1-Tag-Erinnerung)';
+
+        }
+
+    
+
+        $atts = shortcode_atts(
+
+            array(
+
+                'to'            => isset( $email_addresses['husband']['email'] ) ? $email_addresses['husband']['email'] : '',
+
+                'event_label'   => 'Euer Hochzeitstag' . $event_label_suffix,
+
+                'event_date'    => $next_anniversary->format( 'd.m.Y H:i' ),
+
+                'recipient_name'=> isset( $email_addresses['husband']['name'] ) ? $email_addresses['husband']['name'] : 'Liebe/r',
+
+                'send_to_wife'  => false, // Option to send to wife instead
+
+            ),
+
+            $atts,
+
+            'hochzeitstag_test_email'
+
+        );
+
+    
+
+        // Override recipient if send_to_wife is true
+
+        if ( filter_var( $atts['send_to_wife'], FILTER_VALIDATE_BOOLEAN ) && isset( $email_addresses['wife'] ) ) {
+
+            $atts['to'] = $email_addresses['wife']['email'];
+
+            $atts['recipient_name'] = $email_addresses['wife']['name'];
+
+        }
+
+        
+
+        $to_email    = sanitize_email( $atts['to'] );
+
+        $event_label = sanitize_text_field( $atts['event_label'] );
+
+        $event_date  = sanitize_text_field( $atts['event_date'] );
+
+        $recipient_name = sanitize_text_field( $atts['recipient_name'] );
+
+    
+
+        $greeting = empty($recipient_name) ? 'Hallo!' : "Hallo {$recipient_name}!";
+
+    
+
+        $random_quote = $quotes[ array_rand( $quotes ) ];
 
     $subject = 'Erinnerung: Ihr besonderes Ereignis mit Hochzeitstag Countdown';
     $message = "
