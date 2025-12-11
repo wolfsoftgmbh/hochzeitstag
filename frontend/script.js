@@ -117,12 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * Formats a date object to German string: "Weekday, DD. Month YYYY"
      */
     function formatMilestoneDate(date) {
-        return date.toLocaleDateString('de-DE', {
-            weekday: 'short',
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        });
+        const weekday = date.toLocaleDateString('de-DE', { weekday: 'short' }).replace('.', '');
+        const datePart = date.toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+        return `${weekday}, ${datePart}`;
     }
 
     /**
