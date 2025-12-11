@@ -301,12 +301,26 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
 /**
  * Shortcode to trigger a test email.
  * This will now call the shared helper function.
+ * Supports a 'force' attribute to bypass date checks (default: true).
+ * Example: [hochzeitstag_test_email force="false"] to check dates.
  *
  * @param array $atts Shortcode attributes.
  * @return string Message indicating email status.
  */
 function hochzeitstag_send_test_email_shortcode( $atts ) {
-    $result = _hochzeitstag_prepare_and_send_email( array_merge($atts, ['force_send' => true]) ); // Force send for shortcode test
+    $atts = shortcode_atts( array(
+        'force' => 'true', // Default to true for backward compatibility and testing convenience
+    ), $atts, 'hochzeitstag_test_email' );
+
+    $force_send = filter_var( $atts['force'], FILTER_VALIDATE_BOOLEAN );
+
+    // Merge force_send into the attributes passed to the helper
+    // We pass the original $atts as well in case the user provided other overrides (like 'to')
+    // but we filter 'force' out to avoid confusion, though array_merge handles overrides.
+    $email_atts = array_merge( $atts, array( 'force_send' => $force_send ) );
+
+    $result = _hochzeitstag_prepare_and_send_email( $email_atts );
+    
     if ( $result['success'] ) {
         return $result['message'] . ' Bitte überprüfen Sie Ihren Posteingang (und Spam-Ordner).';
     } else {
