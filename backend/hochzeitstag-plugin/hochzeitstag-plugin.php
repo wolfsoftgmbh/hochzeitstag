@@ -165,26 +165,46 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     $config_js_path = plugin_dir_path( __FILE__ ) . 'assets/config.js';
     $config_js_content = file_get_contents( $config_js_path );
 
-    // Extract HOCHZEITSTAG_CONFIG object using regex
-    preg_match( '/const HOCHZEITSTAG_CONFIG = (\{[^;]+\});/s', $config_js_content, $matches );
-    $hochzeitstag_config_json = isset( $matches[1] ) ? $matches[1] : '{}';
-
-    // Convert to valid JSON (replace single quotes with double quotes for keys/values)
-    $hochzeitstag_config_json = preg_replace( "/(\w+):/", "\"$1\":", $hochzeitstag_config_json ); // keys
-    $hochzeitstag_config_json = str_replace( "'", "\"", $hochzeitstag_config_json ); // string values
-
-    // Decode JSON into PHP array
-    $hochzeitstag_config = json_decode( $hochzeitstag_config_json, true );
-
-    if ( ! $hochzeitstag_config ) {
-        return array( 'success' => false, 'message' => 'Fehler: Konfiguration konnte nicht geladen oder geparst werden.' );
+    // Manual extraction of configuration variables to avoid fragile JSON parsing of JS files
+    $wedding_date_str = '';
+    // Match weddingDate: "..."
+    if ( preg_match( '/weddingDate:\s*"([^"]+)"/', $config_js_content, $m ) ) {
+        $wedding_date_str = $m[1];
+    } else {
+        return array( 'success' => false, 'message' => 'Fehler: Hochzeitsdatum (weddingDate) konnte nicht aus der Konfiguration gelesen werden.' );
     }
 
-    $wedding_date_str = $hochzeitstag_config['weddingDate'];
-    $reminder_days_first = defined( 'HOCHZEITSTAG_REMINDER_DAYS_FIRST' ) ? HOCHZEITSTAG_REMINDER_DAYS_FIRST : ( isset( $hochzeitstag_config['emailReminderDaysFirst'] ) ? $hochzeitstag_config['emailReminderDaysFirst'] : 7 );
-    $reminder_days_second = defined( 'HOCHZEITSTAG_REMINDER_DAYS_SECOND' ) ? HOCHZEITSTAG_REMINDER_DAYS_SECOND : ( isset( $hochzeitstag_config['emailReminderDaysSecond'] ) ? $hochzeitstag_config['emailReminderDaysSecond'] : 1 );
-    $quotes = $hochzeitstag_config['quotes'];
-    $email_addresses = $hochzeitstag_config['emailAddresses'];
+    $reminder_days_first = 7;
+    if ( preg_match( '/emailReminderDaysFirst:\s*(\d+)/', $config_js_content, $m ) ) {
+        $reminder_days_first = intval($m[1]);
+    }
+    
+    $reminder_days_second = 1;
+    if ( preg_match( '/emailReminderDaysSecond:\s*(\d+)/', $config_js_content, $m ) ) {
+        $reminder_days_second = intval($m[1]);
+    }
+
+    $email_addresses = array();
+    // Husband
+    if ( preg_match( '/husband:\s*\{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
+        $email_addresses['husband'] = array( 'email' => $m[1], 'name' => $m[2] );
+    }
+    // Wife
+    if ( preg_match( '/wife:\s*\{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
+        $email_addresses['wife'] = array( 'email' => $m[1], 'name' => $m[2] );
+    }
+
+    $quotes = array();
+    if ( preg_match( '/quotes:\s*\[(.*?)\]/s', $config_js_content, $m_quotes_block ) ) {
+        $quotes_content = $m_quotes_block[1];
+        // Match all strings inside double quotes
+        if ( preg_match_all( '/"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"/', $quotes_content, $m_quotes ) ) {
+             $quotes = $m_quotes[1];
+        }
+    }
+    if ( empty($quotes) ) {
+        $quotes = array("Liebe ist alles."); // Fallback
+    }
 
     $today = new DateTime();
     $wedding_date_config = new DateTime( $wedding_date_str );
