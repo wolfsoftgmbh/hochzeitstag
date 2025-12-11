@@ -269,14 +269,24 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateTimer, 1000);
 
     // Smooth scroll to anchor if hash is present in URL, after content is rendered
+    // Implement a retry mechanism in case the element isn't immediately available
     window.addEventListener('load', () => {
         if (window.location.hash) {
-            setTimeout(() => {
-                const element = document.querySelector(window.location.hash);
+            const targetId = window.location.hash;
+            let retries = 0;
+            const maxRetries = 10; // Max attempts
+            const retryInterval = 100; // ms
+
+            const scrollToElement = () => {
+                const element = document.querySelector(targetId);
                 if (element) {
                     element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else if (retries < maxRetries) {
+                    retries++;
+                    setTimeout(scrollToElement, retryInterval);
                 }
-            }, 100); // Give a small delay for content to fully settle
+            };
+            scrollToElement();
         }
     });
 });
