@@ -1,16 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     /**
      * CONFIGURATION
-     * Set the wedding date here. 
-     * Month is 0-indexed in JS Date constructor (0=Jan, 8=Sept),
-     * but standard string parsing "YYYY-MM-DDTHH:mm:ss" is easier/safer. 
+     * Now loaded from config.js via global object HOCHZEITSTAG_CONFIG
      */
-    const WEDDING_DATE_STR = "2025-09-06T11:02:00"; 
+    
+    // Apply Background Image from Config
+    if (typeof HOCHZEITSTAG_CONFIG !== 'undefined' && HOCHZEITSTAG_CONFIG.backgroundImage) {
+        document.documentElement.style.setProperty('--bg-image-url', `url('${HOCHZEITSTAG_CONFIG.backgroundImage}')`);
+    }
+
+    const WEDDING_DATE_STR = (typeof HOCHZEITSTAG_CONFIG !== 'undefined') ? HOCHZEITSTAG_CONFIG.weddingDate : "2025-09-06T11:02:00";
+    const FIRST_CONTACT_DATE_STR = (typeof HOCHZEITSTAG_CONFIG !== 'undefined') ? HOCHZEITSTAG_CONFIG.firstContactDate : "2014-01-11T19:02:00";
+    const FIRST_MEET_DATE_STR = (typeof HOCHZEITSTAG_CONFIG !== 'undefined') ? HOCHZEITSTAG_CONFIG.firstMeetDate : "2014-04-01T21:02:00";
     
     // History Events Configuration
     const historyEvents = [
-        { name: "Erster Kontakt", date: "2014-01-11T19:02:00" },
-        { name: "Zusammen", date: "2014-04-01T21:02:00" },
+        { name: "Erster Kontakt", date: FIRST_CONTACT_DATE_STR },
+        { name: "Zusammen", date: FIRST_MEET_DATE_STR },
         { name: "Hochzeit", date: WEDDING_DATE_STR }
     ];
 

@@ -25,7 +25,8 @@ function hochzeitstag_enqueue_assets() {
     wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.0' );
 
     // Enqueue Script
-    wp_enqueue_script( 'hochzeitstag-script', plugins_url( 'assets/script.js', __FILE__ ), array(), '1.0', true );
+    wp_enqueue_script( 'hochzeitstag-config', plugins_url( 'assets/config.js', __FILE__ ), array(), '1.0', true );
+    wp_enqueue_script( 'hochzeitstag-script', plugins_url( 'assets/script.js', __FILE__ ), array('hochzeitstag-config'), '1.0', true );
 }
 add_action( 'wp_enqueue_scripts', 'hochzeitstag_enqueue_assets' );
 

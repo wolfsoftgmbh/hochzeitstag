@@ -10,6 +10,7 @@
     --card-bg-overlay: rgba(255, 255, 255, 0.85);
     --text-color: #4a4a4a;
     --box-shadow: 0 4px 15px rgba(233, 30, 99, 0.2);
+    --bg-image-url: url('kiss.jpeg'); /* Default background image */
 }
 
 body {
@@ -56,7 +57,7 @@ body {
     right: 0;
     bottom: 0;
     /* Placeholder image - Replace url(...) with your photo */
-    background-image: url('kiss.jpeg');
+    background-image: var(--bg-image-url);
     background-size: cover;
     background-position: center;
     filter: blur(1px); /* Blur effect */
