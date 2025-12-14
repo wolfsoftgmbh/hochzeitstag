@@ -25,6 +25,9 @@ function hochzeitstag_enqueue_assets() {
     // Enqueue Local Fonts
     wp_enqueue_style( 'hochzeitstag-fonts', plugins_url( 'assets/fonts/fonts.css', __FILE__ ), array(), '1.0' );
 
+    // Enqueue Google Font 'Playfair Display'
+    wp_enqueue_style( 'hochzeitstag-google-fonts', 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap', array(), null );
+
     // Enqueue Main Styles
     wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.0' );
 
@@ -52,6 +55,7 @@ function hochzeitstag_render_shortcode() {
             <div class="glass-card">
                 <div class="content-wrapper">
                     
+                    <div class="card-header-image"></div>
                     <header class="header-section">
                         <h1>Unser Hochzeitstag</h1>
                         <div class="subtitle">Jeder Tag mit dir ist ein Geschenk</div>
