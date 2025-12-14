@@ -38,12 +38,11 @@ if ( ! defined( 'ABSPATH' ) ) {
             
             <header class="header-section">
                 <h1>Unser Hochzeitstag</h1>
-                <div class="subtitle">Jeder Tag mit dir ist ein Geschenk</div>
+                <div id="quote-display" class="quote-box">
+                    </div>
             </header>
 
-            <div id="quote-display" class="quote-box">
-                <!-- Quote will be inserted here by JavaScript -->
-            </div>
+            
 
             <div class="counter-grid">
                 <div class="glass-circle">
@@ -76,7 +75,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <div class="footer-stats">
                 <div class="stat-item">
-                    <span id="total-days">0</span> Tage gesamt
+                    <span id="total-days">0</span> Tage gemeinsam
                 </div>
                 <div class="stat-item">
                     <span id="total-seconds">0</span> Sekunden Liebe
