@@ -149,6 +149,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const date1000 = new Date(WEDDING_DATE.getTime() + (next1000 * oneDayMs));
             milestones.push({ date: date1000, label: `${next1000}. Tag` });
 
+            // 3. Geburtstage (wenn konfiguriert)
+            if (CONFIG.birthdays) {
+                for (const [name, dateStr] of Object.entries(CONFIG.birthdays)) {
+                    if (dateStr) {
+                        const bdayDate = new Date(dateStr);
+                        let nextBday = new Date(bdayDate);
+                        nextBday.setFullYear(now.getFullYear());
+                        
+                        // Wenn der Geburtstag dieses Jahr schon war, dann nächstes Jahr
+                        if (nextBday < now) {
+                            nextBday.setFullYear(now.getFullYear() + 1);
+                        }
+                        
+                        // Name formatieren (erster Buchstabe groß)
+                        const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+                        milestones.push({ date: nextBday, label: `Geburtstag ${formattedName}` });
+                    }
+                }
+            }
+
             // Sortieren
             milestones.sort((a,b) => a.date - b.date);
 

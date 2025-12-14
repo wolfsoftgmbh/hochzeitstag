@@ -7,6 +7,11 @@ const HOCHZEITSTAG_CONFIG = {
     firstContactDate: "2014-01-11T19:02:00",
     firstMeetDate: "2014-04-01T21:02:00", // "Zusammen" / Together
 
+    birthdays: {
+        klaus: "1967-08-02",
+        tanja: "1972-07-04"
+    },
+
     // Visuals
     backgroundImage: "kiss.jpeg", // Filename in the same directory (or URL)
 

@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Hochzeitstag Countdown
- * Description: A romantic countdown to your wedding anniversary. Use shortcode [hochzeitstag] to display.
- * Version: 1.0
+ * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
+ * Version: 1.1
  * Author: Gemini
  */
 
@@ -10,12 +10,49 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
+define( 'HOCHZEITSTAG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'HOCHZEITSTAG_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+
 // Define reminder days for email notifications
 define( 'HOCHZEITSTAG_REMINDER_DAYS_FIRST', 7 ); // First reminder 7 days before
 define( 'HOCHZEITSTAG_REMINDER_DAYS_SECOND', 1 ); // Second reminder 1 day before
 
 /**
- * Enqueue scripts and styles.
+ * REWRITE RULES FOR /hochzeit/
+ */
+function hochzeitstag_rewrite_rule() {
+    add_rewrite_rule( '^hochzeit/?$', 'index.php?hochzeitstag_page=1', 'top' );
+}
+add_action( 'init', 'hochzeitstag_rewrite_rule' );
+
+function hochzeitstag_query_vars( $query_vars ) {
+    $query_vars[] = 'hochzeitstag_page';
+    return $query_vars;
+}
+add_filter( 'query_vars', 'hochzeitstag_query_vars' );
+
+function hochzeitstag_template_include( $template ) {
+    if ( get_query_var( 'hochzeitstag_page' ) ) {
+        $new_template = plugin_dir_path( __FILE__ ) . 'page-hochzeitstag.php';
+        if ( file_exists( $new_template ) ) {
+            return $new_template;
+        }
+    }
+    return $template;
+}
+add_filter( 'template_include', 'hochzeitstag_template_include' );
+
+/**
+ * Activation Hook to flush rules
+ */
+function hochzeitstag_activate() {
+    hochzeitstag_rewrite_rule();
+    flush_rewrite_rules();
+}
+register_activation_hook( __FILE__, 'hochzeitstag_activate' );
+
+/**
+ * Enqueue scripts and styles (Legacy/Shortcode support)
  */
 function hochzeitstag_enqueue_assets() {
     // Only load assets if the shortcode is present (optional optimization, but good practice)
@@ -25,8 +62,8 @@ function hochzeitstag_enqueue_assets() {
     // Enqueue Local Fonts
     wp_enqueue_style( 'hochzeitstag-fonts', plugins_url( 'assets/fonts/fonts.css', __FILE__ ), array(), '1.0' );
 
-    // Enqueue Google Font 'Playfair Display'
-    wp_enqueue_style( 'hochzeitstag-google-fonts', 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap', array(), null );
+    // Enqueue Google Font 'Playfair Display' and 'Lato'
+    wp_enqueue_style( 'hochzeitstag-google-fonts', 'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&display=swap', array(), null );
 
     // Enqueue Main Styles
     wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.0' );
@@ -38,10 +75,11 @@ function hochzeitstag_enqueue_assets() {
     // Pass ajaxurl to our script
     wp_localize_script( 'hochzeitstag-script', 'hochzeitstag_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
-add_action( 'wp_enqueue_scripts', 'hochzeitstag_enqueue_assets' );
+// Removed global enqueue to prevent style leakage
+// add_action( 'wp_enqueue_scripts', 'hochzeitstag_enqueue_assets' );
 
 /**
- * Shortcode callback to render the countdown.
+ * Shortcode callback to render the countdown (Legacy support).
  */
 function hochzeitstag_render_shortcode() {
     ob_start();
@@ -156,19 +194,19 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
 
     $email_addresses = array();
     // Husband
-    if ( preg_match( '/husband:\s*\{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
+    if ( preg_match( '/husband:\s*{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
         $email_addresses['husband'] = array( 'email' => $m[1], 'name' => $m[2] );
     }
     // Wife
-    if ( preg_match( '/wife:\s*\{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
+    if ( preg_match( '/wife:\s*{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
         $email_addresses['wife'] = array( 'email' => $m[1], 'name' => $m[2] );
     }
 
     $quotes = array();
-    if ( preg_match( '/quotes:\s*\[(.*?)\]/s', $config_js_content, $m_quotes_block ) ) {
+    if ( preg_match( '/quotes:\s*\[(.*?)(\s*)\]/s', $config_js_content, $m_quotes_block ) ) {
         $quotes_content = $m_quotes_block[1];
         // Match all strings inside double quotes
-        if ( preg_match_all( '/"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"/', $quotes_content, $m_quotes ) ) {
+        if ( preg_match_all( '/"([^"\\]*(?:\\.[^"\\]*)*)"/', $quotes_content, $m_quotes ) ) {
              $quotes = $m_quotes[1];
         }
     }

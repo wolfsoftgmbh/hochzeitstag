@@ -12,7 +12,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Baloo 2', 'Segoe UI', sans-serif; /* Baloo 2 behalten, falls gewünscht */
+    font-family: 'Lato', sans-serif; /* Lato für Fließtext */
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -54,32 +54,101 @@ body {
 
 /* --- GLASS CARD --- */
 .glass-card {
-    /* Mehr Weiß-Anteil im Hintergrund für Lesbarkeit */
-    background: rgba(255, 255, 255, 0.65); 
-    /* Stärkerer Blur für den Hintergrund */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    /* Ein knackiger weißer Rand ist das Geheimnis für den Glass-Look */
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    /* Schlagschatten für 3D-Effekt (Tiefe) */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05);
+    /* Weniger Deckkraft (0.5 statt 0.65), dafür mehr Blur */
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    
+    /* Ein sehr feiner, heller Rand lässt es wie geschliffenes Glas wirken */
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     border-radius: 24px;
-    padding: 30px;
+    padding: 0 0 30px 0; /* Padding oben auf 0, damit Bild am Rand klebt */
     text-align: center;
     position: relative;
     overflow: hidden;
 }
 
+.content-wrapper {
+    padding: 0 30px; /* Padding wiederherstellen für den Inhalt */
+}
+
 .card-header-image {
     width: 100%;
-    height: 180px; /* Höhe nach Geschmack */
-    background-image: url('kiss.jpeg'); /* Pfad anpassen! */
+    height: 220px; /* Ruhig etwas höher machen */
+    background-image: url('kiss.jpeg'); /* Dein Bildpfad */
     background-size: cover;
-    background-position: center;
-    border-radius: 20px 20px 0 0; /* Oben rund, unten eckig passend zur Karte */
-    margin: -30px -30px 20px -30px; /* Negative Margins ziehen es an den Rand der Karte */
-    mask-image: linear-gradient(to bottom, black 60%, transparent 100%); /* Sanftes Ausblenden nach unten */
+    background-position: center 20%; /* Bild etwas nach oben schieben */
+    border-radius: 20px 20px 0 0;
+    
+    /* Der Trick: Ein Verlauf von Schwarz (sichtbar) zu Transparent (unsichtbar) */
     -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    
+    /* Zieht den Text darunter visuell in das Bild hinein */
+    margin-bottom: -60px; 
+    margin-left: -30px; /* Kompensiere .content-wrapper padding falls nötig, hier nicht da image außerhalb von wrapper ist? nein es ist drin */
+    margin-right: -30px;
+    /* Wait, the image is inside .content-wrapper in existing HTML. But .glass-card has padding: 0 now. 
+       Actually, in my HTML structure, .content-wrapper is inside .glass-card.
+       If .glass-card has padding:0, .content-wrapper touches edges.
+       So .card-header-image inside .content-wrapper works.
+       BUT, I need to add padding to .content-wrapper for the REST of the content.
+       Or move .card-header-image OUTSIDE .content-wrapper if .content-wrapper has padding.
+       Let's assume .content-wrapper gets the padding: 0 30px; 
+       And .card-header-image needs negative margins to span full width IF .content-wrapper has padding.
+       OR, simpler: .glass-card has padding 0. .card-header-image is first child of .content-wrapper.
+       .content-wrapper gets padding 0 30px? No, then image would be indented.
+       
+       Let's adjust:
+       .glass-card { padding: 0 0 30px 0; }
+       .content-wrapper { } -> This wraps everything. 
+       
+       If .card-header-image is INSIDE .content-wrapper, and I want it full width, .content-wrapper must have 0 padding.
+       Then I need to add padding to individual elements or a new inner wrapper.
+       
+       Easiest fix given current HTML:
+       .glass-card has padding 0.
+       .content-wrapper has padding 0 (default).
+       .card-header-image is full width.
+       .header-section, .counter-grid, .section-title, .timeline-container, etc. need side padding.
+       OR
+       .content-wrapper { padding: 0 30px; }
+       .card-header-image { margin: 0 -30px -60px -30px; } -> pulls it out.
+       
+       Let's stick to the negative margin approach compatible with .content-wrapper having padding.
+       Wait, I set .glass-card padding to 0 0 30px 0. 
+       Previously .glass-card had padding: 30px.
+       The user instruction says: "padding: 0 0 30px 0; /* Padding oben auf 0, damit Bild am Rand klebt */"
+       
+       If .glass-card has 0 padding on sides, content touches edge.
+       I will set .glass-card padding to 0.
+       And add padding to .content-wrapper.
+    */
+    position: relative;
+    z-index: 0;
+    
+    /* Reset margins for the new structure where .glass-card has 0 padding top/sides */
+    margin: 0; 
+    margin-bottom: -60px;
+}
+
+/* Adjust wrapper to handle content padding */
+.content-wrapper {
+    padding: 0 30px;
+}
+
+/* Specific fix for image if it is inside content-wrapper which has padding */
+.content-wrapper .card-header-image {
+    margin-left: -30px;
+    margin-right: -30px;
+    width: calc(100% + 60px);
+}
+
+.header-section {
+    position: relative;
+    z-index: 1; /* Liegt über dem auslaufenden Bild */
+    padding-top: 20px;
 }
 
 h1 {
@@ -87,6 +156,10 @@ h1 {
     margin: 0;
     font-size: 2.2rem;
     font-weight: 700;
+}
+
+h1, .section-title {
+    font-family: 'Playfair Display', serif; /* Elegant und emotional */
 }
 
 .subtitle {
@@ -123,19 +196,22 @@ h1 {
 }
 
 .glass-circle .number {
-    font-family: 'Playfair Display', serif; /* Falls geladen, sonst Serif */
-    color: #883e4c; /* Dunkleres Rot für Kontrast */
+    font-family: 'Playfair Display', serif;
+    color: #883e4c;
     font-weight: 700;
-    font-size: 1.8rem;
-    line-height: 1.1;
+    font-size: 2.2rem; /* Größer */
+    line-height: 1;
+    margin-bottom: 5px;
 }
 
 .glass-circle .label {
+    font-family: 'Lato', sans-serif; /* Cleanere Schrift für Labels */
+    font-size: 0.65rem;
+    letter-spacing: 2px; /* Mehr Abstand zwischen Buchstaben wirkt edel */
+    opacity: 0.7;
     color: #b76e79;
-    font-weight: 600;
-    font-size: 0.7rem;
-    letter-spacing: 1px;
     text-transform: uppercase;
+    font-weight: 600;
 }
 
 /* --- QUOTE BOX --- */
@@ -173,8 +249,13 @@ h1 {
     top: 5px;
     bottom: 5px;
     width: 3px;
-    background: rgba(255, 255, 255, 0.8);
     border-radius: 2px;
+    background: linear-gradient(to bottom, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.8) 10%, 
+        rgba(255,255,255,0.8) 90%, 
+        rgba(255,255,255,0) 100%
+    );
 }
 
 .timeline-item {
