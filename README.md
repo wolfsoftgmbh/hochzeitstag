@@ -19,7 +19,29 @@ A romantic, single-page application and WordPress plugin to track the time since
 5.  **View:** Visit `your-site.com/hochzeit/` to see your countdown.
 
 ## Configuration
-The plugin configuration (dates, quotes, names) is located in `assets/config.js` within the plugin folder. You can edit this file directly via the Plugin Editor or via FTP.
+The plugin configuration is located in `assets/config.js` within the plugin folder. You can edit this file directly via the Plugin Editor or via FTP.
+
+The configuration object `HOCHZEITSTAG_CONFIG` contains the following customizable properties:
+
+### Dates
+*   `weddingDate` (string): The date and time of your wedding (ISO 8601 format, e.g., `"2025-09-06T11:02:00"`). This is the base for the main countdown.
+*   `firstContactDate` (string): Date of first contact ("Erster Kontakt").
+*   `firstMeetDate` (string): Date when you got together ("Zusammen").
+*   `birthdays` (object): Key-value pairs for birthdays to appear in the milestone timeline.
+    *   Format: `name: "YYYY-MM-DD"` (e.g., `klaus: "1967-08-02"`).
+
+### Visuals
+*   `backgroundImage` (string): Filename of the background image (located in `assets/`). Defaults to `"kiss.jpeg"`.
+
+### Notifications (Email)
+*   `emailAddresses` (object): Configuration for email reminders.
+    *   `husband` / `wife`: Objects containing `email` and `name`.
+*   `emailReminderDaysFirst` (number): Days before an event to send the first reminder (Default: 7).
+*   `emailReminderDaysSecond` (number): Days before an event to send the second reminder (Default: 1).
+*   `enableEmailTestButton` (boolean): Set to `true` to show a "Test Email" button in the footer for debugging.
+
+### Content
+*   `quotes` (array of strings): A list of romantic or humorous quotes that are displayed randomly on the page.
 
 ## Development
 *   **Frontend:** The core logic lives in `frontend/`. Open `wedding.html` in a browser to develop locally.
