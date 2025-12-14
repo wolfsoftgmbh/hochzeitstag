@@ -1,322 +1,263 @@
-/* 
- * GLOBAL STYLES 
- */
 :root {
-    --primary-pink: #e91e63;
-    --soft-pink: #f8bbd0;
-    --light-pink: #ffc1e3;
-    --bg-gradient-start: #fff0f5; /* Lavender Blush */
-    --bg-gradient-end: #f48fb1;   /* Pink */
-    --card-bg-overlay: rgba(255, 255, 255, 0.85);
-    --text-color: #4a4a4a;
-    --box-shadow: 0 4px 15px rgba(233, 30, 99, 0.2);
-    --bg-image-url: url('kiss.jpeg'); /* Default background image */
+    /* Modern Palette: Dusty Rose & Gold/Warm Grey */
+    --primary-color: #b76e79; /* Dusty Rose */
+    --accent-color: #d4a5a5;  /* Lighter Rose */
+    --text-main: #4a4a4a;
+    --text-muted: #6c757d;
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 }
 
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Baloo 2', cursive, sans-serif;
+    font-family: 'Baloo 2', 'Segoe UI', sans-serif; /* Baloo 2 behalten, falls gewünscht */
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Full page pink gradient background */
-    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-    color: var(--text-color);
+    /* Lebendiger Hintergrund für den Glass-Effekt */
+    background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+    color: var(--text-main);
+    overflow-x: hidden;
 }
 
-/* 
- * CARD CONTAINER 
- */
+/* Dekorative Hintergrund-Formen für Tiefe */
+.bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.6;
+}
+.shape-1 {
+    width: 300px;
+    height: 300px;
+    background: #ffecd2;
+    top: -50px;
+    left: -50px;
+}
+.shape-2 {
+    width: 400px;
+    height: 400px;
+    background: #fcb69f;
+    bottom: -100px;
+    right: -100px;
+}
+
 .container {
     width: 90%;
-    max-width: 600px;
-    padding: 20px;
+    max-width: 500px; /* Etwas schmaler für Eleganz */
+    padding: 20px 0;
 }
 
-.card {
-    position: relative;
-    background-color: white;
-    border-radius: 30px;
-    padding: 40px 20px;
+/* --- GLASS CARD --- */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px); /* Der Milchglas-Effekt */
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    padding: 30px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    overflow: hidden; /* Ensures background image stays inside rounded corners */
-}
-
-/* 
- * BACKGROUND IMAGE CONFIGURATION
- * Replace the URL below with your actual wedding photo.
- */
-.card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* Placeholder image - Replace url(...) with your photo */
-    background-image: var(--bg-image-url);
-    background-size: cover;
-    background-position: center;
-    filter: blur(1px); /* Blur effect */
-    z-index: 0;
-}
-
-/* White/Pink Overlay to make text readable */
-.card::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--card-bg-overlay);
-    z-index: 1;
-}
-
-/* Ensures content sits above the background and overlay */
-.content-wrapper {
     position: relative;
-    z-index: 2;
+    overflow: hidden;
 }
 
-/* 
- * TYPOGRAPHY 
- */
 h1 {
-    color: var(--primary-pink);
+    color: #883e4c; /* Dunklerer Ton für Kontrast */
     margin: 0;
-    font-size: 2.5rem;
-    font-weight: 800;
-    line-height: 1.2;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    font-size: 2.2rem;
+    font-weight: 700;
 }
 
 .subtitle {
-    color: #757575;
-    margin-top: 5px;
-    margin-bottom: 30px;
-    font-size: 1.1rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 25px;
     font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
-/* 
- * COUNTER BOXES 
- */
-.row-grid {
+/* --- COUNTER CIRCLES --- */
+.counter-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.box {
-    background-color: #fff;
-    border: 2px solid var(--soft-pink);
-    border-radius: 15px;
-    padding: 15px 5px;
-    box-shadow: var(--box-shadow);
-    transition: transform 0.2s ease;
-}
-
-.box:hover {
-    transform: translateY(-3px);
-    border-color: var(--primary-pink);
-}
-
-.box .number {
-    display: block;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary-pink);
-    line-height: 1;
-}
-
-.box .label {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 5px;
-    display: block;
-}
-
-/* Total Stats Row */
-.stats-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 30px;
 }
 
-.stats-box {
-    background-color: #fce4ec; /* Very light pink */
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
+.glass-circle {
+    background: rgba(255,255,255, 0.4);
+    border: 1px solid rgba(255,255,255, 0.6);
+    border-radius: 15px; /* Soft square/circle mix */
+    padding: 10px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
 }
 
-.stats-box .number {
-    font-size: 1.4rem;
-    color: #c2185b; /* Darker pink */
+.glass-circle:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255, 0.6);
 }
 
-/* 
- * MILESTONE BOX
- */
-.milestone-box {
-    background-color: #fff;
-    border: 2px solid var(--soft-pink);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 25px;
-    box-shadow: var(--box-shadow);
+.glass-circle .number {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    line-height: 1.1;
+}
+
+.glass-circle .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+}
+
+/* --- QUOTE BOX --- */
+.quote-box {
+    margin-bottom: 30px;
+    font-style: italic;
+    color: #883e4c;
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 0 10px;
+}
+
+/* --- TIMELINE STYLES --- */
+.section-title {
+    text-align: left;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.timeline-container {
+    position: relative;
+    padding: 0 10px;
+}
+
+/* Die vertikale Linie */
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 26px; /* Position der Linie */
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: rgba(255,255,255, 0.6);
+    border-radius: 2px;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: flex-start; /* Oben bündig */
+    margin-bottom: 15px;
+    position: relative;
     text-align: left;
 }
 
-.milestone-title {
-    color: var(--primary-pink);
-    font-size: 1.3rem;
+.timeline-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--primary-color);
+    border: 2px solid white;
+    border-radius: 50%;
+    margin-right: 15px;
+    margin-top: 4px; /* Optisch ausrichten mit Text */
+    flex-shrink: 0;
+    z-index: 1; /* Über der Linie */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.timeline-content {
+    background: rgba(255, 255, 255, 0.4);
+    padding: 10px 15px;
+    border-radius: 10px;
+    flex-grow: 1;
+    position: relative;
+}
+
+/* Kleiner Pfeil links am Content */
+.timeline-content::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 8px;
+    width: 0; 
+    height: 0; 
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent; 
+    border-right: 6px solid rgba(255, 255, 255, 0.4);
+}
+
+.t-label {
+    display: block;
     font-weight: 700;
-    margin-bottom: 15px;
-    text-align: center;
+    color: var(--text-main);
+    font-size: 0.95rem;
 }
 
-.milestone-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.t-date {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
 }
 
-.milestone-item {
-    padding: 8px 0;
-    border-bottom: 1px dashed #eee;
-    font-size: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.milestone-item:last-child {
-    border-bottom: none;
-}
-
-.milestone-label {
+.t-countdown {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--primary-color);
     font-weight: 600;
-    color: #d81b60;
-    margin-right: 10px;
-}
-
-.milestone-date {
-    color: #666;
     text-align: right;
 }
 
-/*
- * QUOTE BOX
- */
-.quote-box {
-    background-color: var(--bg-gradient-start);
-    border: 2px solid var(--soft-pink);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 25px;
-    box-shadow: var(--box-shadow);
-    font-size: 1.1rem;
-    font-style: italic;
-    color: #d81b60;
-    line-height: 1.4;
+/* --- FOOTER --- */
+.footer-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    font-size: 0.8rem;
+    color: #777;
+    opacity: 0.8;
 }
 
-/* 
- * FOOTER INFO 
- */
+.footer-stats span {
+    font-weight: 700;
+}
+
 .footer-info {
     margin-top: 20px;
-    border-top: 1px dashed #ccc;
     padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.05);
 }
 
 .start-date {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: #888;
-    margin-bottom: 15px;
-    display: block;
+    margin-bottom: 10px;
 }
 
-.countdown-pill {
-    background-color: var(--primary-pink);
+.next-anniversary-pill {
+    background: var(--primary-color);
     color: white;
     display: inline-block;
-    padding: 10px 25px;
+    padding: 8px 20px;
     border-radius: 50px;
-    font-size: 1rem;
-    font-weight: 600;
-    box-shadow: 0 4px 10px rgba(233, 30, 99, 0.4);
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-/* History Table Styles */
-.history-table-container {
-    overflow-x: auto;
-}
-.history-table {
-    width: 100%;
-    border-collapse: collapse;
     font-size: 0.9rem;
-}
-.history-table th, .history-table td {
-    padding: 8px 4px; /* Reduced padding for mobile */
-    text-align: center;
-    border-bottom: 1px dashed #eee;
-}
-.history-table th {
-    color: var(--primary-pink);
-    font-weight: 700;
-}
-.history-table td {
-    color: #666;
-}
-.history-table td:first-child {
-    text-align: left;
-    font-weight: 600;
-    color: #d81b60;
-}
-
-.history-table th:first-child {
-    text-align: left;
-}
-
-/* 
- * RESPONSIVE ADJUSTMENTS 
- */
-@media (max-width: 480px) {
-    h1 { font-size: 2rem; }
-    
-    /* Wrap the 4 top boxes into 2 rows of 2 */
-    .row-grid {
-        grid-template-columns: 1fr 1fr; 
-    }
-    
-    .box .number { font-size: 1.5rem; }
-    
-    .stats-row {
-        grid-template-columns: 1fr; /* Stack total stats vertically */
-    }
-
-    .milestone-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .milestone-date {
-        text-align: left;
-        margin-top: 2px;
-    }
-    
-    .history-table th, .history-table td {
-        font-size: 0.8rem;
-        padding: 6px 2px;
-    }
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(183, 110, 121, 0.4);
+    margin-top: 10px;
 }
