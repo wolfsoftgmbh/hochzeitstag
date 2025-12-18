@@ -327,45 +327,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Update Email Schedule Info
             if (elEmailScheduleInfo) {
-                // Find next anniversary
-                let nextAnniv = null;
-                const currentYear = now.getFullYear();
-                // Check this year and next
-                for(let y = currentYear; y <= currentYear + 1; y++) {
-                     let d = new Date(WEDDING_DATE);
-                     d.setFullYear(y);
-                     // Set time to wedding time for accurate comparison
-                     d.setHours(WEDDING_DATE.getHours(), WEDDING_DATE.getMinutes(), WEDDING_DATE.getSeconds());
-                     
-                     if (d > now) {
-                         nextAnniv = d;
-                         break;
-                     }
-                }
+                // Calculate next email based on ALL upcoming milestones
+                const potentialReminders = [];
                 
-                if (nextAnniv) {
-                    // Reminders: 7 days before, 1 day before
-                    const reminder1 = new Date(nextAnniv);
-                    reminder1.setDate(reminder1.getDate() - (CONFIG.emailReminderDaysFirst || 7));
+                uniqueMilestones.forEach(m => {
+                    // Reminder 1: 7 days before
+                    const r1 = new Date(m.date);
+                    r1.setDate(r1.getDate() - (CONFIG.emailReminderDaysFirst || 7));
+                    // Set time to something slightly in the future if it's today, to be safe, 
+                    // but 'now' comparison handles it.
                     
-                    const reminder2 = new Date(nextAnniv);
-                    reminder2.setDate(reminder2.getDate() - (CONFIG.emailReminderDaysSecond || 1));
+                    // Reminder 2: 1 day before
+                    const r2 = new Date(m.date);
+                    r2.setDate(r2.getDate() - (CONFIG.emailReminderDaysSecond || 1));
                     
-                    let nextEmailDate = null;
-                    if (reminder1 > now) nextEmailDate = reminder1;
-                    else if (reminder2 > now) nextEmailDate = reminder2;
-                    else {
-                        // Both reminders for THIS anniversary passed. Next one is next year's 7-day reminder.
-                         let nextNextAnniv = new Date(nextAnniv);
-                         nextNextAnniv.setFullYear(nextAnniv.getFullYear() + 1);
-                         const r1Next = new Date(nextNextAnniv);
-                         r1Next.setDate(r1Next.getDate() - (CONFIG.emailReminderDaysFirst || 7));
-                         nextEmailDate = r1Next;
-                    }
-                    
-                    if (nextEmailDate) {
-                        elEmailScheduleInfo.innerText = `Nächste Mail: ${formatShortDate(nextEmailDate)}`;
-                    }
+                    if (r1 > now) potentialReminders.push(r1);
+                    if (r2 > now) potentialReminders.push(r2);
+                });
+                
+                // Sort to find the very next one
+                potentialReminders.sort((a,b) => a - b);
+                
+                if (potentialReminders.length > 0) {
+                    elEmailScheduleInfo.innerText = `Nächste Mail: ${formatShortDate(potentialReminders[0])}`;
+                } else {
+                    elEmailScheduleInfo.innerText = "Keine ausstehenden Erinnerungen";
                 }
             }
         }
