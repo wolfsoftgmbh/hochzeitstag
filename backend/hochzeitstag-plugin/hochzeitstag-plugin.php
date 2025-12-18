@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 1.5
+ * Version: 1.6
  * Author: Gemini
  */
 
@@ -43,13 +43,37 @@ function hochzeitstag_template_include( $template ) {
 add_filter( 'template_include', 'hochzeitstag_template_include' );
 
 /**
- * Activation Hook to flush rules
+ * Activation Hook to flush rules and schedule cron
  */
 function hochzeitstag_activate() {
     hochzeitstag_rewrite_rule();
     flush_rewrite_rules();
+
+    if ( ! wp_next_scheduled( 'hochzeitstag_daily_event' ) ) {
+        // Schedule for 09:00:00
+        $time = strtotime( 'tomorrow 09:00:00' );
+        wp_schedule_event( $time, 'daily', 'hochzeitstag_daily_event' );
+    }
 }
 register_activation_hook( __FILE__, 'hochzeitstag_activate' );
+
+/**
+ * Deactivation Hook to clear cron
+ */
+function hochzeitstag_deactivate() {
+    wp_clear_scheduled_hook( 'hochzeitstag_daily_event' );
+    flush_rewrite_rules();
+}
+register_deactivation_hook( __FILE__, 'hochzeitstag_deactivate' );
+
+/**
+ * Cron Handler
+ */
+add_action( 'hochzeitstag_daily_event', 'hochzeitstag_cron_check' );
+function hochzeitstag_cron_check() {
+    // Attempt to send email with automatic date checking (force_send = false)
+    _hochzeitstag_prepare_and_send_email( array( 'force_send' => false ) );
+}
 
 /**
  * Enqueue scripts and styles (Legacy/Shortcode support)
@@ -171,28 +195,41 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     $config_js_path = plugin_dir_path( __FILE__ ) . 'assets/config.js';
     $config_js_content = file_get_contents( $config_js_path );
 
-    // Manual extraction of configuration variables
-    $wedding_date_str = '';
+    // --- CONFIG EXTRACTION ---
+
+    // 1. Dates
+    $dates = array();
+    
+    // Wedding Date
     if ( preg_match( '/weddingDate:\s*"([^"]+)"/', $config_js_content, $m ) ) {
-        $wedding_date_str = $m[1];
+        $dates['wedding'] = $m[1];
     } else {
         return array( 'success' => false, 'message' => 'Fehler: Hochzeitsdatum (weddingDate) konnte nicht aus der Konfiguration gelesen werden.' );
     }
 
-    // Reminder Days
+    // First Contact & Meet
+    if ( preg_match( '/firstContactDate:\s*"([^"]+)"/', $config_js_content, $m ) ) $dates['contact'] = $m[1];
+    if ( preg_match( '/firstMeetDate:\s*"([^"]+)"/', $config_js_content, $m ) )    $dates['meet'] = $m[1];
+
+    // Birthdays
+    $birthdays = array();
+    if ( preg_match( '/birthdays:\s*\{(.*?)\}/s', $config_js_content, $m_block ) ) {
+        if ( preg_match_all( '/(\w+):\s*"([^"]+)"/', $m_block[1], $m_bday ) ) {
+            foreach ($m_bday[1] as $index => $key) {
+                $birthdays[$key] = $m_bday[2][$index];
+            }
+        }
+    }
+
+    // 2. Reminder Days
     $reminder_days_first = 7;
     $reminder_days_second = 1;
     if ( preg_match( '/emailReminderDays:\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]/', $config_js_content, $m ) ) {
         $reminder_days_first = intval($m[1]);
         $reminder_days_second = intval($m[2]);
-    } elseif ( preg_match( '/emailReminderDaysFirst:\s*(\d+)/', $config_js_content, $m ) ) {
-        $reminder_days_first = intval($m[1]);
-         if ( preg_match( '/emailReminderDaysSecond:\s*(\d+)/', $config_js_content, $m2 ) ) {
-            $reminder_days_second = intval($m2[1]);
-        }
     }
 
-    // Email Addresses
+    // 3. Email Addresses
     $email_addresses = array();
     if ( preg_match( '/husband:\s*{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
         $email_addresses['husband'] = array( 'email' => $m[1], 'name' => $m[2] );
@@ -201,7 +238,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         $email_addresses['wife'] = array( 'email' => $m[1], 'name' => $m[2] );
     }
 
-    // Quotes
+    // 4. Quotes & Ideas
     $quotes = array();
     if ( preg_match( '/quotes:\s*\[(.*?)(\s*)\]/s', $config_js_content, $m_quotes_block ) ) {
         $quotes_content = $m_quotes_block[1];
@@ -211,11 +248,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     }
     if ( empty($quotes) ) $quotes = array("Liebe ist alles.");
 
-    // Parse Surprise Ideas
     $surprise_ideas = array();
-    // Try to find surpriseIdeas array
-    // Since it's at the end, regex might be tricky if not careful with greedy matching, but structure is simple
-    // Look for "surpriseIdeas: [" then content then "]"
     if ( preg_match( '/surpriseIdeas:\s*\[(.*?)(\s*)\]/s', $config_js_content, $m_ideas_block ) ) {
         $ideas_content = $m_ideas_block[1];
          if ( preg_match_all( '/"([^"\\]*(?:\\.[^"\\]*)*)"/', $ideas_content, $m_ideas ) ) {
@@ -223,56 +256,124 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         }
     }
 
-    // --- LOGIC: DETERMINE EVENT ---
+    // --- MILESTONE CALCULATION ---
     $today = new DateTime();
-    $today->setTime(0, 0, 0); // Normalize today
-    $wedding_date_config = new DateTime( $wedding_date_str );
-    $wedding_date_config->setTime(0, 0, 0);
+    $today->setTime(0, 0, 0);
+    $wedding_date = new DateTime( $dates['wedding'] );
+    $wedding_date->setTime(0, 0, 0);
 
-    // Calculate upcoming events to check against
     $upcoming_events = array();
+    $one_day_interval = new DateInterval('P1D');
 
-    // 1. Anniversary
-    $next_anniversary = new DateTime( $wedding_date_str );
-    $next_anniversary->setTime(0,0,0);
-    // Move to next future date
-    while ($next_anniversary <= $today) {
-        $next_anniversary->modify('+1 year');
+    // Helper to add annual event
+    $add_annual = function($date_str, $label_base) use ($today, &$upcoming_events) {
+        if (!$date_str) return;
+        $base_date = new DateTime($date_str);
+        $base_date->setTime(0,0,0);
+        $current_year = $today->format('Y');
+        
+        // Check this year and next
+        for ($y = $current_year; $y <= $current_year + 1; $y++) {
+            $evt_date = clone $base_date;
+            $evt_date->setDate($y, $base_date->format('m'), $base_date->format('d'));
+            
+            if ($evt_date >= $today) {
+                // Calculate anniversary number if it's an annual thing
+                $years = $y - $base_date->format('Y');
+                $label = ($years > 0) ? "{$years}. {$label_base}" : $label_base;
+                $upcoming_events[] = array('label' => $label, 'date' => $evt_date);
+            }
+        }
+    };
+
+    // A. Annual Events
+    $add_annual($dates['wedding'], "Hochzeitstag");
+    if (isset($dates['contact'])) $add_annual($dates['contact'], "Jahrestag (Erster Kontakt)");
+    if (isset($dates['meet']))    $add_annual($dates['meet'], "Jahrestag (Zusammen)");
+
+    // B. Birthdays
+    foreach ($birthdays as $name => $date_str) {
+        $name_uc = ucfirst($name);
+        $add_annual($date_str, "Geburtstag {$name_uc}");
     }
-    $anniv_year = $next_anniversary->format('Y') - $wedding_date_config->format('Y');
-    $upcoming_events[] = array(
-        'label' => "{$anniv_year}. Hochzeitstag",
-        'date' => clone $next_anniversary
-    );
 
-    // 2. Thousands (Schnapszahlen logic simplified to 1000 steps)
-    $diff_days = $today->diff($wedding_date_config)->days;
-    $next_thousand_num = ceil(($diff_days + 1) / 1000) * 1000;
-    $date_thousand = clone $wedding_date_config;
-    $date_thousand->modify("+$next_thousand_num days");
-    $upcoming_events[] = array(
-        'label' => "{$next_thousand_num}. Tag gemeinsam",
-        'date' => $date_thousand
-    );
+    // C. 1000s & Repdigits (Schnapszahlen)
+    $diff_days = $today->diff($wedding_date)->days;
+    // Check next 2000 days range to cover upcoming
+    $check_range = 2000; 
+    
+    // 1000s
+    $next_thousand = ceil(($diff_days + 1) / 1000) * 1000;
+    $date_thousand = clone $wedding_date;
+    $date_thousand->modify("+$next_thousand days");
+    $upcoming_events[] = array('label' => "{$next_thousand}. Tag gemeinsam", 'date' => $date_thousand);
 
-    // Determine if we need to send an email
+    // Repdigits (111, 222 ... 1111, 2222 ... 11111)
+    for ($digits = 3; $digits <= 5; $digits++) {
+        for ($n = 1; $n <= 9; $n++) {
+            $num = intval(str_repeat((string)$n, $digits));
+            if ($num > $diff_days) {
+                $d = clone $wedding_date;
+                $d->modify("+$num days");
+                // Only add if relatively close (within 2 years) to avoid huge array
+                if ($d->diff($today)->days < 750) {
+                     $upcoming_events[] = array('label' => "{$num}. Tag (Schnapszahl!)", 'date' => $d);
+                }
+            }
+        }
+    }
+
+    // D. Quarter Years
+    // Logic: Iterate quarters relative to wedding date
+    $current_year_num = $today->format('Y');
+    $wedding_year_num = $wedding_date->format('Y');
+    
+    for ($y_offset = -1; $y_offset <= 2; $y_offset++) {
+        $target_year = $current_year_num + $y_offset;
+        $years_passed = $target_year - $wedding_year_num;
+        
+        for ($q = 1; $q <= 3; $q++) { // 1=1/4, 2=1/2, 3=3/4
+            $q_date = clone $wedding_date;
+            $q_date->modify("+{$years_passed} years");
+            $months_add = $q * 3;
+            $q_date->modify("+{$months_add} months");
+            
+            if ($q_date >= $today) {
+                $fraction = ($q === 1) ? "1/4" : (($q === 2) ? "1/2" : "3/4");
+                $label_years = $years_passed;
+                // If we added months, we are effectively in the year "years_passed".
+                // Example: Wedding 2000. Target 2000. Q1 = +3 months. Label: "0 1/4 Jahre".
+                // Target 2001. +3 months. Label: "1 1/4 Jahre".
+                $upcoming_events[] = array('label' => "{$label_years} {$fraction} Jahre", 'date' => $q_date);
+            }
+        }
+    }
+
+    // --- TRIGGER LOGIC ---
     $target_event = null;
     $reminder_suffix = '';
     $force_send = (isset($atts['force_send']) && filter_var($atts['force_send'], FILTER_VALIDATE_BOOLEAN));
     
-    // Check automatic triggers
+    // Sort events by date
+    usort($upcoming_events, function($a, $b) {
+        return $a['date'] <=> $b['date'];
+    });
+
+    // Check triggers
     foreach($upcoming_events as $evt) {
-        $diff = $today->diff($evt['date']);
-        // diff->days is absolute, need to check direction. But we calculated future dates.
-        // wait, diff->days is always positive. $diff->invert is 1 if date is in past.
-        // We ensured dates are > today.
-        
-        $days_until = $diff->days;
-        
+        // We need exact day match.
+        // Diff returns absolute days usually, but let's be precise.
+        // We know evt->date >= today.
+        $interval = $today->diff($evt['date']);
+        $days_until = $interval->days; // This is absolute difference
+
+        // Safety check: verify date is in future
+        if ($evt['date'] < $today) continue;
+
         if ($days_until == $reminder_days_first) {
             $target_event = $evt;
             $reminder_suffix = ' (in 7 Tagen)';
-            break;
+            break; // Prioritize closest (though sorting handles this, closest comes first)
         }
         if ($days_until == $reminder_days_second) {
             $target_event = $evt;
@@ -283,13 +384,25 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
 
     // Override if forced (Test Email)
     if ( $force_send ) {
-        // Use provided label/date or fallback to next anniversary
-        $lbl = isset($atts['event_label']) ? sanitize_text_field($atts['event_label']) : $upcoming_events[0]['label'];
-        $dt  = isset($atts['event_date']) ? sanitize_text_field($atts['event_date']) : $upcoming_events[0]['date']->format('d.m.Y');
+        // Use provided label/date or fallback to first upcoming
+        $lbl = isset($atts['event_label']) ? sanitize_text_field($atts['event_label']) : (isset($upcoming_events[0]) ? $upcoming_events[0]['label'] : 'Test-Event');
+        $dt_val = isset($atts['event_date']) ? sanitize_text_field($atts['event_date']) : (isset($upcoming_events[0]) ? $upcoming_events[0]['date'] : $today);
         
+        // Normalize date object if it came from array
+        if (is_string($dt_val) && !empty($dt_val)) {
+             // Try parsing german format dd.mm.yyyy? Or assume ISO?
+             // Frontend sends dd.mm.yyyy usually (e.g. 05.09.2025)
+             $dt_obj = DateTime::createFromFormat('d.m.Y', $dt_val);
+             if (!$dt_obj) $dt_obj = new DateTime($dt_val); // Try ISO
+        } elseif ($dt_val instanceof DateTime) {
+            $dt_obj = $dt_val;
+        } else {
+            $dt_obj = $today;
+        }
+
         $target_event = array(
             'label' => $lbl,
-            'date'  => (is_string($dt) ? $dt : $dt->format('d.m.Y')) // Handle object or string
+            'date'  => $dt_obj
         );
         $reminder_suffix = ' (Test)';
     }
@@ -298,7 +411,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         return array( 'success' => false, 'message' => 'Keine Erinnerung heute fällig.' );
     }
 
-    // Prepare Email Content
+    // --- EMAIL PREPARATION ---
     $defaults = array(
         'to'            => isset( $email_addresses['husband']['email'] ) ? $email_addresses['husband']['email'] : '',
         'recipient_name'=> isset( $email_addresses['husband']['name'] ) ? $email_addresses['husband']['name'] : 'Liebe/r',
@@ -315,8 +428,12 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     $to_email = sanitize_email( $parsed_atts['to'] );
     $recipient_name = sanitize_text_field( $parsed_atts['recipient_name'] );
     
+    if (empty($to_email)) {
+         return array( 'success' => false, 'message' => 'Keine E-Mail-Adresse konfiguriert.' );
+    }
+
     // Formatting date string
-    $event_date_str = is_object($target_event['date']) ? $target_event['date']->format('d.m.Y') : $target_event['date'];
+    $event_date_str = ($target_event['date'] instanceof DateTime) ? $target_event['date']->format('d.m.Y') : $target_event['date'];
 
     // Handle Ideas
     $ideas_list = array();
