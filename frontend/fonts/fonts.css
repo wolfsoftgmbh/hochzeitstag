@@ -47,3 +47,39 @@
        url('../fonts/Baloo2-ExtraBold.woff') format('woff');
   font-display: swap;
 }
+
+/* Lato Regular (400) */
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Lato-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Lato Bold (700) */
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/Lato-Bold.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Playfair Display Regular (400) */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/PlayfairDisplay-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+/* Playfair Display Bold (700) */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/PlayfairDisplay-Bold.ttf') format('truetype');
+  font-display: swap;
+}

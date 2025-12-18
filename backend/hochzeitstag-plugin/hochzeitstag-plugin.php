@@ -62,8 +62,7 @@ function hochzeitstag_enqueue_assets() {
     // Enqueue Local Fonts
     wp_enqueue_style( 'hochzeitstag-fonts', plugins_url( 'assets/fonts/fonts.css', __FILE__ ), array(), '1.0' );
 
-    // Enqueue Google Font 'Playfair Display' and 'Lato'
-    wp_enqueue_style( 'hochzeitstag-google-fonts', 'https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&display=swap', array(), null );
+
 
     // Enqueue Main Styles
     wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.0' );

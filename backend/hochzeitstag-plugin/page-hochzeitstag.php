@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     
     <!-- Fonts -->
     <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/fonts/fonts.css'; ?>" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
     
     <!-- Styles -->
     <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/style.css'; ?>" rel="stylesheet">
@@ -61,6 +61,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <span class="number" id="val-minutes">0</span>
                     <span class="label">Min</span>
                 </div>
+            </div>
+
+            <div class="section-title">Überraschungsidee</div>
+            <div id="surprise-display" class="quote-box" style="margin-bottom: 2rem;">
+                <!-- Random surprise idea will be inserted here -->
             </div>
 
             <div class="section-title">Nächste Meilensteine</div>

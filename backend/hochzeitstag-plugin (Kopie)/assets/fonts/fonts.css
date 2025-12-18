@@ -1,0 +1,49 @@
+/* Baloo 2 Regular (400) */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Baloo2-Regular.woff2') format('woff2'),
+       url('../fonts/Baloo2-Regular.woff') format('woff');
+  font-display: swap;
+}
+
+/* Baloo 2 Medium (500) */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/Baloo2-Medium.woff2') format('woff2'),
+       url('../fonts/Baloo2-Medium.woff') format('woff');
+  font-display: swap;
+}
+
+/* Baloo 2 SemiBold (600) */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 600;
+  src: url('../fonts/Baloo2-SemiBold.woff2') format('woff2'),
+       url('../fonts/Baloo2-SemiBold.woff') format('woff');
+  font-display: swap;
+}
+
+/* Baloo 2 Bold (700) */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/Baloo2-Bold.woff2') format('woff2'),
+       url('../fonts/Baloo2-Bold.woff') format('woff');
+  font-display: swap;
+}
+
+/* Baloo 2 ExtraBold (800) */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 800;
+  src: url('../fonts/Baloo2-ExtraBold.woff2') format('woff2'),
+       url('../fonts/Baloo2-ExtraBold.woff') format('woff');
+  font-display: swap;
+}

@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const elTotalSeconds = document.getElementById('total-seconds');
     const elTotalDays = document.getElementById('total-days');
     const elQuoteDisplay = document.getElementById('quote-display');
+    const elSurpriseDisplay = document.getElementById('surprise-display');
     const elWeddingDateDisplay = document.getElementById('wedding-date-display');
     
     const elMilestoneList = document.getElementById('milestone-list');
@@ -42,6 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!elQuoteDisplay || !CONFIG.quotes) return;
         const randomIndex = Math.floor(Math.random() * CONFIG.quotes.length);
         elQuoteDisplay.innerHTML = `„${CONFIG.quotes[randomIndex]}“`;
+    }
+
+    function displayRandomSurprise() {
+        if (!elSurpriseDisplay || !CONFIG.surpriseIdeas) return;
+        const randomIndex = Math.floor(Math.random() * CONFIG.surpriseIdeas.length);
+        elSurpriseDisplay.innerHTML = `💡 ${CONFIG.surpriseIdeas[randomIndex]}`;
     }
 
     function formatShortDate(date) {
@@ -313,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     displayRandomQuote();
+    displayRandomSurprise();
     updateTimer();
     setInterval(updateTimer, 1000);
 });
