@@ -57,6 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return date.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
     }
 
+    function getRandomIdeas(count) {
+        if (!CONFIG.surpriseIdeas) return [];
+        const shuffled = [...CONFIG.surpriseIdeas].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    }
+
     // Zeig nur Tage an
     function getRemainingDays(targetDate) {
         const now = new Date();
@@ -382,6 +388,9 @@ document.addEventListener('DOMContentLoaded', () => {
              if (firstItemLabel) milestoneLabel = firstItemLabel.innerText;
              if (firstItemDate) milestoneDate = firstItemDate.innerText;
 
+             // Get 5 random ideas
+             const ideas = getRandomIdeas(5);
+
              elTestEmailBtn.disabled = true;
              const originalText = elTestEmailBtn.innerText;
              elTestEmailBtn.innerText = "Sende...";
@@ -390,7 +399,12 @@ document.addEventListener('DOMContentLoaded', () => {
              data.append('action', 'hochzeitstag_send_test_email');
              data.append('event_label', milestoneLabel); // Override default label
              data.append('event_date', milestoneDate);   // Override default date
-             data.append('force', 'true');
+             data.append('force_send', 'true');
+             
+             // Append ideas array
+             ideas.forEach((idea, index) => {
+                 data.append(`ideas[${index}]`, idea);
+             });
 
              fetch(hochzeitstag_ajax_object.ajax_url, {
                  method: 'POST',
