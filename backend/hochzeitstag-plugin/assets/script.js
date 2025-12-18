@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const elQuoteDisplay = document.getElementById('quote-display');
     const elSurpriseDisplay = document.getElementById('surprise-display');
     const elWeddingDateDisplay = document.getElementById('wedding-date-display');
+    const elTestEmailBtn = document.getElementById('test-email-button');
+    const elEmailScheduleInfo = document.getElementById('email-schedule-info');
     
     const elMilestoneList = document.getElementById('milestone-list');
     const elHistoryList = document.getElementById('history-list');
@@ -316,7 +318,101 @@ document.addEventListener('DOMContentLoaded', () => {
                      elNextAnniversary.innerText = `Keine bevorstehenden Meilensteine`;
                 }
             }
+
+            // Update Email Schedule Info
+            if (elEmailScheduleInfo) {
+                // Find next anniversary
+                let nextAnniv = null;
+                const currentYear = now.getFullYear();
+                // Check this year and next
+                for(let y = currentYear; y <= currentYear + 1; y++) {
+                     let d = new Date(WEDDING_DATE);
+                     d.setFullYear(y);
+                     // Set time to wedding time for accurate comparison
+                     d.setHours(WEDDING_DATE.getHours(), WEDDING_DATE.getMinutes(), WEDDING_DATE.getSeconds());
+                     
+                     if (d > now) {
+                         nextAnniv = d;
+                         break;
+                     }
+                }
+                
+                if (nextAnniv) {
+                    // Reminders: 7 days before, 1 day before
+                    const reminder1 = new Date(nextAnniv);
+                    reminder1.setDate(reminder1.getDate() - (CONFIG.emailReminderDaysFirst || 7));
+                    
+                    const reminder2 = new Date(nextAnniv);
+                    reminder2.setDate(reminder2.getDate() - (CONFIG.emailReminderDaysSecond || 1));
+                    
+                    let nextEmailDate = null;
+                    if (reminder1 > now) nextEmailDate = reminder1;
+                    else if (reminder2 > now) nextEmailDate = reminder2;
+                    else {
+                        // Both reminders for THIS anniversary passed. Next one is next year's 7-day reminder.
+                         let nextNextAnniv = new Date(nextAnniv);
+                         nextNextAnniv.setFullYear(nextAnniv.getFullYear() + 1);
+                         const r1Next = new Date(nextNextAnniv);
+                         r1Next.setDate(r1Next.getDate() - (CONFIG.emailReminderDaysFirst || 7));
+                         nextEmailDate = r1Next;
+                    }
+                    
+                    if (nextEmailDate) {
+                        elEmailScheduleInfo.innerText = `Nächste Mail: ${formatShortDate(nextEmailDate)}`;
+                    }
+                }
+            }
         }
+    }
+
+    if (elTestEmailBtn) {
+        elTestEmailBtn.addEventListener('click', () => {
+             if (typeof hochzeitstag_ajax_object === 'undefined') {
+                 alert("Email-Versand funktioniert nur im WordPress Plugin Modus.");
+                 return;
+             }
+             
+             // Get next milestone info for the email content from the DOM
+             let milestoneLabel = "Ein Meilenstein";
+             let milestoneDate = "";
+             
+             const firstItemLabel = document.querySelector('.timeline-item .t-label');
+             const firstItemDate = document.querySelector('.timeline-item .t-date');
+             
+             if (firstItemLabel) milestoneLabel = firstItemLabel.innerText;
+             if (firstItemDate) milestoneDate = firstItemDate.innerText;
+
+             elTestEmailBtn.disabled = true;
+             const originalText = elTestEmailBtn.innerText;
+             elTestEmailBtn.innerText = "Sende...";
+             
+             const data = new FormData();
+             data.append('action', 'hochzeitstag_send_test_email');
+             data.append('event_label', milestoneLabel); // Override default label
+             data.append('event_date', milestoneDate);   // Override default date
+             data.append('force', 'true');
+
+             fetch(hochzeitstag_ajax_object.ajax_url, {
+                 method: 'POST',
+                 body: data
+             })
+             .then(response => response.json())
+             .then(res => {
+                 if (res.success) {
+                     alert(res.data.message);
+                 } else {
+                     alert("Fehler: " + (res.data ? res.data.message : 'Unbekannter Fehler'));
+                 }
+             })
+             .catch(err => {
+                 alert("Netzwerkfehler beim Senden.");
+                 console.error(err);
+             })
+             .finally(() => {
+                 elTestEmailBtn.disabled = false;
+                 elTestEmailBtn.innerText = originalText;
+             });
+        });
     }
 
     displayRandomQuote();

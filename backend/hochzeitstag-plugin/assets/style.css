@@ -368,3 +368,38 @@ h1, .section-title {
     box-shadow: 0 4px 10px rgba(183, 110, 121, 0.4);
     margin-top: 10px;
 }
+
+.email-actions {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    background: #b76e79;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(183, 110, 121, 0.3);
+}
+
+.action-btn:hover {
+    background: #d4a5a5;
+    transform: translateY(-2px);
+}
+
+.schedule-info {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 5px 10px;
+    border-radius: 10px;
+}
