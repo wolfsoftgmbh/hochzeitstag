@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (CONFIG.backgroundImage) {
         // Handled by CSS/HTML usually, but keeping config logic if needed later
     }
+    
+    // Theme Color Logic
+    if (CONFIG.themeColor) {
+        document.documentElement.style.setProperty('--primary-color', CONFIG.themeColor);
+    }
 
     const WEDDING_DATE = new Date(CONFIG.weddingDate);
     
@@ -198,6 +203,16 @@ document.addEventListener('DOMContentLoaded', () => {
                          addAnnualEvents(bday, `Geburtstag ${formattedName}`, 'birthday');
                      }
                 }
+            }
+            
+            // 2b. Custom Events
+            if (CONFIG.customEvents && Array.isArray(CONFIG.customEvents)) {
+                CONFIG.customEvents.forEach(evt => {
+                     if (evt.date && evt.label) {
+                         const d = new Date(evt.date);
+                         addAnnualEvents(d, `Jahrestag: ${evt.label}`, 'custom');
+                     }
+                });
             }
 
             // 3. Vierteljahre (1/4, 1/2, 3/4)

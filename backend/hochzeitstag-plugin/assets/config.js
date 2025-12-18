@@ -2,6 +2,10 @@
  * GLOBAL CONFIGURATION FOR HOCHZEITSTAG APP
  */
 const HOCHZEITSTAG_CONFIG = {
+    // Visuals
+    themeColor: "#b76e79", // Primary pink color
+    backgroundImage: "kiss.jpeg", // Filename in the same directory (or URL)
+
     // Dates (ISO Format: YYYY-MM-DDTHH:mm:ss)
     weddingDate: "2025-09-06T11:02:00",
     firstContactDate: "2014-01-11T19:02:00",
@@ -12,8 +16,11 @@ const HOCHZEITSTAG_CONFIG = {
         tanja: "1972-07-04"
     },
 
-    // Visuals
-    backgroundImage: "kiss.jpeg", // Filename in the same directory (or URL)
+    // Custom Events (Set to empty array [] to disable)
+    customEvents: [
+        { date: "2018-05-20", label: "Hauskauf" },
+        { date: "2013-12-24", label: "Verlobung" }
+    ],
 
     // Notification Settings
     // Controls automatic emails via the backend/plugin
@@ -25,8 +32,8 @@ const HOCHZEITSTAG_CONFIG = {
     emailReminderDaysSecond: 1, 
 
     emailAddresses: {
-        wife: { email: "tanja-risse@gmx.de", name: "Tanja" },
-        husband: { email: "klaus@wolfsoft.de", name: "Klaus" }
+        wife: { email: "tanja-risse@gmx.de", name: "Tanja", sendEmail: true },
+        husband: { email: "klaus@wolfsoft.de", name: "Klaus", sendEmail: true }
     },
 
     enableEmailTestButton: true,
