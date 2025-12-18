@@ -490,7 +490,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         if (empty($to_email)) continue;
 
         $greeting = empty($recipient_name) ? 'Hallo!' : "Hallo {$recipient_name}!";
-        $subject = "📅 Countdown-Alarm: {$target_event['label']} steht an!";
+        $subject = "📅 Countdown-Alarm: {$target_event['label']} steht an!{$reminder_suffix}";
         
         $message = "
             <html>
