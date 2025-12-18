@@ -12,18 +12,18 @@ if ( ! defined( 'ABSPATH' ) ) {
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❤️</text></svg>" />
     
     <!-- Fonts -->
-    <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/fonts/fonts.css?v=1.3'; ?>" rel="stylesheet">
+    <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/fonts/fonts.css?v=1.4'; ?>" rel="stylesheet">
 
     
     <!-- Styles -->
-    <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/style.css?v=1.3'; ?>" rel="stylesheet">
+    <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/style.css?v=1.4'; ?>" rel="stylesheet">
 
     <!-- Scripts -->
-    <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/config.js?v=1.3'; ?>"></script>
+    <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/config.js?v=1.4'; ?>"></script>
     <script>
         var hochzeitstag_ajax_object = { ajax_url: "<?php echo admin_url( 'admin-ajax.php' ); ?>" };
     </script>
-    <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/script.js?v=1.3'; ?>" defer></script>
+    <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/script.js?v=1.4'; ?>" defer></script>
 </head>
 <body>
 

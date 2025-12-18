@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 1.3
+ * Version: 1.4
  * Author: Gemini
  */
 
@@ -60,16 +60,16 @@ function hochzeitstag_enqueue_assets() {
     // Here we load globally to ensure it works, but in production, conditional loading is better.
     
     // Enqueue Local Fonts
-    wp_enqueue_style( 'hochzeitstag-fonts', plugins_url( 'assets/fonts/fonts.css', __FILE__ ), array(), '1.3' );
+    wp_enqueue_style( 'hochzeitstag-fonts', plugins_url( 'assets/fonts/fonts.css', __FILE__ ), array(), '1.4' );
 
 
 
     // Enqueue Main Styles
-    wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.3' );
+    wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.4' );
 
     // Enqueue Script
-    wp_enqueue_script( 'hochzeitstag-config', plugins_url( 'assets/config.js', __FILE__ ), array(), '1.3', true );
-    wp_enqueue_script( 'hochzeitstag-script', plugins_url( 'assets/script.js', __FILE__ ), array('hochzeitstag-config'), '1.3', true );
+    wp_enqueue_script( 'hochzeitstag-config', plugins_url( 'assets/config.js', __FILE__ ), array(), '1.4', true );
+    wp_enqueue_script( 'hochzeitstag-script', plugins_url( 'assets/script.js', __FILE__ ), array('hochzeitstag-config'), '1.4', true );
 
     // Pass ajaxurl to our script
     wp_localize_script( 'hochzeitstag-script', 'hochzeitstag_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
@@ -171,142 +171,224 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     $config_js_path = plugin_dir_path( __FILE__ ) . 'assets/config.js';
     $config_js_content = file_get_contents( $config_js_path );
 
-    // Manual extraction of configuration variables to avoid fragile JSON parsing of JS files
+    // Manual extraction of configuration variables
     $wedding_date_str = '';
-    // Match weddingDate: "..."
     if ( preg_match( '/weddingDate:\s*"([^"]+)"/', $config_js_content, $m ) ) {
         $wedding_date_str = $m[1];
     } else {
         return array( 'success' => false, 'message' => 'Fehler: Hochzeitsdatum (weddingDate) konnte nicht aus der Konfiguration gelesen werden.' );
     }
 
+    // Reminder Days
     $reminder_days_first = 7;
-    if ( preg_match( '/emailReminderDaysFirst:\s*(\d+)/', $config_js_content, $m ) ) {
-        $reminder_days_first = intval($m[1]);
-    }
-    
     $reminder_days_second = 1;
-    if ( preg_match( '/emailReminderDaysSecond:\s*(\d+)/', $config_js_content, $m ) ) {
-        $reminder_days_second = intval($m[1]);
+    if ( preg_match( '/emailReminderDays:\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]/', $config_js_content, $m ) ) {
+        $reminder_days_first = intval($m[1]);
+        $reminder_days_second = intval($m[2]);
+    } elseif ( preg_match( '/emailReminderDaysFirst:\s*(\d+)/', $config_js_content, $m ) ) {
+        $reminder_days_first = intval($m[1]);
+         if ( preg_match( '/emailReminderDaysSecond:\s*(\d+)/', $config_js_content, $m2 ) ) {
+            $reminder_days_second = intval($m2[1]);
+        }
     }
 
+    // Email Addresses
     $email_addresses = array();
-    // Husband
     if ( preg_match( '/husband:\s*{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
         $email_addresses['husband'] = array( 'email' => $m[1], 'name' => $m[2] );
     }
-    // Wife
     if ( preg_match( '/wife:\s*{\s*email:\s*"([^"]+)"\s*,\s*name:\s*"([^"]+)"/', $config_js_content, $m ) ) {
         $email_addresses['wife'] = array( 'email' => $m[1], 'name' => $m[2] );
     }
 
+    // Quotes
     $quotes = array();
     if ( preg_match( '/quotes:\s*\[(.*?)(\s*)\]/s', $config_js_content, $m_quotes_block ) ) {
         $quotes_content = $m_quotes_block[1];
-        // Match all strings inside double quotes
         if ( preg_match_all( '/"([^"\\]*(?:\\.[^"\\]*)*)"/', $quotes_content, $m_quotes ) ) {
              $quotes = $m_quotes[1];
         }
     }
-    if ( empty($quotes) ) {
-        $quotes = array("Liebe ist alles."); // Fallback
+    if ( empty($quotes) ) $quotes = array("Liebe ist alles.");
+
+    // Parse Surprise Ideas
+    $surprise_ideas = array();
+    // Try to find surpriseIdeas array
+    // Since it's at the end, regex might be tricky if not careful with greedy matching, but structure is simple
+    // Look for "surpriseIdeas: [" then content then "]"
+    if ( preg_match( '/surpriseIdeas:\s*\[(.*?)(\s*)\]/s', $config_js_content, $m_ideas_block ) ) {
+        $ideas_content = $m_ideas_block[1];
+         if ( preg_match_all( '/"([^"\\]*(?:\\.[^"\\]*)*)"/', $ideas_content, $m_ideas ) ) {
+             $surprise_ideas = $m_ideas[1];
+        }
     }
 
+    // --- LOGIC: DETERMINE EVENT ---
     $today = new DateTime();
+    $today->setTime(0, 0, 0); // Normalize today
     $wedding_date_config = new DateTime( $wedding_date_str );
-    
-    // Find the next upcoming anniversary based on the wedding date from config
+    $wedding_date_config->setTime(0, 0, 0);
+
+    // Calculate upcoming events to check against
+    $upcoming_events = array();
+
+    // 1. Anniversary
     $next_anniversary = new DateTime( $wedding_date_str );
-    while ($next_anniversary < $today) {
+    $next_anniversary->setTime(0,0,0);
+    // Move to next future date
+    while ($next_anniversary <= $today) {
         $next_anniversary->modify('+1 year');
     }
+    $anniv_year = $next_anniversary->format('Y') - $wedding_date_config->format('Y');
+    $upcoming_events[] = array(
+        'label' => "{$anniv_year}. Hochzeitstag",
+        'date' => clone $next_anniversary
+    );
 
-    $diff_to_anniversary = $today->diff($next_anniversary);
-    $days_to_anniversary = (int)$diff_to_anniversary->days;
+    // 2. Thousands (Schnapszahlen logic simplified to 1000 steps)
+    $diff_days = $today->diff($wedding_date_config)->days;
+    $next_thousand_num = ceil(($diff_days + 1) / 1000) * 1000;
+    $date_thousand = clone $wedding_date_config;
+    $date_thousand->modify("+$next_thousand_num days");
+    $upcoming_events[] = array(
+        'label' => "{$next_thousand_num}. Tag gemeinsam",
+        'date' => $date_thousand
+    );
 
-    $send_first_reminder = false;
-    $send_second_reminder = false;
-
-    if ( $days_to_anniversary == $reminder_days_first ) {
-        $send_first_reminder = true;
-    }
-    if ( $days_to_anniversary == $reminder_days_second ) {
-        $send_second_reminder = true;
-    }
+    // Determine if we need to send an email
+    $target_event = null;
+    $reminder_suffix = '';
+    $force_send = (isset($atts['force_send']) && filter_var($atts['force_send'], FILTER_VALIDATE_BOOLEAN));
     
-    if ( ! $send_first_reminder && ! $send_second_reminder && ! (isset($atts['force_send']) && $atts['force_send']) ) {
+    // Check automatic triggers
+    foreach($upcoming_events as $evt) {
+        $diff = $today->diff($evt['date']);
+        // diff->days is absolute, need to check direction. But we calculated future dates.
+        // wait, diff->days is always positive. $diff->invert is 1 if date is in past.
+        // We ensured dates are > today.
+        
+        $days_until = $diff->days;
+        
+        if ($days_until == $reminder_days_first) {
+            $target_event = $evt;
+            $reminder_suffix = ' (in 7 Tagen)';
+            break;
+        }
+        if ($days_until == $reminder_days_second) {
+            $target_event = $evt;
+            $reminder_suffix = ' (Morgen!)';
+            break;
+        }
+    }
+
+    // Override if forced (Test Email)
+    if ( $force_send ) {
+        // Use provided label/date or fallback to next anniversary
+        $lbl = isset($atts['event_label']) ? sanitize_text_field($atts['event_label']) : $upcoming_events[0]['label'];
+        $dt  = isset($atts['event_date']) ? sanitize_text_field($atts['event_date']) : $upcoming_events[0]['date']->format('d.m.Y');
+        
+        $target_event = array(
+            'label' => $lbl,
+            'date'  => (is_string($dt) ? $dt : $dt->format('d.m.Y')) // Handle object or string
+        );
+        $reminder_suffix = ' (Test)';
+    }
+
+    if ( ! $target_event ) {
         return array( 'success' => false, 'message' => 'Keine Erinnerung heute fällig.' );
     }
 
-    $event_label_suffix = '';
-    if ( $send_first_reminder ) {
-        $event_label_suffix = ' (7-Tage-Erinnerung)';
-    } elseif ( $send_second_reminder ) {
-        $event_label_suffix = ' (1-Tag-Erinnerung)';
-    }
-
+    // Prepare Email Content
     $defaults = array(
         'to'            => isset( $email_addresses['husband']['email'] ) ? $email_addresses['husband']['email'] : '',
-        'event_label'   => 'Euer Hochzeitstag' . $event_label_suffix,
-        'event_date'    => $next_anniversary->format( 'd.m.Y H:i' ),
         'recipient_name'=> isset( $email_addresses['husband']['name'] ) ? $email_addresses['husband']['name'] : 'Liebe/r',
         'send_to_wife'  => false,
     );
-
     $parsed_atts = shortcode_atts( $defaults, $atts, 'hochzeitstag_email' );
 
-    // Override recipient if send_to_wife is true
+    // Override recipient if send_to_wife
     if ( filter_var( $parsed_atts['send_to_wife'], FILTER_VALIDATE_BOOLEAN ) && isset( $email_addresses['wife'] ) ) {
         $parsed_atts['to'] = $email_addresses['wife']['email'];
         $parsed_atts['recipient_name'] = $email_addresses['wife']['name'];
     }
-    
-    $to_email    = sanitize_email( $parsed_atts['to'] );
-    $event_label = sanitize_text_field( $parsed_atts['event_label'] );
-    $event_date  = sanitize_text_field( $parsed_atts['event_date'] );
-    $recipient_name = sanitize_text_field( $parsed_atts['recipient_name'] );
 
-    $greeting = empty($recipient_name) ? 'Hallo!' : "Hallo {$recipient_name}!";
+    $to_email = sanitize_email( $parsed_atts['to'] );
+    $recipient_name = sanitize_text_field( $parsed_atts['recipient_name'] );
+    
+    // Formatting date string
+    $event_date_str = is_object($target_event['date']) ? $target_event['date']->format('d.m.Y') : $target_event['date'];
+
+    // Handle Ideas
+    $ideas_list = array();
+    // Check if passed via AJAX
+    if ( isset($atts['ideas']) && is_array($atts['ideas']) ) {
+        $ideas_list = array_map('sanitize_text_field', $atts['ideas']);
+    }
+    // If empty (automatic mode), pick random from config
+    if ( empty($ideas_list) && !empty($surprise_ideas) ) {
+        shuffle($surprise_ideas);
+        $ideas_list = array_slice($surprise_ideas, 0, 5);
+    }
+    // Fallback
+    if ( empty($ideas_list) ) {
+        $ideas_list = array("Frühstück am Bett", "Ein kleiner Liebesbrief", "Gemeinsamer Spaziergang", "Essen bestellen", "Massieren");
+    }
+
+    $ideas_html = '<ul style="text-align: left; background: #fff; padding: 15px 15px 15px 30px; border-radius: 8px; border: 1px dashed #e91e63;">';
+    foreach($ideas_list as $idea) {
+        $ideas_html .= "<li style=\"margin-bottom: 8px; color: #555;\">{$idea}</li>";
+    }
+    $ideas_html .= '</ul>';
 
     $random_quote = $quotes[ array_rand( $quotes ) ];
+    $greeting = empty($recipient_name) ? 'Hallo!' : "Hallo {$recipient_name}!";
 
-    $subject = 'Erinnerung: Ihr besonderes Ereignis mit Hochzeitstag Countdown';
+    $subject = "📅 Countdown-Alarm: {$target_event['label']} steht an!";
+    
     $message = "
         <html>
         <head>
-            <title>Erinnerung an Ihr besonderes Ereignis!</title>
+            <title>Meilenstein-Alarm</title>
             <style>
-                body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
-                .email-container { background-color: #ffffff; padding: 30px; border-radius: 8px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-                h2 { color: #e91e63; }
-                p { color: #555555; line-height: 1.6; }
-                .event-details { background-color: #fff0f5; border-left: 5px solid #e91e63; padding: 15px; margin: 20px 0; }
-                .event-details p { margin: 5px 0; }
-                .quote { font-style: italic; color: #777777; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eeeeee; }
-                .footer { margin-top: 20px; font-size: 0.8em; color: #aaaaaa; text-align: center; }
+                body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333; }
+                .email-container { background-color: #ffffff; padding: 40px; border-radius: 12px; max-width: 600px; margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+                h2 { color: #b76e79; margin-top: 0; }
+                .highlight-box { background: linear-gradient(135deg, #fff0f5 0%, #ffe6ee 100%); border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; border: 1px solid #ffcdd2; }
+                .event-name { font-size: 1.4em; font-weight: bold; color: #880e4f; display: block; margin-bottom: 5px; }
+                .event-date { font-size: 1.1em; color: #ad1457; }
+                .intro-text { line-height: 1.6; font-size: 16px; color: #555; }
+                .ideas-section { margin-top: 30px; }
+                .ideas-title { font-weight: bold; color: #b76e79; font-size: 1.1em; margin-bottom: 10px; display: block; }
+                .quote-box { font-style: italic; color: #777; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; }
+                .footer { margin-top: 30px; font-size: 0.8em; color: #aaa; text-align: center; }
             </style>
         </head>
         <body>
             <div class=\"email-container\">
                 <h2>{$greeting}</h2>
-                <p>Dies ist eine freundliche Erinnerung an Ihr bevorstehendes besonderes Ereignis:</p>
-                <div class=\"event-details\">
-                    <p><strong>Ereignis:</strong> {$event_label}</p>
-                    <p><strong>Datum & Uhrzeit:</strong> {$event_date} Uhr</p>
-                    <p>Merken Sie sich diesen wichtigen Tag vor!</p>
-                </div>
-                <p>Wir wünschen Ihnen viel Freude und unvergessliche Momente.</p>
                 
-                <div class=\"quote\">
-                    <p>Ein kleiner Gruß, der Freude bringt:</p>
-                    <p>{$random_quote}</p>
+                <p class=\"intro-text\">
+                    Aufgepasst! Eure gemeinsame Reise erreicht bald den nächsten wunderbaren Meilenstein.
+                    Zeit, die Herzen höher schlagen zu lassen!
+                </p>
+
+                <div class=\"highlight-box\">
+                    <span class=\"event-name\">{$target_event['label']}</span>
+                    <span class=\"event-date\">am {$event_date_str}</span>
                 </div>
 
-                <p>Mit freundlichen Grüßen,</p>
-                <p>Ihr Hochzeitstag Countdown Team</p>
+                <div class=\"ideas-section\">
+                    <span class=\"ideas-title\">💡 5 Ideen für eine kleine Überraschung:</span>
+                    <p>Damit du nicht mit leeren Händen (oder leerem Kopf) dastehst, hier ein paar Inspirationen, um deinem Schatz ein Lächeln ins Gesicht zu zaubern:</p>
+                    {$ideas_html}
+                </div>
+
+                <div class=\"quote-box\">
+                    „{$random_quote}“
+                </div>
 
                 <div class=\"footer\">
-                    <p>Diese E-Mail wurde vom Hochzeitstag Countdown Plugin gesendet.</p>
+                    <p>Gesendet mit Liebe vom Hochzeitstag Countdown Plugin.</p>
                 </div>
             </div>
         </body>
@@ -318,9 +400,9 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     $sent = wp_mail( $to_email, $subject, $message, $headers );
 
     if ( $sent ) {
-        return array( 'success' => true, 'message' => "E-Mail wurde an <strong>{$to_email}</strong> gesendet." );
+        return array( 'success' => true, 'message' => "E-Mail für <strong>{$target_event['label']}</strong> wurde gesendet." );
     } else {
-        return array( 'success' => false, 'message' => "Fehler beim Senden der E-Mail an <strong>{$to_email}</strong>. Bitte prüfen Sie das Fehlerprotokoll Ihres Servers." );
+        return array( 'success' => false, 'message' => "Fehler beim Senden der E-Mail." );
     }
 }
 

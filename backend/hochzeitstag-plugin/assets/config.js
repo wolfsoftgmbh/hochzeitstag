@@ -15,9 +15,15 @@ const HOCHZEITSTAG_CONFIG = {
     // Visuals
     backgroundImage: "kiss.jpeg", // Filename in the same directory (or URL)
 
-    // Notification Settings (Placeholder for future functionality)
-    emailReminderDaysFirst: 7, // Days before event to send email (First reminder)
-    emailReminderDaysSecond: 1, // Days before event to send email (Second reminder)
+    // Notification Settings
+    // Controls automatic emails via the backend/plugin
+    emailAutoSend: true, 
+    emailReminderDays: [7, 1], // Send mail 7 days and 1 day before the event
+    
+    // Legacy (kept for backward compatibility, can be ignored if backend uses array)
+    emailReminderDaysFirst: 7, 
+    emailReminderDaysSecond: 1, 
+
     emailAddresses: {
         wife: { email: "tanja-risse@gmx.de", name: "Tanja" },
         husband: { email: "klaus@wolfsoft.de", name: "Klaus" }
