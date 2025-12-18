@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="timeline-dot" style="background: #fff; border-color: var(--primary-color);"></div>
                     <div class="timeline-content">
                         <span class="t-label">${m.label}</span>
-                        <span class="t-date">${formatShortDate(m.date)}</span>
+                        <span class="t-date" data-iso="${m.date.toISOString()}">${formatShortDate(m.date)}</span>
                         <span class="t-countdown">${timeText}</span>
                     </div>
                 </div>`;
@@ -386,7 +386,8 @@ document.addEventListener('DOMContentLoaded', () => {
              const firstItemDate = document.querySelector('.timeline-item .t-date');
              
              if (firstItemLabel) milestoneLabel = firstItemLabel.innerText;
-             if (firstItemDate) milestoneDate = firstItemDate.innerText;
+             // Try to get data-iso attribute for robust date parsing in backend
+             if (firstItemDate) milestoneDate = firstItemDate.getAttribute('data-iso') || firstItemDate.innerText;
 
              // Get 5 random ideas
              const ideas = getRandomIdeas(5);

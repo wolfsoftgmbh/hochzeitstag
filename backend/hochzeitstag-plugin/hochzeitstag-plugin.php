@@ -263,7 +263,6 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     $wedding_date->setTime(0, 0, 0);
 
     $upcoming_events = array();
-    $one_day_interval = new DateInterval('P1D');
 
     // Helper to add annual event
     $add_annual = function($date_str, $label_base) use ($today, &$upcoming_events) {
@@ -388,15 +387,30 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         $lbl = isset($atts['event_label']) ? sanitize_text_field($atts['event_label']) : (isset($upcoming_events[0]) ? $upcoming_events[0]['label'] : 'Test-Event');
         $dt_val = isset($atts['event_date']) ? sanitize_text_field($atts['event_date']) : (isset($upcoming_events[0]) ? $upcoming_events[0]['date'] : $today);
         
-        // Normalize date object if it came from array
-        if (is_string($dt_val) && !empty($dt_val)) {
-             // Try parsing german format dd.mm.yyyy? Or assume ISO?
-             // Frontend sends dd.mm.yyyy usually (e.g. 05.09.2025)
-             $dt_obj = DateTime::createFromFormat('d.m.Y', $dt_val);
-             if (!$dt_obj) $dt_obj = new DateTime($dt_val); // Try ISO
-        } elseif ($dt_val instanceof DateTime) {
-            $dt_obj = $dt_val;
-        } else {
+        $dt_obj = $today; // Default fallback
+
+        try {
+            // Normalize date object if it came from array
+            if (is_string($dt_val) && !empty($dt_val)) {
+                // Try parsing standard german format d.m.Y (e.g. 05.09.2025)
+                $parsed = DateTime::createFromFormat('d.m.Y', $dt_val);
+                if ($parsed) {
+                    $dt_obj = $parsed;
+                } else {
+                    // Try to parse complex localized strings by stripping non-numeric/dot chars?
+                    // Or just try standard DateTime constructor which handles many formats (but not German text like "Dez")
+                    // Basic cleanup: remove weekday names if possible, but "Dez" is tricky.
+                    // Ideally, frontend should send ISO.
+                    // For now, if simple parse fails, we try constructing.
+                    $dt_obj = new DateTime($dt_val); 
+                }
+            } elseif ($dt_val instanceof DateTime) {
+                $dt_obj = $dt_val;
+            }
+        } catch (Exception $e) {
+            // If date parsing fails completely (e.g. German text "19. Dez"), fallback to today
+            // and maybe append note to label
+            $lbl .= " (Datum nicht erkannt)";
             $dt_obj = $today;
         }
 
