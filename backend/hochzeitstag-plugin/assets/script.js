@@ -399,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
              data.append('action', 'hochzeitstag_send_test_email');
              data.append('event_label', milestoneLabel); // Override default label
              data.append('event_date', milestoneDate);   // Override default date
-             data.append('force', 'true');
+             data.append('force_send', 'true');
              
              // Append ideas array
              ideas.forEach((idea, index) => {
