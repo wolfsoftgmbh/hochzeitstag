@@ -132,10 +132,17 @@ function hochzeitstag_get_config() {
 
     if ( ! is_array( $options ) ) {
         $options = [];
+        $config = $defaults;
+    } else {
+        // Merge defaults
+        $config = shortcode_atts($defaults, $options);
+        
+        // Fix Checkbox Logic: 
+        // If $options was saved but a checkbox is missing, it means it's unchecked (false).
+        // shortcode_atts would have filled it with the default (true).
+        if ( ! isset( $options['active_husband'] ) ) $config['active_husband'] = false;
+        if ( ! isset( $options['active_wife'] ) )    $config['active_wife'] = false;
     }
-
-    // Merge defaults
-    $config = shortcode_atts($defaults, $options);
     
     // Process Arrays
     $reminder_days = array_map('intval', explode(',', $config['reminder_days']));
