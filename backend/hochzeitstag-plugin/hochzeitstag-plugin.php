@@ -377,7 +377,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         if ( preg_match_all( '/\{\s*date:\s*"([^"]+)"\s*,\s*label:\s*"([^"]+)"\s*\}/', $m_custom_block[1], $m_ce ) ) {
             foreach ($m_ce[1] as $index => $date_str) {
                 $label = $m_ce[2][$index];
-                $add_annual($date_str, "Jahrestag: {$label}");
+                $add_annual($date_str, "Special Event: {$label}");
             }
         }
     }

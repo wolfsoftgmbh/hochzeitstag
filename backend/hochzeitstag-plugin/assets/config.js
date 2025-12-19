@@ -19,7 +19,8 @@ const HOCHZEITSTAG_CONFIG = {
     // Custom Events (Set to empty array [] to disable)
     customEvents: [
         { date: "2025-12-22", label: "Kasalla" },
-        { date: "2013-12-24", label: "XMAS" }
+        { date: "2013-12-24", label: "XMAS" },
+        { date: "2025-12-20", label: "geb. Party Frank 18:00" }
     ],
 
     // Notification Settings
