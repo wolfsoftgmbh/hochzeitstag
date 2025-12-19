@@ -104,6 +104,10 @@ function hochzeitstag_get_config() {
     $options = get_option( 'hochzeitstag_settings' );
     $defaults = hochzeitstag_get_defaults();
 
+    if ( ! is_array( $options ) ) {
+        $options = [];
+    }
+
     // Merge defaults
     $config = shortcode_atts($defaults, $options);
     
