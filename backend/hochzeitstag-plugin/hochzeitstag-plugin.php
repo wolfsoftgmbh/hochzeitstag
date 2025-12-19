@@ -77,64 +77,13 @@ function hochzeitstag_settings_init() {
 
 }
 
-// Callbacks
-function hochzeitstag_section_general_callback() { echo 'Geben Sie hier die wichtigsten Daten ein.'; }
-function hochzeitstag_section_events_callback() { echo 'Format: JSON Array oder leer lassen.'; }
-function hochzeitstag_section_email_callback() { echo 'Konfiguration der Benachrichtigungen.'; }
-
-function hochzeitstag_date_render( $args ) {
-    $options = get_option( 'hochzeitstag_settings' );
-    $val = isset( $options[ $args['id'] ] ) ? $options[ $args['id'] ] : '';
-    // Format YYYY-MM-DD for input type date, potentially strip time if present
-    $date_val = substr($val, 0, 10);
-    echo "<input type='date' name='hochzeitstag_settings[{$args['id']}]' value='{$date_val}'>";
-}
-
-function hochzeitstag_text_render( $args ) {
-    $options = get_option( 'hochzeitstag_settings' );
-    $val = isset( $options[ $args['id'] ] ) ? $options[ $args['id'] ] : '';
-    echo "<input type='text' name='hochzeitstag_settings[{$args['id']}]' value='{$val}' class='regular-text'>";
-}
-
-function hochzeitstag_checkbox_render( $args ) {
-    $options = get_option( 'hochzeitstag_settings' );
-    $val = isset( $options[ $args['id'] ] ) ? $options[ $args['id'] ] : false;
-    $checked = $val ? 'checked' : '';
-    echo "<input type='checkbox' name='hochzeitstag_settings[{$args['id']}]' value='1' {$checked}>";
-}
-
-function hochzeitstag_textarea_render( $args ) {
-    $options = get_option( 'hochzeitstag_settings' );
-    $val = isset( $options[ $args['id'] ] ) ? $options[ $args['id'] ] : '';
-    echo "<textarea name='hochzeitstag_settings[{$args['id']}]' rows='5' cols='50' class='large-text code'>{$val}</textarea>";
-    if(isset($args['desc'])) echo "<p class='description'>{$args['desc']}</p>";
-}
-
-function hochzeitstag_settings_page() {
-    ?>
-    <div class="wrap">
-        <h1>Hochzeitstag Konfiguration</h1>
-        <form action='options.php' method='post'>
-            <?php
-            settings_fields( 'hochzeitstagPlugin' );
-            do_settings_sections( 'hochzeitstagPlugin' );
-            submit_button();
-            ?>
-        </form>
-    </div>
-    <?php
-}
-
 /**
  * ------------------------------------------------------------------------
- * 2. GET CONFIGURATION (Helper)
+ * 2. CONFIGURATION HELPER & DEFAULTS
  * ------------------------------------------------------------------------
  */
-function hochzeitstag_get_config() {
-    $options = get_option( 'hochzeitstag_settings' );
-    
-    // DEFAULTS (Hardcoded Fallback)
-    $defaults = [
+function hochzeitstag_get_defaults() {
+    return [
         'wedding_date' => '2025-09-06',
         'first_contact_date' => '2014-01-11',
         'first_meet_date' => '2014-04-01',
@@ -149,6 +98,11 @@ function hochzeitstag_get_config() {
         'active_wife' => true,
         'reminder_days' => '7, 1'
     ];
+}
+
+function hochzeitstag_get_config() {
+    $options = get_option( 'hochzeitstag_settings' );
+    $defaults = hochzeitstag_get_defaults();
 
     // Merge defaults
     $config = shortcode_atts($defaults, $options);
@@ -176,6 +130,69 @@ function hochzeitstag_get_config() {
         'customEvents' => $custom_events,
         'reminderDays' => $reminder_days
     ];
+}
+
+/**
+ * ------------------------------------------------------------------------
+ * 1. SETTINGS & MENU (Callbacks)
+ * ------------------------------------------------------------------------
+ */
+
+// Callbacks
+function hochzeitstag_section_general_callback() { echo 'Geben Sie hier die wichtigsten Daten ein.'; }
+function hochzeitstag_section_events_callback() { echo 'Format: JSON Array oder leer lassen.'; }
+function hochzeitstag_section_email_callback() { echo 'Konfiguration der Benachrichtigungen.'; }
+
+function hochzeitstag_date_render( $args ) {
+    $options = get_option( 'hochzeitstag_settings' );
+    $defaults = hochzeitstag_get_defaults();
+    $id = $args['id'];
+    
+    // Use saved value OR default
+    $val = isset( $options[$id] ) ? $options[$id] : $defaults[$id];
+    
+    // Format YYYY-MM-DD
+    $date_val = substr($val, 0, 10);
+    echo "<input type='date' name='hochzeitstag_settings[{$id}]' value='{$date_val}'>";
+}
+
+function hochzeitstag_text_render( $args ) {
+    $options = get_option( 'hochzeitstag_settings' );
+    $defaults = hochzeitstag_get_defaults();
+    $id = $args['id'];
+    
+    $val = isset( $options[$id] ) ? $options[$id] : $defaults[$id];
+    echo "<input type='text' name='hochzeitstag_settings[{$id}]' value='{$val}' class='regular-text'>";
+}
+
+function hochzeitstag_checkbox_render( $args ) {
+    $options = get_option( 'hochzeitstag_settings' );
+    $defaults = hochzeitstag_get_defaults();
+    $id = $args['id'];
+    
+    // Checkbox logic: 
+    // If $options is explicitly set (saved), use the value (which might be unset/false if unchecked).
+    // But if $options is empty/false (plugin just installed), use the default.
+    
+    if ( !empty($options) ) {
+        // Options exist, so respect the saved state (isset = checked)
+        $checked = isset( $options[$id] ) ? 'checked' : '';
+    } else {
+        // First load, use default
+        $checked = $defaults[$id] ? 'checked' : '';
+    }
+    
+    echo "<input type='checkbox' name='hochzeitstag_settings[{$id}]' value='1' {$checked}>";
+}
+
+function hochzeitstag_textarea_render( $args ) {
+    $options = get_option( 'hochzeitstag_settings' );
+    $defaults = hochzeitstag_get_defaults();
+    $id = $args['id'];
+
+    $val = isset( $options[$id] ) ? $options[$id] : $defaults[$id];
+    echo "<textarea name='hochzeitstag_settings[{$id}]' rows='5' cols='50' class='large-text code'>{$val}</textarea>";
+    if(isset($args['desc'])) echo "<p class='description'>{$args['desc']}</p>";
 }
 
 
