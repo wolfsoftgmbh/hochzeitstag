@@ -1,13 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Globale Config nutzen oder Fallback
-    const CONFIG = (typeof HOCHZEITSTAG_CONFIG !== 'undefined') ? HOCHZEITSTAG_CONFIG : {
+    // Default Config
+    let CONFIG = {
         weddingDate: "2025-09-06T11:02:00",
         firstContactDate: "2014-01-11T19:02:00",
         firstMeetDate: "2014-04-01T21:02:00",
         backgroundImage: "",
-        quotes: ["Liebe ist alles."]
+        themeColor: "#b76e79",
+        birthdays: { klaus: "1967-08-02", tanja: "1972-07-04" },
+        customEvents: [],
+        emailReminderDaysFirst: 7,
+        emailReminderDaysSecond: 1,
+        quotes: ["Liebe ist alles.", "Zusammen sind wir stark."], // Fallback
+        surpriseIdeas: ["Frühstück am Bett", "Kinoabend"]
     };
+
+    // Merge with DB Config (Priority 1)
+    if (typeof HOCHZEITSTAG_DB_CONFIG !== 'undefined') {
+        CONFIG = { ...CONFIG, ...HOCHZEITSTAG_DB_CONFIG };
+    } 
+    // Merge with File Config (Priority 2 - Legacy)
+    else if (typeof HOCHZEITSTAG_CONFIG !== 'undefined') {
+        CONFIG = HOCHZEITSTAG_CONFIG;
+    }
 
     // Background Image Logic
     if (CONFIG.backgroundImage) {
