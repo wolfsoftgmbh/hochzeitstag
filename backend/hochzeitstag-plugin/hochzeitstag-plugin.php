@@ -49,6 +49,12 @@ function hochzeitstag_activate() {
     hochzeitstag_rewrite_rule();
     flush_rewrite_rules();
 
+    // Clear old debug schedule if exists
+    $timestamp = wp_next_scheduled( 'hochzeitstag_daily_event' );
+    if( $timestamp ) {
+        wp_unschedule_event( $timestamp, 'hochzeitstag_daily_event' );
+    }
+
     if ( ! wp_next_scheduled( 'hochzeitstag_daily_event' ) ) {
         // Schedule for 09:00:00
         $time = strtotime( 'tomorrow 09:00:00' );
@@ -187,7 +193,10 @@ add_shortcode( 'hochzeitstag', 'hochzeitstag_render_shortcode' );
  * @return array Result of the email attempt (success/failure message).
  */
 function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
+    error_log('HOCHZEITSTAG: Prepare Email Function Called. Atts: ' . json_encode($atts));
+
     if ( ! function_exists( 'wp_mail' ) ) {
+        error_log('HOCHZEITSTAG: wp_mail not available.');
         return array( 'success' => false, 'message' => 'WordPress Mail-Funktion (wp_mail) nicht verfügbar.' );
     }
 
@@ -204,6 +213,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     if ( preg_match( '/weddingDate:\s*"([^"]+)"/', $config_js_content, $m ) ) {
         $dates['wedding'] = $m[1];
     } else {
+        error_log('HOCHZEITSTAG: Wedding date not found in config.');
         return array( 'success' => false, 'message' => 'Fehler: Hochzeitsdatum (weddingDate) konnte nicht aus der Konfiguration gelesen werden.' );
     }
 
@@ -436,6 +446,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     }
 
     if ( ! $target_event ) {
+        error_log('HOCHZEITSTAG: No event found for today (Days until: ' . (isset($days_until) ? $days_until : 'N/A') . ').');
         return array( 'success' => false, 'message' => 'Keine Erinnerung heute fällig.' );
     }
 
@@ -450,6 +461,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     }
 
     if ( empty($recipients) ) {
+         error_log('HOCHZEITSTAG: No recipients found.');
          return array( 'success' => false, 'message' => 'Keine E-Mail-Empfänger konfiguriert.' );
     }
 
