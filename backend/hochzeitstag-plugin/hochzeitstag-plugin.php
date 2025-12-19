@@ -34,6 +34,21 @@ function hochzeitstag_add_admin_menu() {
     );
 }
 
+function hochzeitstag_settings_page() {
+    ?>
+    <div class="wrap">
+        <h1>Hochzeitstag Konfiguration</h1>
+        <form action="options.php" method="post">
+            <?php
+            settings_fields( 'hochzeitstagPlugin' );
+            do_settings_sections( 'hochzeitstagPlugin' );
+            submit_button();
+            ?>
+        </form>
+    </div>
+    <?php
+}
+
 function hochzeitstag_settings_init() {
     register_setting( 'hochzeitstagPlugin', 'hochzeitstag_settings' );
 
@@ -282,6 +297,7 @@ function hochzeitstag_enqueue_assets() {
     
     wp_localize_script( 'hochzeitstag-script', 'hochzeitstag_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 }
+add_action( 'wp_enqueue_scripts', 'hochzeitstag_enqueue_assets' );
 
 /**
  * ------------------------------------------------------------------------
