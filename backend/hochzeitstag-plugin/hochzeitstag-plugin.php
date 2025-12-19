@@ -145,6 +145,7 @@ function hochzeitstag_section_email_callback() { echo 'Konfiguration der Benachr
 
 function hochzeitstag_date_render( $args ) {
     $options = get_option( 'hochzeitstag_settings' );
+    if ( !is_array($options) ) $options = [];
     $defaults = hochzeitstag_get_defaults();
     $id = $args['id'];
     
@@ -158,6 +159,7 @@ function hochzeitstag_date_render( $args ) {
 
 function hochzeitstag_text_render( $args ) {
     $options = get_option( 'hochzeitstag_settings' );
+    if ( !is_array($options) ) $options = [];
     $defaults = hochzeitstag_get_defaults();
     $id = $args['id'];
     
@@ -167,6 +169,7 @@ function hochzeitstag_text_render( $args ) {
 
 function hochzeitstag_checkbox_render( $args ) {
     $options = get_option( 'hochzeitstag_settings' );
+    if ( !is_array($options) ) $options = [];
     $defaults = hochzeitstag_get_defaults();
     $id = $args['id'];
     
@@ -187,6 +190,7 @@ function hochzeitstag_checkbox_render( $args ) {
 
 function hochzeitstag_textarea_render( $args ) {
     $options = get_option( 'hochzeitstag_settings' );
+    if ( !is_array($options) ) $options = [];
     $defaults = hochzeitstag_get_defaults();
     $id = $args['id'];
 
