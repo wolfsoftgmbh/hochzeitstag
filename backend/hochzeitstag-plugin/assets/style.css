@@ -279,6 +279,27 @@ h1, .section-title {
     box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.2); /* Glow Effekt */
 }
 
+/* Slow blinking animation for the next upcoming event */
+.blink-dot {
+    animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+    0% {
+        box-shadow: 0 0 0 0px rgba(183, 110, 121, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(183, 110, 121, 0);
+        transform: scale(1.1);
+        background-color: #b76e79;
+    }
+    100% {
+        box-shadow: 0 0 0 0px rgba(183, 110, 121, 0.4);
+        transform: scale(1);
+    }
+}
+
 .timeline-content {
     background: rgba(255, 255, 255, 0.5); /* Etwas transparenter */
     padding: 10px 15px;

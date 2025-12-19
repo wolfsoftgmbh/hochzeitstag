@@ -321,15 +321,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // HTML Generieren
             let mHtml = '';
-            uniqueMilestones.forEach(m => {
+            uniqueMilestones.forEach((m, index) => {
                 const daysLeft = getRemainingDays(m.date);
                 if (daysLeft === null) return;
                 
                 const timeText = daysLeft === 0 ? "Heute!" : `in ${daysLeft} Tagen`;
+                const blinkClass = index === 0 ? " blink-dot" : "";
                 
                 mHtml += `
                 <div class="timeline-item">
-                    <div class="timeline-dot" style="background: #fff; border-color: var(--primary-color);"></div>
+                    <div class="timeline-dot${blinkClass}" style="background: #fff; border-color: var(--primary-color);"></div>
                     <div class="timeline-content">
                         <span class="t-label">${m.label}</span>
                         <span class="t-date" data-iso="${m.date.toISOString()}">${formatShortDate(m.date)}</span>
