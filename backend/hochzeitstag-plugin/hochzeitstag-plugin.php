@@ -407,13 +407,87 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
 
     if (!$target_event) return ['success'=>false, 'message'=>'Kein Event.'];
 
+    // --- PREPARE EMAIL CONTENT ---
+    $quote = "Liebe ist alles.";
+    if (!empty($cfg['quotes'])) {
+        $quote = $cfg['quotes'][array_rand($cfg['quotes'])];
+    }
+
+    $ideas_list = '';
+    $ideas = [];
+    if (!empty($atts['ideas']) && is_array($atts['ideas'])) {
+        $ideas = $atts['ideas'];
+    } elseif (!empty($cfg['surpriseIdeas'])) {
+        $all_ideas = $cfg['surpriseIdeas'];
+        shuffle($all_ideas);
+        $ideas = array_slice($all_ideas, 0, 5);
+    }
+
+    if (!empty($ideas)) {
+        foreach ($ideas as $idea) {
+            $ideas_list .= '<li style="margin-bottom: 8px; color: #555;">' . esc_html($idea) . '</li>';
+        }
+    }
+
     // Send
     $sent = 0;
     foreach($cfg['recipients'] as $rcp) {
         if(empty($rcp['email']) || !$rcp['active']) continue;
         
         $subject = "📅 Countdown-Alarm: {$target_event['label']} steht an!{$reminder_suffix}";
-        $message = "Hallo {$rcp['name']}!<br>Bald ist es soweit: <b>{$target_event['label']}</b> am " . $target_event['date']->format('d.m.Y');
+        
+        $message = "
+        <html>
+        <head>
+            <title>Meilenstein-Alarm</title>
+            <style>
+                body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333; }
+                .email-container { background-color: #ffffff; padding: 40px; border-radius: 12px; max-width: 600px; margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+                h2 { color: #b76e79; margin-top: 0; }
+                .highlight-box { background: linear-gradient(135deg, #fff0f5 0%, #ffe6ee 100%); border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; border: 1px solid #ffcdd2; }
+                .event-name { font-size: 1.4em; font-weight: bold; color: #880e4f; display: block; margin-bottom: 5px; }
+                .event-date { font-size: 1.1em; color: #ad1457; }
+                .intro-text { line-height: 1.6; font-size: 16px; color: #555; }
+                .ideas-section { margin-top: 30px; }
+                .ideas-title { font-weight: bold; color: #b76e79; font-size: 1.1em; margin-bottom: 10px; display: block; }
+                .quote-box { font-style: italic; color: #777; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; }
+                .footer { margin-top: 30px; font-size: 0.8em; color: #aaa; text-align: center; }
+            </style>
+        </head>
+        <body>
+            <div class=\"email-container\">
+                <h2>Hallo " . esc_html($rcp['name']) . "!</h2>
+                
+                <p class=\"intro-text\">
+                    Aufgepasst! Eure gemeinsame Reise erreicht bald den nächsten wunderbaren Meilenstein.
+                    Zeit, die Herzen höher schlagen zu lassen!
+                </p>
+
+                <div class=\"highlight-box\">
+                    <span class=\"event-name\">" . esc_html($target_event['label']) . "</span>
+                    <span class=\"event-date\">am " . $target_event['date']->format('d.m.Y') . "</span>
+                </div>
+
+                " . (!empty($ideas_list) ? "
+                <div class=\"ideas-section\">
+                    <span class=\"ideas-title\">💡 5 Ideen für eine kleine Überraschung:</span>
+                    <p>Damit du nicht mit leeren Händen (oder leerem Kopf) dastehst, hier ein paar Inspirationen, um deinem Schatz ein Lächeln ins Gesicht zu zaubern:</p>
+                    <ul style=\"text-align: left; background: #fff; padding: 15px 15px 15px 30px; border-radius: 8px; border: 1px dashed #e91e63;\">
+                        {$ideas_list}
+                    </ul>
+                </div>" : "") . "
+
+                <div class=\"quote-box\">
+                    „" . esc_html($quote) . "“
+                </div>
+
+                <div class=\"footer\">
+                    <p>Gesendet mit Liebe vom Hochzeitstag Countdown Plugin.</p>
+                </div>
+            </div>
+        </body>
+        </html>";
+
         $headers = array('Content-Type: text/html; charset=UTF-8');
         
         if(wp_mail($rcp['email'], $subject, $message, $headers)) $sent++;
