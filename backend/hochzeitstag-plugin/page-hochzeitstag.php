@@ -21,6 +21,21 @@ if ( ! defined( 'ABSPATH' ) ) {
     <!-- Scripts -->
     <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/config.js?v=1.5'; ?>"></script>
     <script>
+        <?php
+        // Inject DB Config if available
+        if ( function_exists('hochzeitstag_get_config') ) {
+            $cfg = hochzeitstag_get_config();
+            $js_config = [
+                'weddingDate' => $cfg['dates']['wedding'] . 'T11:02:00',
+                'firstContactDate' => $cfg['dates']['contact'] . 'T19:02:00',
+                'firstMeetDate' => $cfg['dates']['meet'] . 'T21:02:00',
+                'birthdays' => $cfg['birthdays'],
+                'customEvents' => $cfg['customEvents'],
+                'emailReminderDays' => $cfg['reminderDays']
+            ];
+            echo 'var HOCHZEITSTAG_DB_CONFIG = ' . json_encode($js_config) . ';';
+        }
+        ?>
         var hochzeitstag_ajax_object = { ajax_url: "<?php echo admin_url( 'admin-ajax.php' ); ?>" };
     </script>
     <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/script.js?v=1.5'; ?>" defer></script>
