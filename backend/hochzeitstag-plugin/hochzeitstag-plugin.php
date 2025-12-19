@@ -186,7 +186,10 @@ function hochzeitstag_get_config() {
 // Callbacks
 function hochzeitstag_section_general_callback() { echo 'Geben Sie hier die wichtigsten Daten ein.'; }
 function hochzeitstag_section_events_callback() { echo 'Format: JSON Array oder leer lassen.'; }
-function hochzeitstag_section_email_callback() { echo 'Konfiguration der Benachrichtigungen.'; }
+function hochzeitstag_section_email_callback() { 
+    echo 'Konfiguration der Benachrichtigungen.<br>';
+    echo '<span style="color: #666; font-style: italic;">Aktuelle Serverzeit: <b>' . date('H:i:s') . '</b></span>'; 
+}
 function hochzeitstag_section_content_callback() { echo 'Verwalten Sie die Texte, die zufällig angezeigt werden.'; }
 
 function hochzeitstag_date_render( $args ) {
