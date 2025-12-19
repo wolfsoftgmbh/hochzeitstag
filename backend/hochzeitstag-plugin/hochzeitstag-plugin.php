@@ -90,6 +90,15 @@ function hochzeitstag_settings_init() {
     
     add_settings_field( 'reminder_days', 'Erinnerungstage (z.B. 7, 1)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'reminder_days'] );
 
+    add_settings_section(
+        'hochzeitstag_section_content',
+        'Inhalte (Zufallstexte)',
+        'hochzeitstag_section_content_callback',
+        'hochzeitstagPlugin'
+    );
+    add_settings_field( 'quotes', 'Sprüche & Zitate (Einer pro Zeile)', 'hochzeitstag_textarea_render', 'hochzeitstagPlugin', 'hochzeitstag_section_content', ['id' => 'quotes', 'desc' => 'Diese Sprüche werden zufällig auf der Seite angezeigt.'] );
+    add_settings_field( 'surprise_ideas', 'Überraschungsideen (Einer pro Zeile)', 'hochzeitstag_textarea_render', 'hochzeitstagPlugin', 'hochzeitstag_section_content', ['id' => 'surprise_ideas', 'desc' => 'Ideen für kleine Aufmerksamkeiten.'] );
+
 }
 
 /**
@@ -111,7 +120,9 @@ function hochzeitstag_get_defaults() {
         'email_wife' => 'tanja-risse@gmx.de',
         'name_wife' => 'Tanja',
         'active_wife' => true,
-        'reminder_days' => '7, 1'
+        'reminder_days' => '7, 1',
+        'quotes' => "Liebe ist: zu zweit albern sein.\nWir passen, wie Topf und Deckel.\nEhe: Streit um Fernbedienung, endet mit Lachen.\nZusammen sind wir besser, wie Kaffee & Kuchen.\nMein Lieblingsmensch, trotz letztem Keks.\nLiebe: Das Einzige, was mehr wird, wenn man es verschwendet.\nMit dir wird jeder Einkauf zum Abenteuer.\nEchte Liebe erträgt auch Schnarchen.\nMein Anker im Sturm, mein Konfetti im Alltag.\nZuhause ist, wo du bist (und WLAN).\nWir: Ein Team für Chaos und Ordnung.\nLiebe heißt: immer wieder vertragen.\nMit dir: Jeder Tag ein Feiertag.\nDu bist der Grund für mein Handy-Lächeln.\nUnsere Liebe: guter Wein, wird besser mit Jahren.\nDanke, dass du meine Macken magst.\nWir zwei gegen den Rest der Welt (und Abwasch).\nDu bringst mich zum Lachen, auch mürrisch.\nGlück ist: herrlich albern sein.\nDu bist der Zucker in meinem Kaffee.\nEgal wohin, Hauptsache zusammen.\nMit dir macht sogar Nichtstun Spaß.\nDu bist mein Happy Place.\nLiebe ist: blind verstehen.\nIch mag dich mehr als Pizza.\nDu und ich – das passt.\nMein Herz schlägt im Takt von deinem.\nDeine Umarmung: mein Lieblingsort.\nZusammen ist man weniger allein.\nDu bist mein Lieblings-Nervzwerg.\nIch liebe dich mehr als Kaffee (sag's nicht).\nWir sind wie Pech und Schwefel, nur hübscher.\nDu hast den Schlüssel zum Herzen (und Kühlschrank).\nLiebe: Du lässt mir die letzte Schokolade.\nDu bist der Grund, warum ich aufstehe (meistens).\nMit dir ist sogar der Abwasch erträglich.\nWir sind das perfekte Chaos.\nDu bist mein liebster Zeitvertreib.\nIch liebe dich, auch wenn du hungrig bist.\nDu bist mein persönlicher Superheld (ohne Umhang).\nZusammen sind wir unschlagbar (im Faulenzen).\nDu bist mein Lieblingsmensch, Punkt.\nLiebe ist: schweigend anschreien können.\nDu bist süßer als Zuckerwatte.\nIch würde mein Handy für dich weglegen.\nDu bist der Käse auf meiner Pizza.\nWir passen zusammen wie Pommes und Ketchup.\nDu bist mein Einhorn in Pferdeherde.\nLiebe ist: gemeinsam dick werden.\nDu bist der Grund für mein Dauergrinsen.\nIch liebe dich mehr als gestern (weniger als morgen).\nDu bist meine bessere, vernünftigere Hälfte.\nMit dir kann man Pferde stehlen (und Ponys).\nDu bist mein Lieblings-Kuscheltier.\nLiebe: Decke teilen (widerwillig).\nDu bist der Hit in meinen Charts.\nIch folge dir (außer aufs Klo).\nDu bist mein Highlight des Tages.\nWir sind Bonnie & Clyde, ohne Banküberfall.\nDu bist mein 6er im Lotto.\nIch liebe dich bis zur Unendlichkeit.\nDu bist mein Fels and mein Kissen.\nMit dir wird's nie langweilig.\nDu bist mein Lieblings-Abenteuer.\nLiebe ist: blind vertrauen (trotzdem Google Maps checken).\nDu bist mein Sternenhimmel.\nIch hab dich zum Fressen gern.\nDu bist mein Lieblings-Gedanke vor dem Einschlafen.\nWir sind ein Dream-Team.\nDu bist mein Sonnenschein, auch nachts.\nIch liebe dich mehr als Schokolade.\nDu bist mein Herzblatt.\nMit dir ist das Leben ein Ponyhof.\nDu bist mein allerliebster Lieblingsmensch.\nLiebe ist: gegenseitig Sätze beenden.\nDu bist der Grund, warum ich glücklich bin.\nIch bin süchtig nach dir.\nDu bist mein Zuhause.\nWir sind einfach füreinander gemacht.\nZwei Herzen, ein Beat, unser Rhythmus.\nLiebe ist: den anderen in Jogginghose lieben.\nDu bist mein Happy End, jeden Tag.\nUnsere Liebe: mehr als tausend Worte.\nEin Blick sagt mehr als jede Rede.\nMit dir ist jeder Moment Gold wert.\nDu machst mein Leben heller.\nUnsere Herzen tanzen im Gleichklang.\nDu bist mein Traum, der wahr wurde.\nEin Leben ohne dich? Undenkbar!\nLiebe ist die schönste Reise.\nDu bist das Puzzleteil, das fehlte.\nJeder Tag mit dir ist ein Geschenk.\nDu gibst meinem Leben Sinn.\nDu bist mein Anker, mein Halt.\nUnsere Liebe: ein unendliches Band.\nDu bist mein größtes Abenteuer.\nMit dir ist alles leichter.\nDu bist mein Lächeln, meine Freude.\nUnsere Liebe wächst jeden Tag.\nDu bist mein Herz, meine Seele.\nDu bist der Grund für mein Glück.\nEin Kuss von dir: mein Lieblingsgefühl.\nDu bist mein Zuhause, wo immer wir sind.\nUnsere Liebe: stärker als alles.\nDu bist mein Wunsch, der in Erfüllung ging.\nMit dir ist jeder Tag ein Gedicht.\nDu bist mein Held, mein Retter.\nUnsere Liebe: ein ewiges Feuer.\nDu bist mein Schatz, mein größter Gewinn.\nDu machst mich komplett.\nUnsere Herzen sind verbunden.\nDu bist mein Glück, mein Schicksal.\nMit dir ist jeder Weg das Ziel.\nDu bist mein Stern, der leuchtet.\nUnsere Liebe: unendlich und rein.\nDu bist mein Leben, mein Atem.\nDu bist mein Licht, meine Sonne.\nUnsere Liebe: ein Wunder, das bleibt.\nDu bist mein Alles, mein Nichts.\nDu bist meine Ewigkeit.",
+        'surprise_ideas' => "Frühstück am Bett servieren\nEinen handgeschriebenen Liebesbrief verstecken\nEin Picknick im Wohnzimmer veranstalten\nEinen Überraschungs-Wochenendtrip planen\nDas Lieblingsessen kochen\nEin entspannendes Massage-Abend mit Duftöl\nEin Fotoalbum mit gemeinsamen Erinnerungen erstellen\nEine kleine Schatzsuche durch die Wohnung organisieren\nKinokarten für den neuesten Film besorgen\nEin gemeinsames Bad mit Kerzenschein und Musik vorbereiten\nEinfach mal ohne Grund Blumen mitbringen\nEin Kompliment im Vorbeigehen flüstern\nEinen Stern nach dem Partner benennen\nEine Playlist mit 'unseren' Liedern erstellen\nDen Partner von der Arbeit abholen\nEinen gemeinsamen Kochkurs besuchen\nEin Schloss an einer Brücke anbringen\nEinen Liebesbrief per Post schicken\nEinen Wellness-Tag zu Hause einlegen\nZusammen den Sonnenaufgang anschauen\nEin Überraschungs-Date im Lieblingsrestaurant\nDie Lieblingsserie zusammen schauen (auch wenn man sie nicht mag)\nEinen Abend lang alle Hausarbeiten übernehmen\nEin kleines Geschenk ohne Anlass kaufen\nGemeinsam ein neues Hobby ausprobieren\nEinen Brief für die Zukunft schreiben\nEin Kompliment auf den Badezimmerspiegel schreiben\nEin gerahmtes Foto von einem besonderen Moment schenken\nEinen Tanzabend im Wohnzimmer machen\nZusammen Schlittschuhlaufen oder Rollschuhfahren gehen\nEinen Drachen steigen lassen\nGemeinsam in den Zoo oder Botanischen Garten gehen\nEinen Spieleabend mit den Lieblingsspielen organisieren\nEine Massage-Gutschein basteln\nEinen Korb mit Lieblings-Snacks zusammenstellen\nEin privates Fotoshooting machen\nEinen Baum zusammen pflanzen\nEinfach mal 'Ich liebe dich' sagen, wenn es niemand erwartet\nEine Nacht unter freiem Himmel schlafen\nEin Boot mieten und über einen See rudern\nEinen Flohmarktbummel machen\nZusammen ein Puzzle lösen\nEine Flaschenpost vorbereiten\nDen Partner mit einem warmen Handtuch nach dem Duschen überraschen\nEinen Liebes-Post-it am Kühlschrank hinterlassen\nZusammen alte Kinderfotos anschauen\nEin Lied für den Partner singen (oder rappen)\nEinen Ausflug an den Ort des ersten Treffens machen\nGemeinsam ein Museum besuchen\nEine Weinprobe zu Hause machen\nEinen Karaoke-Abend veranstalten\nEin gemeinsames Vision-Board für die Zukunft erstellen\nEinen Malkurs für Paare besuchen\nZusammen in eine Therme gehen\nEinen Kuss im Regen genießen\nEinen Spaziergang im Mondschein machen\nEin Frühstück im Freien (Balkon/Garten)\nEinen gemeinsamen Sportkurs belegen\nEinander vorlesen\nEinen Tag lang das Handy ausschalten und Zeit genießen\nEin DIY-Projekt zusammen starten\nEinen Städtetrip in eine unbekannte Stadt\nZusammen ein Konzert besuchen\nEin Überraschungs-Kaffeetrinken organisieren\nEinander die Haare waschen oder kämmen\nEinen Gutschein für eine Autowäsche schenken\nEinen Tag lang 'Ja' zu allen Wünschen des Partners sagen\nEinen gemeinsamen Back-Abend\nEine Zeitkapsel vergraben\nZusammen in den Zirkus oder Varieté gehen\nEinen Wanderurlaub planen\nEin kleines Gedicht schreiben\nDie Bettwäsche frisch beziehen und mit Blüten bestreuen\nEin Eis essen gehen\nZusammen Tretboot fahren\nEinen Sonnenuntergang am Strand/See beobachten\nEinander massieren (Nacken, Füße)\nEinen gemeinsamen Tanzkurs machen\nEinen Plan für das nächste Jahr schmieden\nEinen Brief schreiben, warum man dankbar ist\nEin Überraschungs-BBQ im Garten\nZusammen eine Sternwarte besuchen\nEinander ein Hobby erklären und ausprobieren lassen\nEinen Roadtrip ohne festes Ziel machen\nEine Nacht im Hotel in der eigenen Stadt buchen\nEinander beim Anziehen helfen\nEinen gemeinsam Garten oder Balkonkasten bepflanzen\nEin Kompliment vor Freunden machen\nZusammen einen Freizeitpark besuchen\nEin gemeinsames Bad mit Badebombe\nEinen Abend lang nur Musik hören und reden\nEin Foto von sich selbst in das Portemonnaie des Partners schleichen\nEinen besonderen Tee oder Kaffee kochen\nEinen kleinen Glücksbringer schenken\nEinen Video-Clip mit gemeinsamen Momenten schneiden\nZusammen die Sterne beobachten und Sternbilder suchen\nEinander etwas Neues beibringen\nEine heiße Schokolade mit Sahne an einem kalten Tag\nEinen Kuss auf die Stirn geben\nGemeinsam alt werden (als Plan)"
     ];
 }
 
@@ -131,6 +142,10 @@ function hochzeitstag_get_config() {
     $custom_events = json_decode(stripslashes($config['custom_events']), true);
     if (!is_array($custom_events)) $custom_events = [];
 
+    // Process Multiline strings to Arrays
+    $quotes = array_values(array_filter(array_map('trim', explode("\n", $config['quotes']))));
+    $surprise_ideas = array_values(array_filter(array_map('trim', explode("\n", $config['surprise_ideas']))));
+
     // Return structured object for PHP logic
     return [
         'dates' => [
@@ -147,7 +162,9 @@ function hochzeitstag_get_config() {
             ['email' => $config['email_wife'], 'name' => $config['name_wife'], 'active' => $config['active_wife']]
         ],
         'customEvents' => $custom_events,
-        'reminderDays' => $reminder_days
+        'reminderDays' => $reminder_days,
+        'quotes' => $quotes,
+        'surpriseIdeas' => $surprise_ideas
     ];
 }
 
@@ -161,6 +178,7 @@ function hochzeitstag_get_config() {
 function hochzeitstag_section_general_callback() { echo 'Geben Sie hier die wichtigsten Daten ein.'; }
 function hochzeitstag_section_events_callback() { echo 'Format: JSON Array oder leer lassen.'; }
 function hochzeitstag_section_email_callback() { echo 'Konfiguration der Benachrichtigungen.'; }
+function hochzeitstag_section_content_callback() { echo 'Verwalten Sie die Texte, die zufällig angezeigt werden.'; }
 
 function hochzeitstag_date_render( $args ) {
     $options = get_option( 'hochzeitstag_settings' );
@@ -269,29 +287,9 @@ function hochzeitstag_enqueue_assets() {
         'birthdays' => $cfg['birthdays'],
         'customEvents' => $cfg['customEvents'],
         'emailReminderDays' => $cfg['reminderDays'],
-        'quotes' => [
-            "Liebe ist: zu zweit albern sein.", "Wir passen, wie Topf und Deckel.", "Liebe ist alles." 
-            // Truncated for brevity in inline script, full list ideally also in DB or kept in JS file if static
-        ],
-        'surpriseIdeas' => [
-            "Frühstück am Bett", "Essen gehen"
-        ]
+        'quotes' => $cfg['quotes'],
+        'surpriseIdeas' => $cfg['surpriseIdeas']
     ];
-    
-    // We keep the huge static lists in JS for now unless you want them in DB too (messy)
-    // We only override the "dynamic" parts.
-    // Actually, script.js checks `typeof HOCHZEITSTAG_CONFIG !== 'undefined'`.
-    // We will inject the object. But we need the quotes. 
-    // Trick: In script.js, merge with defaults if missing?
-    // Current script.js uses the whole object or fallback.
-    // Let's provide the essential override values.
-    
-    // PROBLEM: script.js has `const HOCHZEITSTAG_CONFIG = ...`. It's not a var we can easily merge BEFORE it runs if it's hardcoded.
-    // Wait, script.js says: `const CONFIG = (typeof HOCHZEITSTAG_CONFIG !== 'undefined') ? HOCHZEITSTAG_CONFIG : { ...defaults... }`
-    // So we just need to define `HOCHZEITSTAG_CONFIG` before script.js loads.
-    
-    // We need to include the FULL list of quotes/ideas if we overwrite the object, OR we change script.js to merge.
-    // Changing script.js to merge is safer.
     
     wp_add_inline_script( 'hochzeitstag-script', 'var HOCHZEITSTAG_DB_CONFIG = ' . json_encode($js_config) . ';', 'before' );
     
