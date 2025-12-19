@@ -89,7 +89,10 @@ function hochzeitstag_settings_init() {
     add_settings_field( 'active_wife', 'Aktiv (Ehefrau)', 'hochzeitstag_checkbox_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'active_wife'] );
     
     add_settings_field( 'reminder_days', 'Erinnerungstage (z.B. 7, 1)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'reminder_days'] );
-    add_settings_field( 'email_send_time', 'Sendezeit (HH:MM)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'email_send_time', 'desc' => 'Uhrzeit für den täglichen Versand (z.B. 09:00)'] );
+    add_settings_field( 'email_send_time', 'Sendezeit (HH:MM)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', [
+        'id' => 'email_send_time', 
+        'desc' => 'Uhrzeit für den täglichen Versand (z.B. 09:00).<br><span style="color: #d63638; font-weight: bold;">Aktuelle Serverzeit: ' . current_time('H:i') . '</span>'
+    ] );
 
     add_settings_section(
         'hochzeitstag_section_content',
@@ -186,10 +189,7 @@ function hochzeitstag_get_config() {
 // Callbacks
 function hochzeitstag_section_general_callback() { echo 'Geben Sie hier die wichtigsten Daten ein.'; }
 function hochzeitstag_section_events_callback() { echo 'Format: JSON Array oder leer lassen.'; }
-function hochzeitstag_section_email_callback() { 
-    echo 'Konfiguration der Benachrichtigungen.<br>';
-    echo '<span style="color: #666; font-style: italic;">Aktuelle Serverzeit: <b>' . date('H:i:s') . '</b></span>'; 
-}
+function hochzeitstag_section_email_callback() { echo 'Konfiguration der Benachrichtigungen.'; }
 function hochzeitstag_section_content_callback() { echo 'Verwalten Sie die Texte, die zufällig angezeigt werden.'; }
 
 function hochzeitstag_date_render( $args ) {
