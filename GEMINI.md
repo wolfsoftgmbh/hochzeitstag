@@ -39,3 +39,6 @@ configuration is primarily handled within the `frontend/wedding.html` file:
 *   **Conventions:**
     *   **Localization:** UI text is in **German**. Code comments and variable names are in **English**.
     *   **Formatting:** Standard indentation (4 spaces or 2 spaces), clear separation of CSS, HTML, and JS blocks within the single file.
+
+## wordpress plugin
+build an wordpress plugin in the backend so I can upload it to wordpress for testing
