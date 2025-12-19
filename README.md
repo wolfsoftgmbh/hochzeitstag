@@ -1,66 +1,60 @@
-# Hochzeitstag Countdown
+# Hochzeitstag Countdown Plugin
 
-A romantic, single-page application and WordPress plugin to track the time since your wedding and countdown to the next anniversary.
+Eine romantische Anwendung und WordPress-Plugin, um die Zeit seit dem Hochzeitstag zu verfolgen und bis zum nächsten Jubiläum herunterzuzählen.
 
-## 🌟 Features
-*   **Live Countdown:** Real-time display of years, days, hours, and minutes since the big day.
-*   **Surprise Ideas (Überraschungsidee):** A dedicated section displaying random romantic ideas to surprise your partner. Includes a library of 100+ suggestions.
-*   **Dynamic Milestones:** 
-    *   Automatically calculates upcoming birthdays, annual wedding anniversaries, and special repdigit days (Schnapszahlen like 111, 2222 days).
-    *   Includes quarterly year markers (1/4 year, 1/2 year, etc.).
-    *   **Custom Events:** Support for manual milestones (e.g., Engagement, House purchase).
-    *   Shows the next 5 chronological events.
-*   **Email Notification System:**
-    *   **Automated Cron Job:** Reminders are sent automatically every day at **09:00 AM**.
-    *   **Smart Timing:** Reminders are sent 7 days and 1 day before major milestones.
-    *   **Multi-Recipient Support:** Configurable email addresses for both partners with individual enable/disable flags.
-    *   **Test-Email Button:** Send a manual reminder email anytime to see the current upcoming milestone.
-    *   **Dynamic Content:** Emails include 5 randomly selected surprise ideas to inspire you.
-    *   **Schedule Info:** Displays the date of the next scheduled automatic email right on the page.
-*   **Interactive History:** Displays a timeline of your relationship history.
-*   **Theming:** Custom primary color support via configuration.
-*   **Responsive Design:** Modern Glassmorphism aesthetic that looks great on mobile and desktop.
-*   **Flexible Integration:** Use the standalone page (`/hochzeit/`) or embed it anywhere via shortcode.
+## 🌟 Funktionen
+
+*   **Live-Countdown:** Echtzeitanzeige von Jahren, Tagen, Stunden und Minuten seit dem großen Tag.
+*   **Überraschungsideen:** Ein spezieller Bereich, der zufällige romantische Ideen vorschlägt, um den Partner zu überraschen (über 100 Vorschläge integriert).
+*   **Dynamische Meilensteine:**
+    *   Automatische Berechnung von Geburtstagen, jährlichen Hochzeitstagen und speziellen "Schnapszahl-Jubiläen" (z.B. 1111 Tage, 2222 Tage).
+    *   Vierteljährliche Marker (1/4 Jahr, 1/2 Jahr etc.).
+    *   **Benutzerdefinierte Events:** Unterstützung für eigene Meilensteine (z.B. Verlobung, Hauskauf).
+    *   Zeigt die nächsten 5 chronologischen Ereignisse an.
+*   **E-Mail-Benachrichtigungssystem:**
+    *   **Automatischer Versand:** Erinnerungen werden täglich um **09:00 Uhr** geprüft und versendet.
+    *   **Intelligentes Timing:** Erinnerungen kommen standardmäßig 7 Tage und 1 Tag vor dem Ereignis (konfigurierbar).
+    *   **Mehrere Empfänger:** Konfigurierbare E-Mail-Adressen für beide Partner (Ehemann/Ehefrau) mit individueller Aktivierung.
+    *   **Test-Button:** Senden Sie jederzeit eine Test-E-Mail, um die Funktion zu prüfen.
+    *   **Inhalt:** E-Mails enthalten den Meilenstein und 5 zufällige Überraschungsideen zur Inspiration.
+*   **Interaktive Geschichte:** Zeigt eine Zeitleiste Ihrer Beziehungshistorie.
+*   **Responsive Design:** Modernes "Glassmorphism"-Design, optimiert für Handy und Desktop.
+*   **Einfache Integration:** Eigene Seite unter `/hochzeit/` oder per Shortcode `[hochzeitstag]` einbindbar.
 
 ## 🚀 Installation (WordPress)
 
-1.  **Download:** Get the `hochzeitstag-plugin.zip` file from the `backend/` directory.
-2.  **Upload:** Go to your WordPress Dashboard -> **Plugins -> Add New -> Upload Plugin**. Select the zip file and install.
-3.  **Activate:** Activate the plugin.
-4.  **Setup URL (Optional but recommended):**
-    *   Go to **Settings -> Permalinks**.
-    *   Click **"Save Changes"** (this flushes the rewrite rules to enable the `/hochzeit/` URL).
-5.  **View:** 
-    *   Visit `your-site.com/hochzeit/` for the standalone page.
-    *   **OR** use the shortcode `[hochzeitstag]` on any existing page or post.
+1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_final.zip` herunter.
+2.  **Hochladen:** Gehen Sie in Ihr WordPress-Dashboard zu **Plugins -> Installieren -> Plugin hochladen**. Wählen Sie die ZIP-Datei aus und installieren Sie sie.
+3.  **Aktivieren:** Aktivieren Sie das Plugin.
+4.  **Setup (Optional):**
+    *   Gehen Sie zu **Einstellungen -> Permalinks**.
+    *   Klicken Sie einmal auf **"Änderungen speichern"** (dies aktualisiert die URL-Struktur für die Seite `/hochzeit/`).
 
-## ⚙️ Configuration
-The configuration is located in `assets/config.js` (for the plugin) or `config.js` (for the standalone frontend).
+## ⚙️ Konfiguration (NEU in v2.0)
 
-### Visuals
-*   `themeColor`: Hex code for the primary accent color (Default: `"#b76e79"`).
-*   `backgroundImage`: Filename or URL for the header image.
+Sie müssen keine Dateien mehr bearbeiten! Das Plugin verfügt jetzt über eine eigene Einstellungsseite.
 
-### Dates
-*   `weddingDate`: ISO 8601 format base for the countdown (e.g., `"2025-09-06T11:02:00"`).
-*   `birthdays`: Key-value pairs for milestones (e.g., `klaus: "1967-08-02"`).
-*   `customEvents`: Array of custom objects `{ date: "YYYY-MM-DD", label: "Event Name" }`.
+1.  Klicken Sie im WordPress-Menü auf **"Hochzeitstag"**.
+2.  **Allgemeine Einstellungen:**
+    *   Tragen Sie Ihr Hochzeitsdatum, Kennenlerndaten und Geburtstage ein.
+3.  **Ereignisse:**
+    *   Fügen Sie eigene Events im JSON-Format hinzu (z.B. Hauskauf, Verlobung).
+4.  **E-Mail Einstellungen:**
+    *   Hinterlegen Sie die E-Mail-Adressen und Namen für Ehemann und Ehefrau.
+    *   Aktivieren Sie die Checkbox "Aktiv", um E-Mails zu empfangen.
+    *   Legen Sie fest, wie viele Tage im Voraus Sie erinnert werden möchten (z.B. `7, 1`).
 
-### Notifications (Email)
-*   `emailAddresses`: Define `husband` and `wife` details.
-    *   `email`: Recipient address.
-    *   `name`: Recipient name for the greeting.
-    *   `sendEmail`: Boolean (`true`/`false`) to enable/disable notifications for this person.
-*   `emailAutoSend`: Toggle automatic milestone reminders.
-*   `emailReminderDays`: Array defining how many days before an event to send a mail (Default: `[7, 1]`).
+Klicken Sie auf **"Änderungen speichern"**, um die Einstellungen zu übernehmen.
 
-### Content
-*   `quotes`: Array of romantic or humorous quotes.
-*   `surpriseIdeas`: Array of 100+ ideas for partner surprises.
+## 🛠 Nutzung
 
-## 🛠 Development
-*   **Frontend:** Core logic in `frontend/`. Open `wedding.html` for local development.
-*   **Backend:** WordPress plugin structure in `backend/hochzeitstag-plugin/`.
+*   **Direktlink:** Besuchen Sie `ihre-domain.de/hochzeit/`.
+*   **Shortcode:** Fügen Sie `[hochzeitstag]` in eine beliebige Seite oder einen Beitrag ein.
 
-## 📜 License
-Proprietary / Private use.
+## ⚠️ Hinweis zum automatischen Versand
+
+WordPress führt geplante Aufgaben (wie den E-Mail-Versand um 09:00 Uhr) nur aus, wenn ein Besucher die Website aufruft. 
+Für eine garantierte pünktliche Zustellung, auch wenn niemand die Seite besucht, empfehlen wir die Einrichtung eines externen Cron-Jobs (z.B. über *cron-job.org*), der einmal täglich `ihre-domain.de/wp-cron.php` aufruft.
+
+## 📜 Lizenz
+Privatnutzung.
