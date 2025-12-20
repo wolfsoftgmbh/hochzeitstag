@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
             elMilestoneList.innerHTML = mHtml;
 
             if (isMilestoneToday) {
-                startFireworks();
+                // Future celebration logic could go here
             }
 
             // Update Footer Pill
@@ -496,6 +496,8 @@ document.addEventListener('DOMContentLoaded', () => {
              });
         });
     }
+
+});
 
     displayRandomQuote();
     displayRandomSurprise();
