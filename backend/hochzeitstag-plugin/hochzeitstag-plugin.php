@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.5
+ * Version: 2.8
  * Author: Gemini
  */
 
@@ -299,6 +299,11 @@ function hochzeitstag_template_include( $template ) {
 add_filter( 'template_include', 'hochzeitstag_template_include' );
 
 function hochzeitstag_enqueue_assets() {
+    // Only load assets on the specific Hochzeitstag page
+    if ( ! get_query_var( 'hochzeitstag_page' ) ) {
+        return;
+    }
+
     // Local Fonts & Styles
     wp_enqueue_style( 'hochzeitstag-fonts', plugins_url( 'assets/fonts/fonts.css', __FILE__ ), array(), '1.5' );
     wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.5' );
