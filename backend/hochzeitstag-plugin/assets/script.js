@@ -646,8 +646,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-});
-
     displayRandomQuote();
     displayRandomSurprise();
     updateTimer();

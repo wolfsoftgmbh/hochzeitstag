@@ -309,7 +309,8 @@ function hochzeitstag_enqueue_assets() {
     wp_enqueue_style( 'hochzeitstag-style', plugins_url( 'assets/style.css', __FILE__ ), array(), '1.5' );
 
     // Script
-    wp_enqueue_script( 'hochzeitstag-script', plugins_url( 'assets/script.js', __FILE__ ), array(), '2.0', true );
+    wp_enqueue_script( 'hochzeitstag-config', plugins_url( 'assets/config.js', __FILE__ ), array(), '2.8', true );
+    wp_enqueue_script( 'hochzeitstag-script', plugins_url( 'assets/script.js', __FILE__ ), array('hochzeitstag-config'), '2.8', true );
 
     // INJECT CONFIGURATION FROM DB
     $cfg = hochzeitstag_get_config();
