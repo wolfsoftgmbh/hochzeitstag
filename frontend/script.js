@@ -44,17 +44,195 @@ document.addEventListener('DOMContentLoaded', () => {
     const elHistoryList = document.getElementById('history-list');
     const elNextAnniversary = document.getElementById('next-anniversary');
 
+    // --- FIREWORKS LOGIC ---
+    let fireworksCanvas, ctx, fireworks = [], particles = [];
+    let fireworksActive = false;
+
+    function initFireworks() {
+        if (document.getElementById('fireworks-canvas')) return;
+        fireworksCanvas = document.createElement('canvas');
+        fireworksCanvas.id = 'fireworks-canvas';
+        document.body.appendChild(fireworksCanvas);
+        ctx = fireworksCanvas.getContext('2d');
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        loopFireworks();
+    }
+
+    function resizeCanvas() {
+        if(!fireworksCanvas) return;
+        fireworksCanvas.width = window.innerWidth;
+        fireworksCanvas.height = window.innerHeight;
+    }
+
+    function random(min, max) { return Math.random() * (max - min) + min; }
+
+    class Particle {
+        constructor(x, y, hue) {
+            this.x = x;
+            this.y = y;
+            this.coordinates = [];
+            this.coordinateCount = 5;
+            while (this.coordinateCount--) {
+                this.coordinates.push([this.x, this.y]);
+            }
+            this.angle = random(0, Math.PI * 2);
+            this.speed = random(1, 10);
+            this.friction = 0.95;
+            this.gravity = 1;
+            this.hue = random(hue - 20, hue + 20);
+            this.brightness = random(50, 80);
+            this.alpha = 1;
+            this.decay = random(0.015, 0.03);
+        }
+
+        update(index) {
+            this.coordinates.pop();
+            this.coordinates.unshift([this.x, this.y]);
+            this.speed *= this.friction;
+            this.x += Math.cos(this.angle) * this.speed;
+            this.y += Math.sin(this.angle) * this.speed + this.gravity;
+            this.alpha -= this.decay;
+            if (this.alpha <= this.decay) {
+                particles.splice(index, 1);
+            }
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+            ctx.lineTo(this.x, this.y);
+            ctx.strokeStyle = 'hsla(' + this.hue + ', 100%, ' + this.brightness + '%, ' + this.alpha + ')';
+            ctx.stroke();
+        }
+    }
+
+    class Firework {
+        constructor(sx, sy, tx, ty) {
+            this.x = sx;
+            this.y = sy;
+            this.sx = sx;
+            this.sy = sy;
+            this.tx = tx;
+            this.ty = ty;
+            this.distanceToTarget = Math.sqrt(Math.pow(tx - sx, 2) + Math.pow(ty - sy, 2));
+            this.distanceTraveled = 0;
+            this.coordinates = [];
+            this.coordinateCount = 3;
+            while (this.coordinateCount--) {
+                this.coordinates.push([this.x, this.y]);
+            }
+            this.angle = Math.atan2(ty - sy, tx - sx);
+            this.speed = 2;
+            this.acceleration = 1.05;
+            this.brightness = random(50, 70);
+            this.targetRadius = 1;
+        }
+
+        update(index) {
+            this.coordinates.pop();
+            this.coordinates.unshift([this.x, this.y]);
+            this.speed *= this.acceleration;
+            const vx = Math.cos(this.angle) * this.speed;
+            const vy = Math.sin(this.angle) * this.speed;
+            this.distanceTraveled = Math.sqrt(Math.pow(this.sx - this.x, 2) + Math.pow(this.sy - this.y, 2));
+
+            if (this.distanceTraveled >= this.distanceToTarget) {
+                createParticles(this.tx, this.ty);
+                fireworks.splice(index, 1);
+            } else {
+                this.x += vx;
+                this.y += vy;
+            }
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+            ctx.lineTo(this.x, this.y);
+            ctx.strokeStyle = 'hsl(' + random(0, 360) + ', 100%, ' + this.brightness + '%)';
+            ctx.stroke();
+        }
+    }
+
+    function createParticles(x, y) {
+        let particleCount = 30;
+        let hue = random(0, 360);
+        while (particleCount--) {
+            particles.push(new Particle(x, y, hue));
+        }
+    }
+
+    function loopFireworks() {
+        if (!fireworksActive) return;
+        requestAnimationFrame(loopFireworks);
+        
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+        ctx.globalCompositeOperation = 'lighter';
+
+        let i = fireworks.length;
+        while (i--) {
+            fireworks[i].draw();
+            fireworks[i].update(i);
+        }
+
+        let j = particles.length;
+        while (j--) {
+            particles[j].draw();
+            particles[j].update(j);
+        }
+
+        if (Math.random() < 0.05) { // Spawn rate
+            fireworks.push(new Firework(fireworksCanvas.width / 2, fireworksCanvas.height, random(0, fireworksCanvas.width), random(0, fireworksCanvas.height / 2)));
+        }
+    }
+
+    function startFireworks() {
+        if (fireworksActive) return;
+        fireworksActive = true;
+        initFireworks();
+    }
+
     /* --- Hilfsfunktionen --- */
 
     function displayRandomQuote() {
-        if (!elQuoteDisplay || !CONFIG.quotes) return;
-        const randomIndex = Math.floor(Math.random() * CONFIG.quotes.length);
+        if (!elQuoteDisplay || !CONFIG.quotes || CONFIG.quotes.length === 0) return;
+        
+        let randomIndex;
+        if (CONFIG.quotes.length > 1) {
+            const lastIndex = parseInt(localStorage.getItem('hochzeitstag_last_quote_index'));
+            // Try to find a new index (max 10 attempts to be safe)
+            let attempts = 0;
+            do {
+                randomIndex = Math.floor(Math.random() * CONFIG.quotes.length);
+                attempts++;
+            } while (randomIndex === lastIndex && attempts < 10);
+        } else {
+            randomIndex = 0;
+        }
+        
+        localStorage.setItem('hochzeitstag_last_quote_index', randomIndex);
         elQuoteDisplay.innerHTML = `„${CONFIG.quotes[randomIndex]}“`;
     }
 
     function displayRandomSurprise() {
-        if (!elSurpriseDisplay || !CONFIG.surpriseIdeas) return;
-        const randomIndex = Math.floor(Math.random() * CONFIG.surpriseIdeas.length);
+        if (!elSurpriseDisplay || !CONFIG.surpriseIdeas || CONFIG.surpriseIdeas.length === 0) return;
+        
+        let randomIndex;
+        if (CONFIG.surpriseIdeas.length > 1) {
+             const lastIndex = parseInt(localStorage.getItem('hochzeitstag_last_surprise_index'));
+             let attempts = 0;
+             do {
+                 randomIndex = Math.floor(Math.random() * CONFIG.surpriseIdeas.length);
+                 attempts++;
+             } while (randomIndex === lastIndex && attempts < 10);
+        } else {
+            randomIndex = 0;
+        }
+
+        localStorage.setItem('hochzeitstag_last_surprise_index', randomIndex);
         elSurpriseDisplay.innerHTML = `💡 ${CONFIG.surpriseIdeas[randomIndex]}`;
     }
 
@@ -306,10 +484,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // HTML Generieren
             let mHtml = '';
+            let isMilestoneToday = false;
+            
             uniqueMilestones.forEach(m => {
                 const daysLeft = getRemainingDays(m.date);
                 if (daysLeft === null) return;
                 
+                if (daysLeft === 0) isMilestoneToday = true;
+
                 const timeText = daysLeft === 0 ? "Heute!" : `in ${daysLeft} Tagen`;
                 
                 mHtml += `
@@ -323,6 +505,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             });
             elMilestoneList.innerHTML = mHtml;
+
+            if (isMilestoneToday) {
+                startFireworks();
+            }
 
             // Update Footer Pill
             if (elNextAnniversary) {

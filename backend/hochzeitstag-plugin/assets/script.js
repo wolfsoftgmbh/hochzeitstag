@@ -62,14 +62,41 @@ document.addEventListener('DOMContentLoaded', () => {
     /* --- Hilfsfunktionen --- */
 
     function displayRandomQuote() {
-        if (!elQuoteDisplay || !CONFIG.quotes) return;
-        const randomIndex = Math.floor(Math.random() * CONFIG.quotes.length);
+        if (!elQuoteDisplay || !CONFIG.quotes || CONFIG.quotes.length === 0) return;
+        
+        let randomIndex;
+        if (CONFIG.quotes.length > 1) {
+            const lastIndex = parseInt(localStorage.getItem('hochzeitstag_last_quote_index'));
+            // Try to find a new index (max 10 attempts to be safe)
+            let attempts = 0;
+            do {
+                randomIndex = Math.floor(Math.random() * CONFIG.quotes.length);
+                attempts++;
+            } while (randomIndex === lastIndex && attempts < 10);
+        } else {
+            randomIndex = 0;
+        }
+        
+        localStorage.setItem('hochzeitstag_last_quote_index', randomIndex);
         elQuoteDisplay.innerHTML = `„${CONFIG.quotes[randomIndex]}“`;
     }
 
     function displayRandomSurprise() {
-        if (!elSurpriseDisplay || !CONFIG.surpriseIdeas) return;
-        const randomIndex = Math.floor(Math.random() * CONFIG.surpriseIdeas.length);
+        if (!elSurpriseDisplay || !CONFIG.surpriseIdeas || CONFIG.surpriseIdeas.length === 0) return;
+        
+        let randomIndex;
+        if (CONFIG.surpriseIdeas.length > 1) {
+             const lastIndex = parseInt(localStorage.getItem('hochzeitstag_last_surprise_index'));
+             let attempts = 0;
+             do {
+                 randomIndex = Math.floor(Math.random() * CONFIG.surpriseIdeas.length);
+                 attempts++;
+             } while (randomIndex === lastIndex && attempts < 10);
+        } else {
+            randomIndex = 0;
+        }
+
+        localStorage.setItem('hochzeitstag_last_surprise_index', randomIndex);
         elSurpriseDisplay.innerHTML = `💡 ${CONFIG.surpriseIdeas[randomIndex]}`;
     }
 

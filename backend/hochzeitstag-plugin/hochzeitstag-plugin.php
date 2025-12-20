@@ -158,6 +158,14 @@ function hochzeitstag_get_config() {
     $quotes = array_values(array_filter(array_map('trim', explode("\n", $config['quotes']))));
     $surprise_ideas = array_values(array_filter(array_map('trim', explode("\n", $config['surprise_ideas']))));
 
+    // FAILSAFE: If user config has very few items (likely accidental empty save or test), fallback to defaults
+    if (count($quotes) < 5) {
+        $quotes = array_values(array_filter(array_map('trim', explode("\n", $defaults['quotes']))));
+    }
+    if (count($surprise_ideas) < 5) {
+        $surprise_ideas = array_values(array_filter(array_map('trim', explode("\n", $defaults['surprise_ideas']))));
+    }
+
     // Return structured object for PHP logic
     return [
         'dates' => [
