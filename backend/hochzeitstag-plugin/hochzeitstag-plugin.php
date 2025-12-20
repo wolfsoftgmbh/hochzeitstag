@@ -437,7 +437,15 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     }
 
     if ($force_send) {
-        $target_event = ['label' => isset($atts['event_label'])?$atts['event_label']:'Test', 'date' => $today];
+        $test_date = $today;
+        if (!empty($atts['event_date'])) {
+            try {
+                $test_date = new DateTime($atts['event_date']);
+            } catch (Exception $e) {
+                $test_date = $today;
+            }
+        }
+        $target_event = ['label' => isset($atts['event_label']) ? $atts['event_label'] : 'Test', 'date' => $test_date];
         $reminder_suffix = " (Test)";
     }
 

@@ -58,8 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const elMilestoneList = document.getElementById('milestone-list');
     const elHistoryList = document.getElementById('history-list');
     const elNextAnniversary = document.getElementById('next-anniversary');
+    const elServerTime = document.getElementById('server-time-display');
 
-    /* --- Hilfsfunktionen --- */
+    function updateClock() {
+        if (!elServerTime) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const dateStr = now.toLocaleDateString('de-DE');
+        elServerTime.innerText = `Serverzeit: ${dateStr} ${timeStr}`;
+    }
+
+    // --- FIREWORKS LOGIC ---
 
     function displayRandomQuote() {
         if (!elQuoteDisplay || !CONFIG.quotes || CONFIG.quotes.length === 0) return;
@@ -147,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateTimer() {
         const now = new Date();
         const time = calculateTimeComponents(WEDDING_DATE, now);
+        updateClock();
 
         // Header Counters
         if (elYears) elYears.innerText = time.years;

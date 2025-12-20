@@ -12,14 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❤️</text></svg>" />
     
     <!-- Fonts -->
-    <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/fonts/fonts.css?v=1.5'; ?>" rel="stylesheet">
+    <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/fonts/fonts.css?v=2.1'; ?>" rel="stylesheet">
 
     
     <!-- Styles -->
-    <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/style.css?v=1.5'; ?>" rel="stylesheet">
+    <link href="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/style.css?v=2.1'; ?>" rel="stylesheet">
 
     <!-- Scripts -->
-    <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/config.js?v=1.5'; ?>"></script>
+    <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/config.js?v=2.1'; ?>"></script>
     <script>
         <?php
         // Inject DB Config if available
@@ -31,14 +31,16 @@ if ( ! defined( 'ABSPATH' ) ) {
                 'firstMeetDate' => $cfg['dates']['meet'] . 'T21:02:00',
                 'birthdays' => $cfg['birthdays'],
                 'customEvents' => $cfg['customEvents'],
-                'emailReminderDays' => $cfg['reminderDays']
+                'emailReminderDays' => $cfg['reminderDays'],
+                'quotes' => $cfg['quotes'],
+                'surpriseIdeas' => $cfg['surpriseIdeas']
             ];
             echo 'var HOCHZEITSTAG_DB_CONFIG = ' . json_encode($js_config) . ';';
         }
         ?>
         var hochzeitstag_ajax_object = { ajax_url: "<?php echo admin_url( 'admin-ajax.php' ); ?>" };
     </script>
-    <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/script.js?v=1.5'; ?>" defer></script>
+    <script src="<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/script.js?v=2.1'; ?>" defer></script>
 </head>
 <body>
 
@@ -112,6 +114,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                 <div class="next-anniversary-pill" id="next-anniversary">
                     Berechne...
+                </div>
+
+                <div id="server-time-display" class="server-time" style="margin-top: 15px; font-size: 0.75rem; color: #999; opacity: 0.7;">
+                    Serverzeit: <?php echo current_time('d.m.Y H:i'); ?>
                 </div>
             </footer>
             
