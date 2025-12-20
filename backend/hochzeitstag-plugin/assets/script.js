@@ -524,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (daysLeft === 0) isMilestoneToday = true;
 
                 const timeText = daysLeft === 0 ? "Heute!" : `in ${daysLeft} Tagen`;
-                const blinkClass = (index === 0 && daysLeft > 0) ? " blink-dot" : "";
+                const blinkClass = index === 0 ? " blink-dot" : "";
                 
                 mHtml += `
                 <div class="timeline-item">
