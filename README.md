@@ -13,9 +13,10 @@ Eine romantische Anwendung und WordPress-Plugin, um die Zeit seit dem Hochzeitst
     *   Zeigt die nächsten 5 chronologischen Ereignisse an.
 *   **E-Mail-Benachrichtigungssystem:**
     *   **Automatischer Versand:** Erinnerungen werden täglich um **09:00 Uhr** geprüft und versendet.
-    *   **Intelligentes Timing:** Erinnerungen kommen standardmäßig 7 Tage und 1 Tag vor dem Ereignis (konfigurierbar).
+    *   **Intelligentes Timing:** Erinnerungen kommen im frei konfigurierbaren Intervall (z.B. 7 Tage, 1 Tag und am Tag des Ereignisses selbst).
     *   **Mehrere Empfänger:** Konfigurierbare E-Mail-Adressen für beide Partner (Ehemann/Ehefrau) mit individueller Aktivierung.
     *   **Test-Button:** Senden Sie jederzeit eine Test-E-Mail, um die Funktion zu prüfen.
+    *   **Debug-Modus:** Integriertes Logging zur Fehlersuche bei Cron-Jobs oder Mailversand.
     *   **Inhalt:** E-Mails enthalten den Meilenstein und 5 zufällige Überraschungsideen zur Inspiration.
 *   **Interaktive Geschichte:** Zeigt eine Zeitleiste Ihrer Beziehungshistorie.
 *   **Responsive Design:** Modernes "Glassmorphism"-Design, optimiert für Handy und Desktop.
@@ -23,14 +24,14 @@ Eine romantische Anwendung und WordPress-Plugin, um die Zeit seit dem Hochzeitst
 
 ## 🚀 Installation (WordPress)
 
-1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_final.zip` herunter.
+1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.5.zip` herunter.
 2.  **Hochladen:** Gehen Sie in Ihr WordPress-Dashboard zu **Plugins -> Installieren -> Plugin hochladen**. Wählen Sie die ZIP-Datei aus und installieren Sie sie.
 3.  **Aktivieren:** Aktivieren Sie das Plugin.
 4.  **Setup (Optional):**
     *   Gehen Sie zu **Einstellungen -> Permalinks**.
     *   Klicken Sie einmal auf **"Änderungen speichern"** (dies aktualisiert die URL-Struktur für die Seite `/hochzeit/`).
 
-## ⚙️ Konfiguration (NEU in v2.0)
+## ⚙️ Konfiguration (Update v2.5)
 
 Sie müssen keine Dateien mehr bearbeiten! Das Plugin verfügt jetzt über eine eigene Einstellungsseite.
 
@@ -38,11 +39,18 @@ Sie müssen keine Dateien mehr bearbeiten! Das Plugin verfügt jetzt über eine 
 2.  **Allgemeine Einstellungen:**
     *   Tragen Sie Ihr Hochzeitsdatum, Kennenlerndaten und Geburtstage ein.
 3.  **Ereignisse:**
-    *   Fügen Sie eigene Events im JSON-Format hinzu (z.B. Hauskauf, Verlobung).
+    *   Fügen Sie eigene Events im JSON-Format hinzu.
 4.  **E-Mail Einstellungen:**
-    *   Hinterlegen Sie die E-Mail-Adressen und Namen für Ehemann und Ehefrau.
-    *   Aktivieren Sie die Checkbox "Aktiv", um E-Mails zu empfangen.
-    *   Legen Sie fest, wie viele Tage im Voraus Sie erinnert werden möchten (z.B. `7, 1`).
+    *   Hinterlegen Sie E-Mail-Adressen und Namen.
+    *   **Erinnerungstage:** Geben Sie kommagetrennt die Tage ein (z.B. `7, 1, 0`). Die `0` steht für eine Benachrichtigung am Tag des Ereignisses selbst.
+    *   **Sendezeit:** Legen Sie die tägliche Uhrzeit fest (orientieren Sie sich an der angezeigten Serverzeit).
+
+## 🛠 Fehlersuche (Debugging)
+
+Sollten keine E-Mails ankommen, bietet v2.5 ein integriertes Log:
+1.  Prüfen Sie die Datei `wp-content/plugins/hochzeitstag-plugin/debug.log` auf Ihrem Server.
+2.  Achten Sie auf Einträge wie `MATCH` (Erinnerungstag erkannt) oder `SUCCESS` (Mail an WordPress übergeben).
+3.  Die Logs werden zusätzlich in das Standard PHP error_log (z.B. Docker Logs) geschrieben.
 
 Klicken Sie auf **"Änderungen speichern"**, um die Einstellungen zu übernehmen.
 

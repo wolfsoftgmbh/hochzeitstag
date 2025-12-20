@@ -255,12 +255,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return shuffled.slice(0, count);
     }
 
-    // Zeig nur Tage an
+    // Zeig nur Tage an (0 = Heute, >0 = Zukunft, null = Vergangenheit)
     function getRemainingDays(targetDate) {
         const now = new Date();
-        const diff = targetDate - now;
-        if (diff <= 0) return null; 
-        return Math.ceil(diff / (1000 * 60 * 60 * 24));
+        const t = new Date(targetDate);
+        
+        // Normalize both to midnight for day calculation
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const target = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+        
+        const diffMs = target - today;
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) return null; 
+        return diffDays;
     }
 
     function calculateTimeComponents(startDate, endDate) {

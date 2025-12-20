@@ -119,12 +119,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return shuffled.slice(0, count);
     }
 
-    // Zeig nur Tage an
+    // Zeig nur Tage an (0 = Heute, >0 = Zukunft, null = Vergangenheit)
     function getRemainingDays(targetDate) {
         const now = new Date();
-        const diff = targetDate - now;
-        if (diff <= 0) return null; 
-        return Math.ceil(diff / (1000 * 60 * 60 * 24));
+        const t = new Date(targetDate);
+        
+        // Normalize both to midnight for day calculation
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const target = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+        
+        const diffMs = target - today;
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) return null; 
+        return diffDays;
     }
 
     function calculateTimeComponents(startDate, endDate) {
@@ -358,10 +366,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // HTML Generieren
             let mHtml = '';
+            let isMilestoneToday = false;
+            
             uniqueMilestones.forEach((m, index) => {
                 const daysLeft = getRemainingDays(m.date);
                 if (daysLeft === null) return;
                 
+                if (daysLeft === 0) isMilestoneToday = true;
+
                 const timeText = daysLeft === 0 ? "Heute!" : `in ${daysLeft} Tagen`;
                 const blinkClass = index === 0 ? " blink-dot" : "";
                 
@@ -376,6 +388,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             });
             elMilestoneList.innerHTML = mHtml;
+
+            if (isMilestoneToday) {
+                startFireworks();
+            }
 
             // Update Footer Pill
             if (elNextAnniversary) {
@@ -399,18 +415,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const potentialReminders = [];
                 
                 uniqueMilestones.forEach(m => {
-                    // Reminder 1: 7 days before
-                    const r1 = new Date(m.date);
-                    r1.setDate(r1.getDate() - (CONFIG.emailReminderDaysFirst || 7));
-                    // Set time to something slightly in the future if it's today, to be safe, 
-                    // but 'now' comparison handles it.
+                    // Loop through configured reminder days
+                    const daysToRemind = CONFIG.emailReminderDays || [7, 1];
                     
-                    // Reminder 2: 1 day before
-                    const r2 = new Date(m.date);
-                    r2.setDate(r2.getDate() - (CONFIG.emailReminderDaysSecond || 1));
-                    
-                    if (r1 > now) potentialReminders.push(r1);
-                    if (r2 > now) potentialReminders.push(r2);
+                    daysToRemind.forEach(d => {
+                        const r = new Date(m.date);
+                        r.setDate(r.getDate() - d);
+                        
+                        if (r > now) potentialReminders.push(r);
+                    });
                 });
                 
                 // Sort to find the very next one

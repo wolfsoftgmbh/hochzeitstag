@@ -15,7 +15,9 @@ This project is a standalone, client-side web application designed to track time
 *   `frontend/`: Contains the main application files.
     *   `wedding.html`: The core file containing HTML, CSS (`<style>`), and JavaScript (`<script>`).
     *   `kiss.jpeg`: Background image for the main card.
-*   `backend/`: Currently empty/unused.
+*   `backend/`: Contains the WordPress Plugin.
+    *   `hochzeitstag-plugin/`: Source code of the plugin.
+    *   `hochzeitstag-plugin_v2.5.zip`: Latest distributable plugin file.
 
 ## Key Configurations
 configuration is primarily handled within the `frontend/wedding.html` file:
@@ -34,11 +36,8 @@ configuration is primarily handled within the `frontend/wedding.html` file:
     *   **Quotes:** A JavaScript array `const quotes` contains localized (German) strings.
     *   **Milestones:** Logic in `calculateMilestones()` function.
 
-## Development & Usage
-*   **Running:** Open `frontend/wedding.html` directly in a modern web browser. No local server or build process is strictly required, though a simple HTTP server is recommended for better asset loading behavior in some browsers.
-*   **Conventions:**
-    *   **Localization:** UI text is in **German**. Code comments and variable names are in **English**.
-    *   **Formatting:** Standard indentation (4 spaces or 2 spaces), clear separation of CSS, HTML, and JS blocks within the single file.
-
-## wordpress plugin
-build an wordpress plugin in the backend so I can upload it to wordpress for testing
+## WordPress Plugin (Backend)
+The `backend/hochzeitstag-plugin` is a full WordPress plugin that wraps the frontend logic and adds server-side email notifications.
+*   **Version:** 2.5
+*   **Email Logic:** Sends emails on configured days before an event (default: 7, 1, and 0/Today).
+*   **Cron:** Runs daily. If configured time is in the past for the current day, it runs immediately upon saving settings.

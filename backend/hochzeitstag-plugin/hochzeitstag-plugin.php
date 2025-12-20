@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.0
+ * Version: 2.5
  * Author: Gemini
  */
 
@@ -12,6 +12,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'HOCHZEITSTAG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'HOCHZEITSTAG_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+
+function hochzeitstag_log($msg) {
+    $entry = "HOCHZEITSTAG-LOG: " . (is_array($msg) || is_object($msg) ? print_r($msg, true) : $msg);
+    error_log($entry); // Writes to Docker/Server logs
+    
+    // Also try writing to file as backup
+    $log_file = HOCHZEITSTAG_PLUGIN_PATH . 'debug.log';
+    $file_entry = date('Y-m-d H:i:s') . " - " . (is_array($msg) || is_object($msg) ? print_r($msg, true) : $msg) . "\n";
+    @file_put_contents($log_file, $file_entry, FILE_APPEND);
+}
 
 /**
  * ------------------------------------------------------------------------
@@ -124,7 +134,7 @@ function hochzeitstag_get_defaults() {
         'email_wife' => 'tanja-risse@gmx.de',
         'name_wife' => 'Tanja',
         'active_wife' => true,
-        'reminder_days' => '7, 1',
+        'reminder_days' => '7, 1, 0',
         'email_send_time' => '09:00',
         'quotes' => "Liebe ist: zu zweit albern sein.\nWir passen, wie Topf und Deckel.\nEhe: Streit um Fernbedienung, endet mit Lachen.\nZusammen sind wir besser, wie Kaffee & Kuchen.\nMein Lieblingsmensch, trotz letztem Keks.\nLiebe: Das Einzige, was mehr wird, wenn man es verschwendet.\nMit dir wird jeder Einkauf zum Abenteuer.\nEchte Liebe erträgt auch Schnarchen.\nMein Anker im Sturm, mein Konfetti im Alltag.\nZuhause ist, wo du bist (und WLAN).\nWir: Ein Team für Chaos und Ordnung.\nLiebe heißt: immer wieder vertragen.\nMit dir: Jeder Tag ein Feiertag.\nDu bist der Grund für mein Handy-Lächeln.\nUnsere Liebe: guter Wein, wird besser mit Jahren.\nDanke, dass du meine Macken magst.\nWir zwei gegen den Rest der Welt (und Abwasch).\nDu bringst mich zum Lachen, auch mürrisch.\nGlück ist: herrlich albern sein.\nDu bist der Zucker in meinem Kaffee.\nEgal wohin, Hauptsache zusammen.\nMit dir macht sogar Nichtstun Spaß.\nDu bist mein Happy Place.\nLiebe ist: blind verstehen.\nIch mag dich mehr als Pizza.\nDu und ich – das passt.\nMein Herz schlägt im Takt von deinem.\nDeine Umarmung: mein Lieblingsort.\nZusammen ist man weniger allein.\nDu bist mein Lieblings-Nervzwerg.\nIch liebe dich mehr als Kaffee (sag's nicht).\nWir sind wie Pech und Schwefel, nur hübscher.\nDu hast den Schlüssel zum Herzen (und Kühlschrank).\nLiebe: Du lässt mir die letzte Schokolade.\nDu bist der Grund, warum ich aufstehe (meistens).\nMit dir ist sogar der Abwasch erträglich.\nWir sind das perfekte Chaos.\nDu bist mein liebster Zeitvertreib.\nIch liebe dich, auch wenn du hungrig bist.\nDu bist mein persönlicher Superheld (ohne Umhang).\nZusammen sind wir unschlagbar (im Faulenzen).\nDu bist mein Lieblingsmensch, Punkt.\nLiebe ist: schweigend anschreien können.\nDu bist süßer als Zuckerwatte.\nIch würde mein Handy für dich weglegen.\nDu bist der Käse auf meiner Pizza.\nWir passen zusammen wie Pommes und Ketchup.\nDu bist mein Einhorn in Pferdeherde.\nLiebe ist: gemeinsam dick werden.\nDu bist der Grund für mein Dauergrinsen.\nIch liebe dich mehr als gestern (weniger als morgen).\nDu bist meine bessere, vernünftigere Hälfte.\nMit dir kann man Pferde stehlen (und Ponys).\nDu bist mein Lieblings-Kuscheltier.\nLiebe: Decke teilen (widerwillig).\nDu bist der Hit in meinen Charts.\nIch folge dir (außer aufs Klo).\nDu bist mein Highlight des Tages.\nWir sind Bonnie & Clyde, ohne Banküberfall.\nDu bist mein 6er im Lotto.\nIch liebe dich bis zur Unendlichkeit.\nDu bist mein Fels and mein Kissen.\nMit dir wird's nie langweilig.\nDu bist mein Lieblings-Abenteuer.\nLiebe ist: blind vertrauen (trotzdem Google Maps checken).\nDu bist mein Sternenhimmel.\nIch hab dich zum Fressen gern.\nDu bist mein Lieblings-Gedanke vor dem Einschlafen.\nWir sind ein Dream-Team.\nDu bist mein Sonnenschein, auch nachts.\nIch liebe dich mehr als Schokolade.\nDu bist mein Herzblatt.\nMit dir ist das Leben ein Ponyhof.\nDu bist mein allerliebster Lieblingsmensch.\nLiebe ist: gegenseitig Sätze beenden.\nDu bist der Grund, warum ich glücklich bin.\nIch bin süchtig nach dir.\nDu bist mein Zuhause.\nWir sind einfach füreinander gemacht.\nZwei Herzen, ein Beat, unser Rhythmus.\nLiebe ist: den anderen in Jogginghose lieben.\nDu bist mein Happy End, jeden Tag.\nUnsere Liebe: mehr als tausend Worte.\nEin Blick sagt mehr als jede Rede.\nMit dir ist jeder Moment Gold wert.\nDu machst mein Leben heller.\nUnsere Herzen tanzen im Gleichklang.\nDu bist mein Traum, der wahr wurde.\nEin Leben ohne dich? Undenkbar!\nLiebe ist die schönste Reise.\nDu bist das Puzzleteil, das fehlte.\nJeder Tag mit dir ist ein Geschenk.\nDu gibst meinem Leben Sinn.\nDu bist mein Anker, mein Halt.\nUnsere Liebe: ein unendliches Band.\nDu bist mein größtes Abenteuer.\nMit dir ist alles leichter.\nDu bist mein Lächeln, meine Freude.\nUnsere Liebe wächst jeden Tag.\nDu bist mein Herz, meine Seele.\nDu bist der Grund für mein Glück.\nEin Kuss von dir: mein Lieblingsgefühl.\nDu bist mein Zuhause, wo immer wir sind.\nUnsere Liebe: stärker als alles.\nDu bist mein Wunsch, der in Erfüllung ging.\nMit dir ist jeder Tag ein Gedicht.\nDu bist mein Held, mein Retter.\nUnsere Liebe: ein ewiges Feuer.\nDu bist mein Schatz, mein größter Gewinn.\nDu machst mich komplett.\nUnsere Herzen sind verbunden.\nDu bist mein Glück, mein Schicksal.\nMit dir ist jeder Weg das Ziel.\nDu bist mein Stern, der leuchtet.\nUnsere Liebe: unendlich und rein.\nDu bist mein Leben, mein Atem.\nDu bist mein Licht, meine Sonne.\nUnsere Liebe: ein Wunder, das bleibt.\nDu bist mein Alles, mein Nichts.\nDu bist meine Ewigkeit.",
         'surprise_ideas' => "Frühstück am Bett servieren\nEinen handgeschriebenen Liebesbrief verstecken\nEin Picknick im Wohnzimmer veranstalten\nEinen Überraschungs-Wochenendtrip planen\nDas Lieblingsessen kochen\nEin entspannendes Massage-Abend mit Duftöl\nEin Fotoalbum mit gemeinsamen Erinnerungen erstellen\nEine kleine Schatzsuche durch die Wohnung organisieren\nKinokarten für den neuesten Film besorgen\nEin gemeinsames Bad mit Kerzenschein und Musik vorbereiten\nEinfach mal ohne Grund Blumen mitbringen\nEin Kompliment im Vorbeigehen flüstern\nEinen Stern nach dem Partner benennen\nEine Playlist mit 'unseren' Liedern erstellen\nDen Partner von der Arbeit abholen\nEinen gemeinsamen Kochkurs besuchen\nEin Schloss an einer Brücke anbringen\nEinen Liebesbrief per Post schicken\nEinen Wellness-Tag zu Hause einlegen\nZusammen den Sonnenaufgang anschauen\nEin Überraschungs-Date im Lieblingsrestaurant\nDie Lieblingsserie zusammen schauen (auch wenn man sie nicht mag)\nEinen Abend lang alle Hausarbeiten übernehmen\nEin kleines Geschenk ohne Anlass kaufen\nGemeinsam ein neues Hobby ausprobieren\nEinen Brief für die Zukunft schreiben\nEin Kompliment auf den Badezimmerspiegel schreiben\nEin gerahmtes Foto von einem besonderen Moment schenken\nEinen Tanzabend im Wohnzimmer machen\nZusammen Schlittschuhlaufen oder Rollschuhfahren gehen\nEinen Drachen steigen lassen\nGemeinsam in den Zoo oder Botanischen Garten gehen\nEinen Spieleabend mit den Lieblingsspielen organisieren\nEine Massage-Gutschein basteln\nEinen Korb mit Lieblings-Snacks zusammenstellen\nEin privates Fotoshooting machen\nEinen Baum zusammen pflanzen\nEinfach mal 'Ich liebe dich' sagen, wenn es niemand erwartet\nEine Nacht unter freiem Himmel schlafen\nEin Boot mieten und über einen See rudern\nEinen Flohmarktbummel machen\nZusammen ein Puzzle lösen\nEine Flaschenpost vorbereiten\nDen Partner mit einem warmen Handtuch nach dem Duschen überraschen\nEinen Liebes-Post-it am Kühlschrank hinterlassen\nZusammen alte Kinderfotos anschauen\nEin Lied für den Partner singen (oder rappen)\nEinen Ausflug an den Ort des ersten Treffens machen\nGemeinsam ein Museum besuchen\nEine Weinprobe zu Hause machen\nEinen Karaoke-Abend veranstalten\nEin gemeinsames Vision-Board für die Zukunft erstellen\nEinen Malkurs für Paare besuchen\nZusammen in eine Therme gehen\nEinen Kuss im Regen genießen\nEinen Spaziergang im Mondschein machen\nEin Frühstück im Freien (Balkon/Garten)\nEinen gemeinsamen Sportkurs belegen\nEinander vorlesen\nEinen Tag lang das Handy ausschalten und Zeit genießen\nEin DIY-Projekt zusammen starten\nEinen Städtetrip in eine unbekannte Stadt\nZusammen ein Konzert besuchen\nEin Überraschungs-Kaffeetrinken organisieren\nEinander die Haare waschen oder kämmen\nEinen Gutschein für eine Autowäsche schenken\nEinen Tag lang 'Ja' zu allen Wünschen des Partners sagen\nEinen gemeinsamen Back-Abend\nEine Zeitkapsel vergraben\nZusammen in den Zirkus oder Varieté gehen\nEinen Wanderurlaub planen\nEin kleines Gedicht schreiben\nDie Bettwäsche frisch beziehen und mit Blüten bestreuen\nEin Eis essen gehen\nZusammen Tretboot fahren\nEinen Sonnenuntergang am Strand/See beobachten\nEinander massieren (Nacken, Füße)\nEinen gemeinsamen Tanzkurs machen\nEinen Plan für das nächste Jahr schmieden\nEinen Brief schreiben, warum man dankbar ist\nEin Überraschungs-BBQ im Garten\nZusammen eine Sternwarte besuchen\nEinander ein Hobby erklären und ausprobieren lassen\nEinen Roadtrip ohne festes Ziel machen\nEine Nacht im Hotel in der eigenen Stadt buchen\nEinander beim Anziehen helfen\nEinen gemeinsam Garten oder Balkonkasten bepflanzen\nEin Kompliment vor Freunden machen\nZusammen einen Freizeitpark besuchen\nEin gemeinsames Bad mit Badebombe\nEinen Abend lang nur Musik hören und reden\nEin Foto von sich selbst in das Portemonnaie des Partners schleichen\nEinen besonderen Tee oder Kaffee kochen\nEinen kleinen Glücksbringer schenken\nEinen Video-Clip mit gemeinsamen Momenten schneiden\nZusammen die Sterne beobachten und Sternbilder suchen\nEinander etwas Neues beibringen\nEine heiße Schokolade mit Sahne an einem kalten Tag\nEinen Kuss auf die Stirn geben\nGemeinsam alt werden (als Plan)"
@@ -333,7 +343,7 @@ function hochzeitstag_reschedule_cron() {
     // Ensure format HH:MM
     if (!preg_match('/^\d{2}:\d{2}$/', $time_str)) $time_str = '09:00';
 
-    $time = strtotime( 'tomorrow ' . $time_str );
+    $time = strtotime( $time_str );
     wp_schedule_event( $time, 'daily', 'hochzeitstag_daily_event' );
 }
 
@@ -357,15 +367,22 @@ register_deactivation_hook( __FILE__, 'hochzeitstag_deactivate' );
 
 add_action( 'hochzeitstag_daily_event', 'hochzeitstag_cron_check' );
 function hochzeitstag_cron_check() {
+    hochzeitstag_log("CRON: Daily event triggered.");
     _hochzeitstag_prepare_and_send_email( array( 'force_send' => false ) );
 }
 
 function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
-    if ( ! function_exists( 'wp_mail' ) ) return ['success'=>false, 'message'=>'wp_mail fail'];
+    hochzeitstag_log("MAIL: Starting email check...");
+    if ( ! function_exists( 'wp_mail' ) ) {
+        hochzeitstag_log("ERROR: wp_mail function missing!");
+        return ['success'=>false, 'message'=>'wp_mail fail'];
+    }
 
     $cfg = hochzeitstag_get_config();
     $today = new DateTime();
     $today->setTime(0, 0, 0);
+    hochzeitstag_log("DATE: Today is " . $today->format('Y-m-d'));
+
     $wedding_date = new DateTime( $cfg['dates']['wedding'] );
     $wedding_date->setTime(0, 0, 0);
 
@@ -425,18 +442,34 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     $reminder_suffix = '';
     $force_send = (isset($atts['force_send']) && filter_var($atts['force_send'], FILTER_VALIDATE_BOOLEAN));
     
-    $days_1 = isset($cfg['reminderDays'][0]) ? $cfg['reminderDays'][0] : 7;
-    $days_2 = isset($cfg['reminderDays'][1]) ? $cfg['reminderDays'][1] : 1;
-
+    // Check all configured reminder days
+    hochzeitstag_log("CHECK: Checking " . count($upcoming_events) . " events against reminders: " . implode(',', $cfg['reminderDays']));
+    
     foreach($upcoming_events as $evt) {
         if ($evt['date'] < $today) continue;
         $diff = $today->diff($evt['date'])->days;
         
-        if ($diff == $days_1) { $target_event = $evt; $reminder_suffix=" (in $days_1 Tagen)"; break; }
-        if ($diff == $days_2) { $target_event = $evt; $reminder_suffix=" (Morgen!)"; break; }
+        // Detailed log for debugging specific day issues (optional, remove if too verbose)
+        if ($diff <= 10) hochzeitstag_log("DEBUG: Event '{$evt['label']}' is in $diff days.");
+
+        foreach($cfg['reminderDays'] as $d_remind) {
+            if ($diff == $d_remind) {
+                hochzeitstag_log("MATCH: Event '{$evt['label']}' matches reminder day $d_remind (Diff: $diff).");
+                $target_event = $evt;
+                if ($diff == 0) {
+                    $reminder_suffix = " (Heute!)";
+                } elseif ($diff == 1) {
+                    $reminder_suffix = " (Morgen!)";
+                } else {
+                    $reminder_suffix = " (in $diff Tagen)";
+                }
+                break 2; // Break both loops
+            }
+        }
     }
 
     if ($force_send) {
+        hochzeitstag_log("FORCE: Manual test triggered.");
         $test_date = $today;
         if (!empty($atts['event_date'])) {
             try {
@@ -449,7 +482,10 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         $reminder_suffix = " (Test)";
     }
 
-    if (!$target_event) return ['success'=>false, 'message'=>'Kein Event.'];
+    if (!$target_event) {
+        hochzeitstag_log("RESULT: No matching event found for today.");
+        return ['success'=>false, 'message'=>'Kein Event.'];
+    }
 
     // --- PREPARE EMAIL CONTENT ---
     $quote = "Liebe ist alles.";
@@ -534,7 +570,14 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
 
         $headers = array('Content-Type: text/html; charset=UTF-8');
         
-        if(wp_mail($rcp['email'], $subject, $message, $headers)) $sent++;
+        hochzeitstag_log("SENDING: To {$rcp['email']}...");
+        $mail_result = wp_mail($rcp['email'], $subject, $message, $headers);
+        if($mail_result) {
+            hochzeitstag_log("SUCCESS: Mail sent to {$rcp['email']}.");
+            $sent++;
+        } else {
+            hochzeitstag_log("FAIL: wp_mail returned false for {$rcp['email']}.");
+        }
     }
 
     return ['success'=>true, 'message'=>"Gesendet an $sent Empfänger."];

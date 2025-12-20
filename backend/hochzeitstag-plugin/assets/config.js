@@ -27,7 +27,7 @@ const HOCHZEITSTAG_CONFIG = {
     // Notification Settings
     // Controls automatic emails via the backend/plugin
     emailAutoSend: true, 
-    emailReminderDays: [7, 1], // Send mail 7 days and 1 day before the event
+    emailReminderDays: [7, 1, 0], // Send mail 7 days, 1 day before, and on the day (0)
     
     // Legacy (kept for backward compatibility, can be ignored if backend uses array)
     emailReminderDaysFirst: 7, 
