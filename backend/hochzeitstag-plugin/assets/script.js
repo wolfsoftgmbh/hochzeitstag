@@ -68,155 +68,50 @@ document.addEventListener('DOMContentLoaded', () => {
         elServerTime.innerText = `Serverzeit: ${dateStr} ${timeStr}`;
     }
 
-    // --- FIREWORKS LOGIC ---
-    let fireworksCanvas, ctx, fireworks = [], particles = [];
-    let fireworksActive = false;
+    // --- CELEBRATION LOGIC (Hearts & Gold Mode) ---
+    let celebrationActive = false;
+    let heartInterval;
 
-    function initFireworks() {
-        if (document.getElementById('fireworks-canvas')) return;
-        fireworksCanvas = document.createElement('canvas');
-        fireworksCanvas.id = 'fireworks-canvas';
-        document.body.appendChild(fireworksCanvas);
-        ctx = fireworksCanvas.getContext('2d');
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-        loopFireworks();
-    }
-
-    function resizeCanvas() {
-        if(!fireworksCanvas) return;
-        fireworksCanvas.width = window.innerWidth;
-        fireworksCanvas.height = window.innerHeight;
-    }
-
-    function random(min, max) { return Math.random() * (max - min) + min; }
-
-    class Particle {
-        constructor(x, y, hue) {
-            this.x = x;
-            this.y = y;
-            this.coordinates = [];
-            this.coordinateCount = 5;
-            while (this.coordinateCount--) {
-                this.coordinates.push([this.x, this.y]);
-            }
-            this.angle = random(0, Math.PI * 2);
-            this.speed = random(1, 10);
-            this.friction = 0.95;
-            this.gravity = 1;
-            this.hue = random(hue - 20, hue + 20);
-            this.brightness = random(50, 80);
-            this.alpha = 1;
-            this.decay = random(0.015, 0.03);
-        }
-
-        update(index) {
-            this.coordinates.pop();
-            this.coordinates.unshift([this.x, this.y]);
-            this.speed *= this.friction;
-            this.x += Math.cos(this.angle) * this.speed;
-            this.y += Math.sin(this.angle) * this.speed + this.gravity;
-            this.alpha -= this.decay;
-            if (this.alpha <= this.decay) {
-                particles.splice(index, 1);
-            }
-        }
-
-        draw() {
-            ctx.beginPath();
-            ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
-            ctx.lineTo(this.x, this.y);
-            ctx.strokeStyle = 'hsla(' + this.hue + ', 100%, ' + this.brightness + '%, ' + this.alpha + ')';
-            ctx.stroke();
-        }
-    }
-
-    class Firework {
-        constructor(sx, sy, tx, ty) {
-            this.x = sx;
-            this.y = sy;
-            this.sx = sx;
-            this.sy = sy;
-            this.tx = tx;
-            this.ty = ty;
-            this.distanceToTarget = Math.sqrt(Math.pow(tx - sx, 2) + Math.pow(ty - sy, 2));
-            this.distanceTraveled = 0;
-            this.coordinates = [];
-            this.coordinateCount = 3;
-            while (this.coordinateCount--) {
-                this.coordinates.push([this.x, this.y]);
-            }
-            this.angle = Math.atan2(ty - sy, tx - sx);
-            this.speed = 2;
-            this.acceleration = 1.05;
-            this.brightness = random(50, 70);
-            this.targetRadius = 1;
-        }
-
-        update(index) {
-            this.coordinates.pop();
-            this.coordinates.unshift([this.x, this.y]);
-            this.speed *= this.acceleration;
-            const vx = Math.cos(this.angle) * this.speed;
-            const vy = Math.sin(this.angle) * this.speed;
-            this.distanceTraveled = Math.sqrt(Math.pow(this.sx - this.x, 2) + Math.pow(this.sy - this.y, 2));
-
-            if (this.distanceTraveled >= this.distanceToTarget) {
-                createParticles(this.tx, this.ty);
-                fireworks.splice(index, 1);
-            } else {
-                this.x += vx;
-                this.y += vy;
-            }
-        }
-
-        draw() {
-            ctx.beginPath();
-            ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
-            ctx.lineTo(this.x, this.y);
-            ctx.strokeStyle = 'hsl(' + random(0, 360) + ', 100%, ' + this.brightness + '%)';
-            ctx.stroke();
-        }
-    }
-
-    function createParticles(x, y) {
-        let particleCount = 30;
-        let hue = random(0, 360);
-        while (particleCount--) {
-            particles.push(new Particle(x, y, hue));
-        }
-    }
-
-    function loopFireworks() {
-        if (!fireworksActive) return;
-        requestAnimationFrame(loopFireworks);
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.classList.add('floating-heart');
         
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
-        ctx.globalCompositeOperation = 'lighter';
+        // Random Position (left)
+        heart.style.left = Math.random() * 100 + 'vw';
+        
+        // Random Size
+        const size = Math.random() * 20 + 10; // 10px to 30px
+        heart.style.fontSize = size + 'px';
+        
+        // Random Animation Duration
+        const duration = Math.random() * 2 + 3; // 3s to 5s
+        heart.style.animationDuration = duration + 's';
+        
+        document.body.appendChild(heart);
 
-        let i = fireworks.length;
-        while (i--) {
-            fireworks[i].draw();
-            fireworks[i].update(i);
-        }
-
-        let j = particles.length;
-        while (j--) {
-            particles[j].draw();
-            particles[j].update(j);
-        }
-
-        if (Math.random() < 0.05) { // Spawn rate
-            fireworks.push(new Firework(fireworksCanvas.width / 2, fireworksCanvas.height, random(0, fireworksCanvas.width), random(0, fireworksCanvas.height / 2)));
-        }
+        // Remove after animation
+        setTimeout(() => {
+            heart.remove();
+        }, duration * 1000);
     }
 
-    function startFireworks() {
-        if (fireworksActive) return;
-        fireworksActive = true;
-        initFireworks();
+    function activateCelebration() {
+        if (celebrationActive) return;
+        celebrationActive = true;
+
+        // 1. Gold Mode for Card
+        const card = document.querySelector('.glass-card');
+        if (card) {
+            card.classList.add('celebration-mode');
+        }
+
+        // 2. Spawn Hearts
+        // Initial burst
+        for(let i=0; i<5; i++) setTimeout(createHeart, i*300);
+
+        // Continuous stream
+        heartInterval = setInterval(createHeart, 800);
     }
 
     function displayRandomQuote() {
@@ -539,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
             elMilestoneList.innerHTML = mHtml;
 
             if (isMilestoneToday) {
-                // Future celebration logic could go here
+                activateCelebration();
             }
 
             // Update Footer Pill

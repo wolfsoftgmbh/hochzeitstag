@@ -67,6 +67,7 @@ body {
     text-align: center;
     position: relative;
     overflow: hidden;
+    transition: all 1s ease;
 }
 
 .content-wrapper {
@@ -358,4 +359,46 @@ h1, .section-title {
     background: rgba(255, 255, 255, 0.5);
     padding: 5px 10px;
     border-radius: 10px;
+}
+
+/* --- CELEBRATION MODE (Gold) --- */
+.celebration-mode {
+    border-color: rgba(255, 215, 0, 0.8); /* Gold border */
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    animation: pulse-gold 3s infinite ease-in-out;
+}
+
+@keyframes pulse-gold {
+    0% {
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(255, 215, 0, 0.5), inset 0 0 30px rgba(255, 215, 0, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    }
+}
+
+/* --- FLOATING HEARTS --- */
+.floating-heart {
+    position: fixed;
+    bottom: -50px;
+    font-size: 20px;
+    animation: floatUp 5s linear forwards;
+    z-index: 9999;
+    pointer-events: none; /* Click-through */
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.8));
+    opacity: 0.8;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-110vh) scale(1.5) rotate(360deg);
+        opacity: 0;
+    }
 }
