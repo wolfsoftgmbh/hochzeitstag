@@ -24,14 +24,14 @@ Eine romantische Anwendung und WordPress-Plugin, um die Zeit seit dem Hochzeitst
 
 ## 🚀 Installation (WordPress)
 
-1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.5.zip` herunter.
+1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.8.zip` herunter.
 2.  **Hochladen:** Gehen Sie in Ihr WordPress-Dashboard zu **Plugins -> Installieren -> Plugin hochladen**. Wählen Sie die ZIP-Datei aus und installieren Sie sie.
 3.  **Aktivieren:** Aktivieren Sie das Plugin.
 4.  **Setup (Optional):**
     *   Gehen Sie zu **Einstellungen -> Permalinks**.
     *   Klicken Sie einmal auf **"Änderungen speichern"** (dies aktualisiert die URL-Struktur für die Seite `/hochzeit/`).
 
-## ⚙️ Konfiguration (Update v2.5)
+## ⚙️ Konfiguration
 
 Sie müssen keine Dateien mehr bearbeiten! Das Plugin verfügt jetzt über eine eigene Einstellungsseite.
 
@@ -47,7 +47,7 @@ Sie müssen keine Dateien mehr bearbeiten! Das Plugin verfügt jetzt über eine 
 
 ## 🛠 Fehlersuche (Debugging)
 
-Sollten keine E-Mails ankommen, bietet v2.5 ein integriertes Log:
+Sollten keine E-Mails ankommen, bietet das Plugin ein integriertes Log:
 1.  Prüfen Sie die Datei `wp-content/plugins/hochzeitstag-plugin/debug.log` auf Ihrem Server.
 2.  Achten Sie auf Einträge wie `MATCH` (Erinnerungstag erkannt) oder `SUCCESS` (Mail an WordPress übergeben).
 3.  Die Logs werden zusätzlich in das Standard PHP error_log (z.B. Docker Logs) geschrieben.
