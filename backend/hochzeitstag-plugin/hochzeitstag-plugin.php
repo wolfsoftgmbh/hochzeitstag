@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10.5
+ * Version: 2.10.6
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.5</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.6</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -416,7 +416,7 @@ function hochzeitstag_failsafe_cron_trigger() {
         hochzeitstag_log("FAILSAFE: Rescheduled for " . date('d.m H:i', $tomorrow));
     }
 }
-add_action( 'init', 'hochzeitstag_failsafe_cron_trigger' );
+add_action( 'wp_loaded', 'hochzeitstag_failsafe_cron_trigger' );
 
 function hochzeitstag_activate() {
     hochzeitstag_rewrite_rule();
