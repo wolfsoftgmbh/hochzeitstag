@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10.3
+ * Version: 2.10.4
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.3</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.4</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -209,7 +209,43 @@ function hochzeitstag_get_config() {
 // Callbacks
 function hochzeitstag_section_general_callback() { echo 'Geben Sie hier die wichtigsten Daten ein.'; }
 function hochzeitstag_section_events_callback() { echo 'Format: JSON Array oder leer lassen.'; }
-function hochzeitstag_section_email_callback() { echo 'Konfiguration der Benachrichtigungen.'; }
+function hochzeitstag_section_email_callback() { 
+    echo '<p>Konfiguration der Benachrichtigungen.</p>';
+    ?>
+    <div style="margin-top: 10px; padding: 10px; background: #f0f0f1; border: 1px solid #ccc; border-radius: 4px;">
+        <strong>Diagnose / Manuelle Steuerung:</strong><br>
+        <p style="font-size: 0.9em; margin: 5px 0 10px;">Wenn der "Nächste geplante Lauf" in der Vergangenheit liegt, hängt der WordPress-Cron. Hier können Sie die Prüfung sofort anstoßen.</p>
+        <button type="button" id="hochzeitstag-run-now" class="button button-secondary">Jetzt manuell prüfen & senden</button>
+        <span id="hochzeitstag-run-status" style="margin-left: 10px; font-weight: bold;"></span>
+    </div>
+    <script>
+    jQuery(document).ready(function($) {
+        $('#hochzeitstag-run-now').on('click', function() {
+            var $btn = $(this);
+            var $status = $('#hochzeitstag-run-status');
+            
+            $btn.prop('disabled', true).text('Prüfe...');
+            $status.text('').css('color', 'inherit');
+
+            $.post(ajaxurl, {
+                action: 'hochzeitstag_send_test_email',
+                force_send: 'false' // Use standard logic, do not force
+            }, function(response) {
+                $btn.prop('disabled', false).text('Jetzt manuell prüfen & senden');
+                if (response.success) {
+                    $status.text('✅ ' + response.data.message).css('color', 'green');
+                } else {
+                    $status.text('ℹ️ ' + (response.data ? response.data.message : 'Keine Aktion')).css('color', '#d63638');
+                }
+            }).fail(function() {
+                $btn.prop('disabled', false).text('Jetzt manuell prüfen & senden');
+                $status.text('❌ Server-Fehler beim Aufruf.').css('color', 'red');
+            });
+        });
+    });
+    </script>
+    <?php
+}
 function hochzeitstag_section_content_callback() { echo 'Verwalten Sie die Texte, die zufällig angezeigt werden.'; }
 
 function hochzeitstag_date_render( $args ) {
