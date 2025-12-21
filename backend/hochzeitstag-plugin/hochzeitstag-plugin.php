@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10
+ * Version: 2.10.3
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration</h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.3</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -101,7 +101,9 @@ function hochzeitstag_settings_init() {
     add_settings_field( 'reminder_days', 'Erinnerungstage (z.B. 7, 1)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'reminder_days'] );
     add_settings_field( 'email_send_time', 'Sendezeit (HH:MM)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', [
         'id' => 'email_send_time', 
-        'desc' => 'Uhrzeit für den täglichen Versand (z.B. 09:00).<br><span style="color: #d63638; font-weight: bold;">Aktuelle Serverzeit: ' . current_time('H:i') . '</span>'
+        'desc' => 'Uhrzeit für den täglichen Versand (z.B. 09:00).<br>' .
+                  '<span style="color: #666;">Aktuelle Serverzeit: <b>' . current_time('H:i') . '</b></span><br>' .
+                  '<span style="color: #666;">Nächster geplanter Lauf: <b>' . (wp_next_scheduled('hochzeitstag_daily_event') ? date_i18n('d.m.Y H:i', wp_next_scheduled('hochzeitstag_daily_event')) : 'Nicht geplant') . '</b></span>'
     ] );
 
     add_settings_section(
@@ -232,6 +234,7 @@ function hochzeitstag_text_render( $args ) {
     
     $val = isset( $options[$id] ) ? $options[$id] : $defaults[$id];
     echo "<input type='text' name='hochzeitstag_settings[{$id}]' value='{$val}' class='regular-text'>";
+    if(isset($args['desc'])) echo "<p class='description'>{$args['desc']}</p>";
 }
 
 function hochzeitstag_checkbox_render( $args ) {
@@ -444,36 +447,12 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     usort($upcoming_events, function($a, $b) { return $a['date'] <=> $b['date']; });
 
     // Trigger Check
-    $target_event = null;
-    $reminder_suffix = '';
+    $matching_events = [];
     $force_send = (isset($atts['force_send']) && filter_var($atts['force_send'], FILTER_VALIDATE_BOOLEAN));
     
     // Check all configured reminder days
     hochzeitstag_log("CHECK: Checking " . count($upcoming_events) . " events against reminders: " . implode(',', $cfg['reminderDays']));
     
-    foreach($upcoming_events as $evt) {
-        if ($evt['date'] < $today) continue;
-        $diff = $today->diff($evt['date'])->days;
-        
-        // Detailed log for debugging specific day issues (optional, remove if too verbose)
-        if ($diff <= 10) hochzeitstag_log("DEBUG: Event '{$evt['label']}' is in $diff days.");
-
-        foreach($cfg['reminderDays'] as $d_remind) {
-            if ($diff == $d_remind) {
-                hochzeitstag_log("MATCH: Event '{$evt['label']}' matches reminder day $d_remind (Diff: $diff).");
-                $target_event = $evt;
-                if ($diff == 0) {
-                    $reminder_suffix = " (Heute!)";
-                } elseif ($diff == 1) {
-                    $reminder_suffix = " (Morgen!)";
-                } else {
-                    $reminder_suffix = " (in $diff Tagen)";
-                }
-                break 2; // Break both loops
-            }
-        }
-    }
-
     if ($force_send) {
         hochzeitstag_log("FORCE: Manual test triggered.");
         $test_date = $today;
@@ -484,11 +463,41 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
                 $test_date = $today;
             }
         }
-        $target_event = ['label' => isset($atts['event_label']) ? $atts['event_label'] : 'Test', 'date' => $test_date];
-        $reminder_suffix = " (Test)";
+        $matching_events[] = [
+            'label' => isset($atts['event_label']) ? $atts['event_label'] : 'Test-Ereignis', 
+            'date' => $test_date,
+            'suffix' => ' (Test)'
+        ];
+    } else {
+        foreach($upcoming_events as $evt) {
+            if ($evt['date'] < $today) continue;
+            $diff = $today->diff($evt['date'])->days;
+            
+            foreach($cfg['reminderDays'] as $d_remind) {
+                if ($diff == $d_remind) {
+                    hochzeitstag_log("MATCH: Event '{$evt['label']}' matches reminder day $d_remind (Diff: $diff).");
+                    
+                    $suffix = "";
+                    if ($diff == 0) {
+                        $suffix = " (Heute!)";
+                    } elseif ($diff == 1) {
+                        $suffix = " (Morgen!)";
+                    } else {
+                        $suffix = " (in $diff Tagen)";
+                    }
+
+                    $matching_events[] = [
+                        'label' => $evt['label'],
+                        'date' => $evt['date'],
+                        'suffix' => $suffix
+                    ];
+                    break; // Found a reminder for this event, move to next event (don't match multiple reminders for same event)
+                }
+            }
+        }
     }
 
-    if (!$target_event) {
+    if (empty($matching_events)) {
         hochzeitstag_log("RESULT: No matching event found for today.");
         return ['success'=>false, 'message'=>'Kein Event.'];
     }
@@ -515,12 +524,28 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         }
     }
 
+    // Prepare Events HTML
+    $events_html = '';
+    foreach ($matching_events as $me) {
+        $events_html .= '
+        <div class="highlight-box">
+            <span class="event-name">' . esc_html($me['label']) . '</span>
+            <span class="event-date">am ' . $me['date']->format('d.m.Y') . $me['suffix'] . '</span>
+        </div>';
+    }
+
     // Send
     $sent = 0;
     foreach($cfg['recipients'] as $rcp) {
         if(empty($rcp['email']) || !$rcp['active']) continue;
         
-        $subject = "📅 Countdown-Alarm: {$target_event['label']} steht an!{$reminder_suffix}";
+        if (count($matching_events) === 1) {
+            $subject = "📅 Countdown-Alarm: {$matching_events[0]['label']} steht an!{$matching_events[0]['suffix']}";
+            $intro_text = "Aufgepasst! Ein besonderer Meilenstein steht vor der Tür.";
+        } else {
+            $subject = "📅 Countdown-Alarm: " . count($matching_events) . " Ereignisse stehen an!";
+            $intro_text = "Aufgepasst! Es gibt gleich mehrere Gründe zu feiern.";
+        }
         
         $message = "
         <html>
@@ -545,14 +570,11 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
                 <h2>Hallo " . esc_html($rcp['name']) . "!</h2>
                 
                 <p class=\"intro-text\">
-                    Aufgepasst! Eure gemeinsame Reise erreicht bald den nächsten wunderbaren Meilenstein.
+                    {$intro_text}
                     Zeit, die Herzen höher schlagen zu lassen!
                 </p>
 
-                <div class=\"highlight-box\">
-                    <span class=\"event-name\">" . esc_html($target_event['label']) . "</span>
-                    <span class=\"event-date\">am " . $target_event['date']->format('d.m.Y') . "</span>
-                </div>
+                {$events_html}
 
                 " . (!empty($ideas_list) ? "
                 <div class=\"ideas-section\">
