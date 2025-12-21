@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10.4
+ * Version: 2.10.5
  * Author: Gemini
  */
 
@@ -18,8 +18,8 @@ function hochzeitstag_log($msg) {
     error_log($entry); // Writes to Docker/Server logs
     
     // Also try writing to file as backup
-    $log_file = HOCHZEITSTAG_PLUGIN_PATH . 'debug.log';
-    $file_entry = date('Y-m-d H:i:s') . " - " . (is_array($msg) || is_object($msg) ? print_r($msg, true) : $msg) . "\n";
+    $log_file = HOCHZEITSTAG_PLUGIN_PATH + 'debug.log';
+    $file_entry = date('Y-m-d H:i:s') + " - " + (is_array($msg) || is_object($msg) ? print_r($msg, true) : $msg) + "\n";
     @file_put_contents($log_file, $file_entry, FILE_APPEND);
 }
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.4</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.5</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -395,6 +395,29 @@ function hochzeitstag_reschedule_cron() {
 // Reschedule when settings are saved
 add_action( 'update_option_hochzeitstag_settings', 'hochzeitstag_reschedule_cron' );
 
+/**
+ * Failsafe: If WP Cron is stuck (overdue > 30 mins), run immediately on page load.
+ */
+function hochzeitstag_failsafe_cron_trigger() {
+    $next = wp_next_scheduled( 'hochzeitstag_daily_event' );
+    if ( $next && $next < (time() - 1800) ) { // 30 mins overdue
+        hochzeitstag_log("FAILSAFE: Cron overdue (Scheduled: " . date('d.m H:i', $next) . "). Running now.");
+        
+        // Execute logic immediately
+        hochzeitstag_cron_check();
+        
+        // Fix the schedule to prevent it staying "stuck" in the past
+        wp_clear_scheduled_hook( 'hochzeitstag_daily_event' );
+        
+        $tomorrow = $next + 86400;
+        while($tomorrow < time()) { $tomorrow += 86400; }
+        
+        wp_schedule_event( $tomorrow, 'daily', 'hochzeitstag_daily_event' );
+        hochzeitstag_log("FAILSAFE: Rescheduled for " . date('d.m H:i', $tomorrow));
+    }
+}
+add_action( 'init', 'hochzeitstag_failsafe_cron_trigger' );
+
 function hochzeitstag_activate() {
     hochzeitstag_rewrite_rule();
     flush_rewrite_rules();
@@ -421,6 +444,16 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     if ( ! function_exists( 'wp_mail' ) ) {
         hochzeitstag_log("ERROR: wp_mail function missing!");
         return ['success'=>false, 'message'=>'wp_mail fail'];
+    }
+
+    $force_send = (isset($atts['force_send']) && filter_var($atts['force_send'], FILTER_VALIDATE_BOOLEAN));
+    $today_str = date('Y-m-d');
+    
+    // Safety: Prevent double send on same day (unless forced)
+    $last_sent = get_option('hochzeitstag_last_sent');
+    if (!$force_send && $last_sent === $today_str) {
+        hochzeitstag_log("SKIP: Emails already sent today ($today_str).");
+        return ['success'=>true, 'message'=>'Bereits heute gesendet.'];
     }
 
     $cfg = hochzeitstag_get_config();
@@ -642,6 +675,11 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         } else {
             hochzeitstag_log("FAIL: wp_mail returned false for {$rcp['email']}.");
         }
+    }
+
+    if ($sent > 0 && !$force_send) {
+        update_option('hochzeitstag_last_sent', date('Y-m-d'));
+        hochzeitstag_log("SUCCESS: Updated last_sent timestamp.");
     }
 
     return ['success'=>true, 'message'=>"Gesendet an $sent Empfänger."];
