@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 CONFIG.customEvents.forEach(evt => {
                      if (evt.date && evt.label) {
                          const d = new Date(evt.date);
-                         addAnnualEvents(d, `Special Event: ${evt.label}`, 'custom');
+                         addAnnualEvents(d, evt.label, 'custom');
                      }
                 });
             }

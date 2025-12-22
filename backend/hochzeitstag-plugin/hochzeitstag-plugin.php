@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10.8
+ * Version: 2.10.9
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.8</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.9</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -467,7 +467,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     // (We reuse the logic from before but use $cfg array now)
     $upcoming_events = [];
     
-    $add_annual = function($date_str, $label_base) use ($today, &$upcoming_events) {
+    $add_annual = function($date_str, $label_base, $show_year = true) use ($today, &$upcoming_events) {
         if (!$date_str) return;
         $base_date = new DateTime($date_str);
         $base_date->setTime(0,0,0);
@@ -477,7 +477,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
             $evt_date->setDate($y, $base_date->format('m'), $base_date->format('d'));
             if ($evt_date >= $today) {
                 $years = $y - $base_date->format('Y');
-                $label = ($years > 0) ? "{$years}. {$label_base}" : $label_base;
+                $label = ($show_year && $years > 0) ? "{$years}. {$label_base}" : $label_base;
                 $upcoming_events[] = array('label' => $label, 'date' => $evt_date);
             }
         }
@@ -492,7 +492,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     }
 
     foreach ($cfg['customEvents'] as $ce) {
-        if(isset($ce['date'])) $add_annual($ce['date'], "Special Event: " . $ce['label']);
+        if(isset($ce['date'])) $add_annual($ce['date'], $ce['label'], false);
     }
 
     // 1000s & Schnapszahlen

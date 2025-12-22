@@ -1,14 +1,15 @@
+
 ## 📅 Changelog
 
+### v2.10.9 (2025-12-22)
+*   **Fix:** Removed year count (e.g., "12.") and "Special Event:" prefix from custom events for cleaner email and UI display.
+*   **Sync:** Unified label logic between frontend and backend.
+
 ### v2.10.8 (2025-12-22)
-*   **Fix:** Refactored email notification logic to be more reliable.
-    *   Now tracks each specific reminder event separately.
-    *   Allows "catch-up" emails if a cron job was missed (within a reasonable window).
-    *   Prevents duplicate emails if multiple events occur on the same day.
-    *   Fixed: Issue #21 (Email sending unreliability).
+*   **Fix:** Refactored email notification logic to be more reliable (Issue #21).
+    *   Tracks reminders individually via `sent_log`.
+    *   Supports catch-up for missed cron runs.
 
 ### v2.10.7 (2025-12-22)
-*   **Neu:** "Hearts & Gold"-Feiermodus für den Hochzeitstag und Meilensteine.
-*   **Sync:** Frontend-Standalone-Version mit Plugin-Features synchronisiert.
-*   **Fix:** Kritischer PHP-Fehler (String-Konkatenation) im Logging behoben.
-*   **Update:** Abhängigkeiten und Assets aktualisiert.
+*   **Neu:** "Hearts & Gold"-Feiermodus.
+*   **Sync:** Standalone-Version aktualisiert.

@@ -26,10 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Background Image Logic
     if (CONFIG.backgroundImage) {
-        const headerImg = document.querySelector('.card-header-image');
-        if (headerImg) {
-            headerImg.style.backgroundImage = `url('${CONFIG.backgroundImage}')`;
-        }
+        // Handled by CSS/HTML usually, but keeping config logic if needed later
     }
     
     // Theme Color Logic
@@ -317,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 CONFIG.customEvents.forEach(evt => {
                      if (evt.date && evt.label) {
                          const d = new Date(evt.date);
-                         addAnnualEvents(d, `Special Event: ${evt.label}`, 'custom');
+                         addAnnualEvents(d, evt.label, 'custom');
                      }
                 });
             }
@@ -415,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let mHtml = '';
             let isMilestoneToday = false;
             
-            uniqueMilestones.forEach(m => {
+            uniqueMilestones.forEach((m, index) => {
                 const daysLeft = getRemainingDays(m.date);
                 if (daysLeft === null) return;
                 
