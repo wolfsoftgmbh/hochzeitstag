@@ -67,73 +67,9 @@ body {
     text-align: center;
     position: relative;
     overflow: hidden;
+    transition: all 1s ease;
 }
 
-.content-wrapper {
-    padding: 0 30px; /* Padding wiederherstellen für den Inhalt */
-}
-
-.card-header-image {
-    width: 100%;
-    height: 220px; /* Ruhig etwas höher machen */
-    background-image: url('kiss.jpeg'); /* Dein Bildpfad */
-    background-size: cover;
-    background-position: center 20%; /* Bild etwas nach oben schieben */
-    border-radius: 20px 20px 0 0;
-    
-    /* Der Trick: Ein Verlauf von Schwarz (sichtbar) zu Transparent (unsichtbar) */
-    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
-    
-    /* Zieht den Text darunter visuell in das Bild hinein */
-    margin-bottom: -60px; 
-    margin-left: -30px; /* Kompensiere .content-wrapper padding falls nötig, hier nicht da image außerhalb von wrapper ist? nein es ist drin */
-    margin-right: -30px;
-    /* Wait, the image is inside .content-wrapper in existing HTML. But .glass-card has padding: 0 now. 
-       Actually, in my HTML structure, .content-wrapper is inside .glass-card.
-       If .glass-card has padding:0, .content-wrapper touches edges.
-       So .card-header-image inside .content-wrapper works.
-       BUT, I need to add padding to .content-wrapper for the REST of the content.
-       Or move .card-header-image OUTSIDE .content-wrapper if .content-wrapper has padding.
-       Let's assume .content-wrapper gets the padding: 0 30px; 
-       And .card-header-image needs negative margins to span full width IF .content-wrapper has padding.
-       OR, simpler: .glass-card has padding 0. .card-header-image is first child of .content-wrapper.
-       .content-wrapper gets padding 0 30px? No, then image would be indented.
-       
-       Let's adjust:
-       .glass-card { padding: 0 0 30px 0; }
-       .content-wrapper { } -> This wraps everything. 
-       
-       If .card-header-image is INSIDE .content-wrapper, and I want it full width, .content-wrapper must have 0 padding.
-       Then I need to add padding to individual elements or a new inner wrapper.
-       
-       Easiest fix given current HTML:
-       .glass-card has padding 0.
-       .content-wrapper has padding 0 (default).
-       .card-header-image is full width.
-       .header-section, .counter-grid, .section-title, .timeline-container, etc. need side padding.
-       OR
-       .content-wrapper { padding: 0 30px; }
-       .card-header-image { margin: 0 -30px -60px -30px; } -> pulls it out.
-       
-       Let's stick to the negative margin approach compatible with .content-wrapper having padding.
-       Wait, I set .glass-card padding to 0 0 30px 0. 
-       Previously .glass-card had padding: 30px.
-       The user instruction says: "padding: 0 0 30px 0; /* Padding oben auf 0, damit Bild am Rand klebt */"
-       
-       If .glass-card has 0 padding on sides, content touches edge.
-       I will set .glass-card padding to 0.
-       And add padding to .content-wrapper.
-    */
-    position: relative;
-    z-index: 0;
-    
-    /* Reset margins for the new structure where .glass-card has 0 padding top/sides */
-    margin: 0; 
-    margin-bottom: -60px;
-}
-
-/* Adjust wrapper to handle content padding */
 .content-wrapper {
     padding: 0 30px;
 }
@@ -279,6 +215,27 @@ h1, .section-title {
     box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.2); /* Glow Effekt */
 }
 
+/* Slow blinking animation for the next upcoming event */
+.blink-dot {
+    animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+    0% {
+        box-shadow: 0 0 0 0px rgba(183, 110, 121, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(183, 110, 121, 0);
+        transform: scale(1.1);
+        background-color: #b76e79;
+    }
+    100% {
+        box-shadow: 0 0 0 0px rgba(183, 110, 121, 0.4);
+        transform: scale(1);
+    }
+}
+
 .timeline-content {
     background: rgba(255, 255, 255, 0.5); /* Etwas transparenter */
     padding: 10px 15px;
@@ -404,14 +361,44 @@ h1, .section-title {
     border-radius: 10px;
 }
 
-/* Fireworks Canvas */
-#fireworks-canvas {
+/* --- CELEBRATION MODE (Gold) --- */
+.celebration-mode {
+    border-color: rgba(255, 215, 0, 0.8); /* Gold border */
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    animation: pulse-gold 3s infinite ease-in-out;
+}
+
+@keyframes pulse-gold {
+    0% {
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 60px rgba(255, 215, 0, 0.5), inset 0 0 30px rgba(255, 215, 0, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 40px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    }
+}
+
+/* --- FLOATING HEARTS --- */
+.floating-heart {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    bottom: -50px;
+    font-size: 20px;
+    animation: floatUp 5s linear forwards;
     z-index: 9999;
     pointer-events: none; /* Click-through */
-    background: transparent;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.8));
+    opacity: 0.8;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-110vh) scale(1.5) rotate(360deg);
+        opacity: 0;
+    }
 }
