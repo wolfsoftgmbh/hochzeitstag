@@ -60,6 +60,20 @@ Klicken Sie auf **"Änderungen speichern"**, um die Einstellungen zu übernehmen
 *   **Direktlink:** Besuchen Sie `ihre-domain.de/hochzeit/`.
 *   **Shortcode:** Fügen Sie `[hochzeitstag]` in eine beliebige Seite oder einen Beitrag ein.
 
+## 🛠 Testen der E-Mail-Funktion
+
+Sie haben zwei Möglichkeiten, den Versand zu prüfen:
+
+1.  **"Test-Email senden" Button:**
+    *   Auf der Frontend-Seite (`/hochzeit/`) im Footer.
+    *   Sendet sofort eine E-Mail, ignoriert alle Regeln und Logs. Ideal zum Testen der SMTP-Verbindung.
+
+2.  **Echte Logik testen (Cron):**
+    *   Installieren Sie das Plugin **WP Crontrol**.
+    *   Suchen Sie unter *Werkzeuge -> Cron-Events* nach `hochzeitstag_daily_event`.
+    *   Klicken Sie auf **"Jetzt ausführen"**.
+    *   Dies prüft die echten Regeln (Datum, bereits gesendet?).
+
 ## ⚠️ Hinweis zum automatischen Versand
 
 WordPress führt geplante Aufgaben (wie den E-Mail-Versand um 09:00 Uhr) nur aus, wenn ein Besucher die Website aufruft. 
