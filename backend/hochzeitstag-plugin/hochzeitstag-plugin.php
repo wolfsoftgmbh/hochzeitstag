@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10.7
+ * Version: 2.10.8
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.7</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.8</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -447,16 +447,15 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     }
 
     $force_send = (isset($atts['force_send']) && filter_var($atts['force_send'], FILTER_VALIDATE_BOOLEAN));
-    $today_str = date('Y-m-d');
     
-    // Safety: Prevent double send on same day (unless forced)
-    $last_sent = get_option('hochzeitstag_last_sent');
-    if (!$force_send && $last_sent === $today_str) {
-        hochzeitstag_log("SKIP: Emails already sent today ($today_str).");
-        return ['success'=>true, 'message'=>'Bereits heute gesendet.'];
-    }
+    // NEW: Load Sent Log
+    $sent_log = get_option('hochzeitstag_sent_log', []);
+    if (!is_array($sent_log)) $sent_log = [];
 
     $cfg = hochzeitstag_get_config();
+    // Sort reminders ascending (e.g. 0, 1, 7) to prioritize closest deadline
+    sort($cfg['reminderDays']); 
+
     $today = new DateTime();
     $today->setTime(0, 0, 0);
     hochzeitstag_log("DATE: Today is " . $today->format('Y-m-d'));
@@ -517,10 +516,12 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
 
     // Trigger Check
     $matching_events = [];
-    $force_send = (isset($atts['force_send']) && filter_var($atts['force_send'], FILTER_VALIDATE_BOOLEAN));
-    
-    // Check all configured reminder days
-    hochzeitstag_log("CHECK: Checking " . count($upcoming_events) . " events against reminders: " . implode(',', $cfg['reminderDays']));
+    $new_sent_entries = [];
+
+    // Log check debug
+    if (!$force_send) {
+        hochzeitstag_log("CHECK: Checking events against reminders: " . implode(',', $cfg['reminderDays']));
+    }
     
     if ($force_send) {
         hochzeitstag_log("FORCE: Manual test triggered.");
@@ -539,12 +540,26 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         ];
     } else {
         foreach($upcoming_events as $evt) {
-            if ($evt['date'] < $today) continue;
-            $diff = $today->diff($evt['date'])->days;
+            // Calculate days remaining
+            $diff_obj = $today->diff($evt['date']);
+            $diff = $diff_obj->days;
             
+            // Loop through sorted reminders (0, 1, 7...)
             foreach($cfg['reminderDays'] as $d_remind) {
-                if ($diff == $d_remind) {
-                    hochzeitstag_log("MATCH: Event '{$evt['label']}' matches reminder day $d_remind (Diff: $diff).");
+                // Check if we are within the window
+                if ($diff <= $d_remind) {
+                    
+                    // Generate Unique Hash for this specific reminder
+                    // Format: EventLabel | Date(Y-m-d) | ReminderDay
+                    $hash_key = $evt['label'] . '|' . $evt['date']->format('Y-m-d') . '|' . $d_remind;
+                    $hash = md5($hash_key);
+                    
+                    if (isset($sent_log[$hash])) {
+                        // Already sent this specific reminder
+                        continue;
+                    }
+                    
+                    hochzeitstag_log("MATCH: Event '{$evt['label']}' matches reminder day $d_remind (Diff: $diff). Sending...");
                     
                     $suffix = "";
                     if ($diff == 0) {
@@ -560,7 +575,12 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
                         'date' => $evt['date'],
                         'suffix' => $suffix
                     ];
-                    break; // Found a reminder for this event, move to next event (don't match multiple reminders for same event)
+                    
+                    // Mark this as sent (will save after success)
+                    $new_sent_entries[$hash] = time();
+                    
+                    // Stop checking other reminders for this event.
+                    break; 
                 }
             }
         }
@@ -677,9 +697,12 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         }
     }
 
-    if ($sent > 0 && !$force_send) {
-        update_option('hochzeitstag_last_sent', date('Y-m-d'));
-        hochzeitstag_log("SUCCESS: Updated last_sent timestamp.");
+    // Update Log (Save new entries)
+    if ($sent > 0 && !$force_send && !empty($new_sent_entries)) {
+        // Merge and Save
+        $updated_log = array_merge($sent_log, $new_sent_entries);
+        update_option('hochzeitstag_sent_log', $updated_log);
+        hochzeitstag_log("SUCCESS: Updated sent_log with " . count($new_sent_entries) . " new entries.");
     }
 
     return ['success'=>true, 'message'=>"Gesendet an $sent Empfänger."];
