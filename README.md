@@ -5,6 +5,7 @@ Eine romantische Anwendung und WordPress-Plugin, um die Zeit seit dem Hochzeitst
 ## 🌟 Funktionen
 
 *   **Live-Countdown:** Echtzeitanzeige von Jahren, Tagen, Stunden und Minuten seit dem großen Tag.
+*   **Feiermodus (Neu):** "Hearts & Gold"-Animation mit schwebenden Herzen und goldenem Leuchteffekt bei besonderen Anlässen (Meilenstein = Heute).
 *   **Überraschungsideen:** Ein spezieller Bereich, der zufällige romantische Ideen vorschlägt, um den Partner zu überraschen (über 100 Vorschläge integriert).
 *   **Dynamische Meilensteine:**
     *   Automatische Berechnung von Geburtstagen, jährlichen Hochzeitstagen und speziellen "Schnapszahl-Jubiläen" (z.B. 1111 Tage, 2222 Tage).
@@ -24,7 +25,7 @@ Eine romantische Anwendung und WordPress-Plugin, um die Zeit seit dem Hochzeitst
 
 ## 🚀 Installation (WordPress)
 
-1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.10.zip` herunter.
+1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.10.7.zip` herunter.
 2.  **Hochladen:** Gehen Sie in Ihr WordPress-Dashboard zu **Plugins -> Installieren -> Plugin hochladen**. Wählen Sie die ZIP-Datei aus und installieren Sie sie.
 3.  **Aktivieren:** Aktivieren Sie das Plugin.
 4.  **Setup (Optional):**
@@ -66,3 +67,6 @@ Für eine garantierte pünktliche Zustellung, auch wenn niemand die Seite besuch
 
 ## 📜 Lizenz
 Privatnutzung.
+
+## 📅 Änderungen
+Siehe [CHANGELOG.md](CHANGELOG.md) für die Historie.
