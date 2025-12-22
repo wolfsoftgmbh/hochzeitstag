@@ -18,8 +18,8 @@ function hochzeitstag_log($msg) {
     error_log($entry); // Writes to Docker/Server logs
     
     // Also try writing to file as backup
-    $log_file = HOCHZEITSTAG_PLUGIN_PATH + 'debug.log';
-    $file_entry = date('Y-m-d H:i:s') + " - " + (is_array($msg) || is_object($msg) ? print_r($msg, true) : $msg) + "\n";
+    $log_file = HOCHZEITSTAG_PLUGIN_PATH . 'debug.log';
+    $file_entry = date('Y-m-d H:i:s') . " - " . (is_array($msg) || is_object($msg) ? print_r($msg, true) : $msg) . "\n";
     @file_put_contents($log_file, $file_entry, FILE_APPEND);
 }
 
