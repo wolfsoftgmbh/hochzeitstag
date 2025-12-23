@@ -1,4 +1,12 @@
+
 ## 📅 Changelog
+
+### v2.10.16 (2025-12-23)
+*   **Cleanup:** Entfernung von Debug-Elementen im Frontend (Test-Email Button, Countdown-Pille), um das Design schlichter zu halten.
+*   **Fix:** Sprüche aus der Konfiguration werden nun priorisiert (Failsafe gelockert).
+
+### v2.10.15 (2025-12-23)
+*   **Fix:** Gelockerter Failsafe-Check für Zitate (Eigene Zitate werden nun auch genutzt, wenn weniger als 5 hinterlegt sind).
 
 ### v2.10.14 (2025-12-23)
 *   **Feature:** Intelligente Highlight-Box in Emails: Zeigt immer das absolut nächste Ereignis an, unabhängig vom Auslöser.

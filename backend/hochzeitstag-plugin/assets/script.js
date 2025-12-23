@@ -437,22 +437,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 activateCelebration();
             }
 
-            // Update Footer Pill
-            if (elNextAnniversary) {
-                const anniv = uniqueMilestones.find(m => m.label.includes("Hochzeitstag"));
-                if (anniv) {
-                    const dLeft = getRemainingDays(anniv.date);
-                    const txt = dLeft === 0 ? "Heute!" : `Noch ${dLeft} Tage`;
-                    elNextAnniversary.innerText = `${txt} bis zum ${anniv.label}`;
-                } else if (uniqueMilestones.length > 0) {
-                     const first = uniqueMilestones[0];
-                     const dLeft = getRemainingDays(first.date);
-                     elNextAnniversary.innerText = `Noch ${dLeft} Tage bis zum ${first.label}`;
-                } else {
-                     elNextAnniversary.innerText = `Keine bevorstehenden Meilensteine`;
-                }
-            }
-
             // Update Email Schedule Info
             if (elEmailScheduleInfo) {
                 // Calculate next email based on ALL upcoming milestones
@@ -480,65 +464,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-    }
-
-    if (elTestEmailBtn) {
-        elTestEmailBtn.addEventListener('click', () => {
-             if (typeof hochzeitstag_ajax_object === 'undefined') {
-                 alert("Email-Versand funktioniert nur im WordPress Plugin Modus.");
-                 return;
-             }
-             
-             // Get next milestone info for the email content from the DOM
-             let milestoneLabel = "Ein Meilenstein";
-             let milestoneDate = "";
-             
-             const firstItemLabel = document.querySelector('.timeline-item .t-label');
-             const firstItemDate = document.querySelector('.timeline-item .t-date');
-             
-             if (firstItemLabel) milestoneLabel = firstItemLabel.innerText;
-             // Try to get data-iso attribute for robust date parsing in backend
-             if (firstItemDate) milestoneDate = firstItemDate.getAttribute('data-iso') || firstItemDate.innerText;
-
-             // Get 5 random ideas
-             const ideas = getRandomIdeas(5);
-
-             elTestEmailBtn.disabled = true;
-             const originalText = elTestEmailBtn.innerText;
-             elTestEmailBtn.innerText = "Sende...";
-             
-             const data = new FormData();
-             data.append('action', 'hochzeitstag_send_test_email');
-             data.append('event_label', milestoneLabel); // Override default label
-             data.append('event_date', milestoneDate);   // Override default date
-             data.append('force_send', 'true');
-             
-             // Append ideas array
-             ideas.forEach((idea, index) => {
-                 data.append(`ideas[${index}]`, idea);
-             });
-
-             fetch(hochzeitstag_ajax_object.ajax_url, {
-                 method: 'POST',
-                 body: data
-             })
-             .then(response => response.json())
-             .then(res => {
-                 if (res.success) {
-                     alert(res.data.message);
-                 } else {
-                     alert("Fehler: " + (res.data ? res.data.message : 'Unbekannter Fehler'));
-                 }
-             })
-             .catch(err => {
-                 alert("Netzwerkfehler beim Senden.");
-                 console.error(err);
-             })
-             .finally(() => {
-                 elTestEmailBtn.disabled = false;
-                 elTestEmailBtn.innerText = originalText;
-             });
-        });
     }
 
     displayRandomQuote();

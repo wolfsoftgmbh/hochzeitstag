@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10.14
+ * Version: 2.10.16
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.14</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.16</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -175,11 +175,11 @@ function hochzeitstag_get_config() {
     $quotes = array_values(array_filter(array_map('trim', explode("\n", $config['quotes']))));
     $surprise_ideas = array_values(array_filter(array_map('trim', explode("\n", $config['surprise_ideas']))));
 
-    // FAILSAFE: If user config has very few items (likely accidental empty save or test), fallback to defaults
-    if (count($quotes) < 5) {
+    // FAILSAFE: Only fallback if completely empty
+    if (empty($quotes)) {
         $quotes = array_values(array_filter(array_map('trim', explode("\n", $defaults['quotes']))));
     }
-    if (count($surprise_ideas) < 5) {
+    if (empty($surprise_ideas)) {
         $surprise_ideas = array_values(array_filter(array_map('trim', explode("\n", $defaults['surprise_ideas']))));
     }
 
