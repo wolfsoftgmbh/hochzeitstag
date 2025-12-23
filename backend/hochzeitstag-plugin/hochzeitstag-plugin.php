@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10.16
+ * Version: 2.10.18
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.16</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.18</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -664,7 +664,7 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     foreach($cfg['recipients'] as $rcp) {
         if(empty($rcp['email']) || !$rcp['active']) continue;
         
-        $subject = "📅 Countdown-Alarm: {$primary_event['label']} steht an! {$p_suffix}";
+        $subject = "❤️ Countdown-Alarm: {$primary_event['label']} steht an! {$p_suffix}";
         $intro_text = "Aufgepasst! Ein besonderer Meilenstein steht vor der Tür.";
         
         $message = "

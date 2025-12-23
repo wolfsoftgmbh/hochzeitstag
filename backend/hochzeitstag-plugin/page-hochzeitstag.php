@@ -22,8 +22,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="glass-card">
         <div class="content-wrapper">
             
-            <div class="card-header-image" style="background-image: url('<?php echo HOCHZEITSTAG_PLUGIN_URL . 'assets/kiss.jpeg'; ?>');"></div>
-            
             <header class="header-section">
                 <h1>Unser Hochzeitstag</h1>
                 <div id="quote-display" class="quote-box">
@@ -77,19 +75,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <footer class="footer-info">
                 <div id="wedding-date-display" class="start-date"></div>
-                
-                <div class="email-actions">
-                    <button id="test-email-button" class="action-btn">Test-Email senden</button>
-                    <div id="email-schedule-info" class="schedule-info"></div>
-                </div>
-
-                <div class="next-anniversary-pill" id="next-anniversary">
-                    Berechne...
-                </div>
-
-                <div id="server-time-display" class="server-time" style="margin-top: 15px; font-size: 0.75rem; color: #999; opacity: 0.7;">
-                    Serverzeit: <?php echo current_time('d.m.Y H:i'); ?>
-                </div>
             </footer>
             
         </div>
