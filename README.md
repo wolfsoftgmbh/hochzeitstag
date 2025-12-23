@@ -18,14 +18,15 @@ Eine romantische Anwendung und WordPress-Plugin, um die Zeit seit dem Hochzeitst
     *   **Mehrere Empfänger:** Konfigurierbare E-Mail-Adressen für beide Partner (Ehemann/Ehefrau) mit individueller Aktivierung.
     *   **Test-Button:** Senden Sie jederzeit eine Test-E-Mail, um die Funktion zu prüfen.
     *   **Debug-Modus:** Integriertes Logging zur Fehlersuche bei Cron-Jobs oder Mailversand.
-    *   **Inhalt:** E-Mails enthalten den Meilenstein und 5 zufällige Überraschungsideen zur Inspiration.
+    *   **Inhalt:** E-Mails enthalten den nächsten Meilenstein (Highlight), eine Vorschau auf die nächsten 14 Tage und 5 zufällige Überraschungsideen.
+    *   **Design:** Anpassbare Hintergrundfarben für die E-Mail.
 *   **Interaktive Geschichte:** Zeigt eine Zeitleiste Ihrer Beziehungshistorie.
 *   **Responsive Design:** Modernes "Glassmorphism"-Design, optimiert für Handy und Desktop.
 *   **Einfache Integration:** Eigene Seite unter `/hochzeit/` oder per Shortcode `[hochzeitstag]` einbindbar.
 
 ## 🚀 Installation (WordPress)
 
-1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.10.9.zip` herunter.
+1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.10.14.zip` herunter.
 2.  **Hochladen:** Gehen Sie in Ihr WordPress-Dashboard zu **Plugins -> Installieren -> Plugin hochladen**. Wählen Sie die ZIP-Datei aus und installieren Sie sie.
 3.  **Aktivieren:** Aktivieren Sie das Plugin.
 4.  **Setup (Optional):**

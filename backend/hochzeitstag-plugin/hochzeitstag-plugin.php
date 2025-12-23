@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.10.9
+ * Version: 2.10.14
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.9</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.10.14</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -97,6 +97,9 @@ function hochzeitstag_settings_init() {
     add_settings_field( 'email_wife', 'E-Mail (Ehefrau)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'email_wife'] );
     add_settings_field( 'name_wife', 'Name (Ehefrau)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'name_wife'] );
     add_settings_field( 'active_wife', 'Aktiv (Ehefrau)', 'hochzeitstag_checkbox_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'active_wife'] );
+
+    add_settings_field( 'email_bg_color', 'E-Mail Hintergrundfarbe', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'email_bg_color', 'desc' => 'Hex-Code für den äußeren Hintergrund.'] );
+    add_settings_field( 'email_inner_bg_color', 'E-Mail Box-Farbe', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'email_inner_bg_color', 'desc' => 'Farbe der inneren Inhalts-Box (Standard: #ffffff).'] );
     
     add_settings_field( 'reminder_days', 'Erinnerungstage (z.B. 7, 1)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', ['id' => 'reminder_days'] );
     add_settings_field( 'email_send_time', 'Sendezeit (HH:MM)', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_email', [
@@ -136,6 +139,8 @@ function hochzeitstag_get_defaults() {
         'email_wife' => 'tanja-risse@gmx.de',
         'name_wife' => 'Tanja',
         'active_wife' => true,
+        'email_bg_color' => '#ff9a9e',
+        'email_inner_bg_color' => '#ffffff',
         'reminder_days' => '7, 1, 0',
         'email_send_time' => '09:00',
         'quotes' => "Liebe ist: zu zweit albern sein.\nWir passen, wie Topf und Deckel.\nEhe: Streit um Fernbedienung, endet mit Lachen.\nZusammen sind wir besser, wie Kaffee & Kuchen.\nMein Lieblingsmensch, trotz letztem Keks.\nLiebe: Das Einzige, was mehr wird, wenn man es verschwendet.\nMit dir wird jeder Einkauf zum Abenteuer.\nEchte Liebe erträgt auch Schnarchen.\nMein Anker im Sturm, mein Konfetti im Alltag.\nZuhause ist, wo du bist (und WLAN).\nWir: Ein Team für Chaos und Ordnung.\nLiebe heißt: immer wieder vertragen.\nMit dir: Jeder Tag ein Feiertag.\nDu bist der Grund für mein Handy-Lächeln.\nUnsere Liebe: guter Wein, wird besser mit Jahren.\nDanke, dass du meine Macken magst.\nWir zwei gegen den Rest der Welt (und Abwasch).\nDu bringst mich zum Lachen, auch mürrisch.\nGlück ist: herrlich albern sein.\nDu bist der Zucker in meinem Kaffee.\nEgal wohin, Hauptsache zusammen.\nMit dir macht sogar Nichtstun Spaß.\nDu bist mein Happy Place.\nLiebe ist: blind verstehen.\nIch mag dich mehr als Pizza.\nDu und ich – das passt.\nMein Herz schlägt im Takt von deinem.\nDeine Umarmung: mein Lieblingsort.\nZusammen ist man weniger allein.\nDu bist mein Lieblings-Nervzwerg.\nIch liebe dich mehr als Kaffee (sag's nicht).\nWir sind wie Pech und Schwefel, nur hübscher.\nDu hast den Schlüssel zum Herzen (und Kühlschrank).\nLiebe: Du lässt mir die letzte Schokolade.\nDu bist der Grund, warum ich aufstehe (meistens).\nMit dir ist sogar der Abwasch erträglich.\nWir sind das perfekte Chaos.\nDu bist mein liebster Zeitvertreib.\nIch liebe dich, auch wenn du hungrig bist.\nDu bist mein persönlicher Superheld (ohne Umhang).\nZusammen sind wir unschlagbar (im Faulenzen).\nDu bist mein Lieblingsmensch, Punkt.\nLiebe ist: schweigend anschreien können.\nDu bist süßer als Zuckerwatte.\nIch würde mein Handy für dich weglegen.\nDu bist der Käse auf meiner Pizza.\nWir passen zusammen wie Pommes und Ketchup.\nDu bist mein Einhorn in Pferdeherde.\nLiebe ist: gemeinsam dick werden.\nDu bist der Grund für mein Dauergrinsen.\nIch liebe dich mehr als gestern (weniger als morgen).\nDu bist meine bessere, vernünftigere Hälfte.\nMit dir kann man Pferde stehlen (und Ponys).\nDu bist mein Lieblings-Kuscheltier.\nLiebe: Decke teilen (widerwillig).\nDu bist der Hit in meinen Charts.\nIch folge dir (außer aufs Klo).\nDu bist mein Highlight des Tages.\nWir sind Bonnie & Clyde, ohne Banküberfall.\nDu bist mein 6er im Lotto.\nIch liebe dich bis zur Unendlichkeit.\nDu bist mein Fels and mein Kissen.\nMit dir wird's nie langweilig.\nDu bist mein Lieblings-Abenteuer.\nLiebe ist: blind vertrauen (trotzdem Google Maps checken).\nDu bist mein Sternenhimmel.\nIch hab dich zum Fressen gern.\nDu bist mein Lieblings-Gedanke vor dem Einschlafen.\nWir sind ein Dream-Team.\nDu bist mein Sonnenschein, auch nachts.\nIch liebe dich mehr als Schokolade.\nDu bist mein Herzblatt.\nMit dir ist das Leben ein Ponyhof.\nDu bist mein allerliebster Lieblingsmensch.\nLiebe ist: gegenseitig Sätze beenden.\nDu bist der Grund, warum ich glücklich bin.\nIch bin süchtig nach dir.\nDu bist mein Zuhause.\nWir sind einfach füreinander gemacht.\nZwei Herzen, ein Beat, unser Rhythmus.\nLiebe ist: den anderen in Jogginghose lieben.\nDu bist mein Happy End, jeden Tag.\nUnsere Liebe: mehr als tausend Worte.\nEin Blick sagt mehr als jede Rede.\nMit dir ist jeder Moment Gold wert.\nDu machst mein Leben heller.\nUnsere Herzen tanzen im Gleichklang.\nDu bist mein Traum, der wahr wurde.\nEin Leben ohne dich? Undenkbar!\nLiebe ist die schönste Reise.\nDu bist das Puzzleteil, das fehlte.\nJeder Tag mit dir ist ein Geschenk.\nDu gibst meinem Leben Sinn.\nDu bist mein Anker, mein Halt.\nUnsere Liebe: ein unendliches Band.\nDu bist mein größtes Abenteuer.\nMit dir ist alles leichter.\nDu bist mein Lächeln, meine Freude.\nUnsere Liebe wächst jeden Tag.\nDu bist mein Herz, meine Seele.\nDu bist der Grund für mein Glück.\nEin Kuss von dir: mein Lieblingsgefühl.\nDu bist mein Zuhause, wo immer wir sind.\nUnsere Liebe: stärker als alles.\nDu bist mein Wunsch, der in Erfüllung ging.\nMit dir ist jeder Tag ein Gedicht.\nDu bist mein Held, mein Retter.\nUnsere Liebe: ein ewiges Feuer.\nDu bist mein Schatz, mein größter Gewinn.\nDu machst mich komplett.\nUnsere Herzen sind verbunden.\nDu bist mein Glück, mein Schicksal.\nMit dir ist jeder Weg das Ziel.\nDu bist mein Stern, der leuchtet.\nUnsere Liebe: unendlich und rein.\nDu bist mein Leben, mein Atem.\nDu bist mein Licht, meine Sonne.\nUnsere Liebe: ein Wunder, das bleibt.\nDu bist mein Alles, mein Nichts.\nDu bist meine Ewigkeit.",
@@ -193,6 +198,8 @@ function hochzeitstag_get_config() {
             ['email' => $config['email_husband'], 'name' => $config['name_husband'], 'active' => $config['active_husband']],
             ['email' => $config['email_wife'], 'name' => $config['name_wife'], 'active' => $config['active_wife']]
         ],
+        'emailBgColor' => $config['email_bg_color'],
+        'emailInnerBgColor' => $config['email_inner_bg_color'],
         'customEvents' => $custom_events,
         'reminderDays' => $reminder_days,
         'quotes' => $quotes,
@@ -592,6 +599,45 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
     }
 
     // --- PREPARE EMAIL CONTENT ---
+    
+    // Always use the absolute next event for the main Highlight Box
+    $primary_event = $upcoming_events[0];
+    $p_diff = $today->diff($primary_event['date'])->days;
+    $p_suffix = ($p_diff == 0) ? " (Heute!)" : (($p_diff == 1) ? " (Morgen!)" : " (in $p_diff Tagen)");
+    
+    $events_html = '
+    <div class="highlight-box">
+        <span class="event-name">' . esc_html($primary_event['label']) . '</span>
+        <span class="event-date">am ' . date_i18n('D. \d\e\n d.m.Y', $primary_event['date']->getTimestamp()) . $p_suffix . '</span>
+    </div>';
+
+    // Preview for OTHER events in the next 14 days
+    $preview_html = '';
+    $preview_events = [];
+    for ($i = 1; $i < count($upcoming_events); $i++) {
+        $evt = $upcoming_events[$i];
+        $diff = $today->diff($evt['date'])->days;
+        if ($diff <= 14) {
+            $preview_events[] = $evt;
+        } else {
+            break; // Sorted, so we can stop
+        }
+    }
+
+    if (!empty($preview_events)) {
+        $preview_html .= '<div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">';
+        $preview_html .= '<h3 style="color: #b76e79; font-size: 1.1em; margin-bottom: 15px;">📅 Außerdem in den nächsten 2 Wochen:</h3>';
+        $preview_html .= '<ul style="list-style: none; padding: 0; margin: 0;">';
+        foreach ($preview_events as $pe) {
+            $d_str = date_i18n('D., d.m.', $pe['date']->getTimestamp());
+            $preview_html .= '<li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #f0f0f0; display: flex; justify-content: space-between;">';
+            $preview_html .= '<span style="font-weight: bold; color: #555;">' . esc_html($pe['label']) . '</span>';
+            $preview_html .= '<span style="color: #ad1457; white-space: nowrap;">' . $d_str . '</span>';
+            $preview_html .= '</li>';
+        }
+        $preview_html .= '</ul></div>';
+    }
+
     $quote = "Liebe ist alles.";
     if (!empty($cfg['quotes'])) {
         $quote = $cfg['quotes'][array_rand($cfg['quotes'])];
@@ -613,40 +659,26 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
         }
     }
 
-    // Prepare Events HTML
-    $events_html = '';
-    foreach ($matching_events as $me) {
-        $events_html .= '
-        <div class="highlight-box">
-            <span class="event-name">' . esc_html($me['label']) . '</span>
-            <span class="event-date">am ' . $me['date']->format('d.m.Y') . $me['suffix'] . '</span>
-        </div>';
-    }
-
     // Send
     $sent = 0;
     foreach($cfg['recipients'] as $rcp) {
         if(empty($rcp['email']) || !$rcp['active']) continue;
         
-        if (count($matching_events) === 1) {
-            $subject = "📅 Countdown-Alarm: {$matching_events[0]['label']} steht an!{$matching_events[0]['suffix']}";
-            $intro_text = "Aufgepasst! Ein besonderer Meilenstein steht vor der Tür.";
-        } else {
-            $subject = "📅 Countdown-Alarm: " . count($matching_events) . " Ereignisse stehen an!";
-            $intro_text = "Aufgepasst! Es gibt gleich mehrere Gründe zu feiern.";
-        }
+        $subject = "📅 Countdown-Alarm: {$primary_event['label']} steht an! {$p_suffix}";
+        $intro_text = "Aufgepasst! Ein besonderer Meilenstein steht vor der Tür.";
         
         $message = "
         <html>
         <head>
             <title>Meilenstein-Alarm</title>
             <style>
-                body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f9f9f9; padding: 20px; color: #333; }
-                .email-container { background-color: #ffffff; padding: 40px; border-radius: 12px; max-width: 600px; margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+                body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: " . esc_attr($cfg['emailBgColor']) . "; color: #333; }
+                .email-wrapper { background-color: " . esc_attr($cfg['emailBgColor']) . "; padding: 40px 10px; }
+                .email-container { background-color: " . esc_attr($cfg['emailInnerBgColor']) . "; padding: 40px; border-radius: 12px; max-width: 600px; margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
                 h2 { color: #b76e79; margin-top: 0; }
-                .highlight-box { background: linear-gradient(135deg, #fff0f5 0%, #ffe6ee 100%); border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; border: 1px solid #ffcdd2; }
-                .event-name { font-size: 1.4em; font-weight: bold; color: #880e4f; display: block; margin-bottom: 5px; }
-                .event-date { font-size: 1.1em; color: #ad1457; }
+                .highlight-box { background-color: #fdfaf7; border-radius: 12px; padding: 25px; text-align: center; margin: 25px 0; border: 2px solid #b76e79; }
+                .event-name { font-size: 1.5em; font-weight: bold; color: #880e4f; display: block; margin-bottom: 8px; }
+                .event-date { font-size: 1.2em; color: #ad1457; }
                 .intro-text { line-height: 1.6; font-size: 16px; color: #555; }
                 .ideas-section { margin-top: 30px; }
                 .ideas-title { font-weight: bold; color: #b76e79; font-size: 1.1em; margin-bottom: 10px; display: block; }
@@ -655,31 +687,35 @@ function _hochzeitstag_prepare_and_send_email( $atts = array() ) {
             </style>
         </head>
         <body>
-            <div class=\"email-container\">
-                <h2>Hallo " . esc_html($rcp['name']) . "!</h2>
-                
-                <p class=\"intro-text\">
-                    {$intro_text}
-                    Zeit, die Herzen höher schlagen zu lassen!
-                </p>
+            <div class=\"email-wrapper\">
+                <div class=\"email-container\">
+                    <h2>Hallo " . esc_html($rcp['name']) . "!</h2>
+                    
+                    <p class=\"intro-text\">
+                        {$intro_text}
+                        Zeit, die Herzen höher schlagen zu lassen!
+                    </p>
 
-                {$events_html}
+                    {$events_html}
+                    
+                    {$preview_html}
 
-                " . (!empty($ideas_list) ? "
-                <div class=\"ideas-section\">
-                    <span class=\"ideas-title\">💡 5 Ideen für eine kleine Überraschung:</span>
-                    <p>Damit du nicht mit leeren Händen (oder leerem Kopf) dastehst, hier ein paar Inspirationen, um deinem Schatz ein Lächeln ins Gesicht zu zaubern:</p>
-                    <ul style=\"text-align: left; background: #fff; padding: 15px 15px 15px 30px; border-radius: 8px; border: 1px dashed #e91e63;\">
-                        {$ideas_list}
-                    </ul>
-                </div>" : "") . "
+                    " . (!empty($ideas_list) ? "
+                    <div class=\"ideas-section\">
+                        <span class=\"ideas-title\">💡 5 Ideen für eine kleine Überraschung:</span>
+                        <p>Damit du nicht mit leeren Händen (oder leerem Kopf) dastehst, hier ein paar Inspirationen, um deinem Schatz ein Lächeln ins Gesicht zu zaubern:</p>
+                        <ul style=\"text-align: left; background: #fff; padding: 15px 15px 15px 30px; border-radius: 8px; border: 1px dashed #e91e63;\">
+                            {$ideas_list}
+                        </ul>
+                    </div>" : "") . "
 
-                <div class=\"quote-box\">
-                    „" . esc_html($quote) . "“
-                </div>
+                    <div class=\"quote-box\">
+                        „" . esc_html($quote) . "“
+                    </div>
 
-                <div class=\"footer\">
-                    <p>Gesendet mit Liebe vom Hochzeitstag Countdown Plugin.</p>
+                    <div class=\"footer\">
+                        <p>Gesendet mit Liebe vom Hochzeitstag Countdown Plugin.</p>
+                    </div>
                 </div>
             </div>
         </body>
