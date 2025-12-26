@@ -1,12 +1,9 @@
 ## 📅 Changelog
-
-### v2.10.18 (2025-12-23)
-*   **Design:** Kalender-Symbol (📅) im E-Mail-Betreff durch ein Herz-Symbol (❤️) ersetzt.
-
-### v2.10.17 (2025-12-23)
-*   **Design:** Entfernung des Header-Bildes und weiterer Footer-Elemente (Serverzeit, Pille) für ein minimalistisches Layout.
-
-### v2.10.16 (2025-12-23)
+ 
+ ### v2.10.17 (2025-12-23)
+ *   **Design:** Entfernung des Header-Bildes und weiterer Footer-Elemente (Serverzeit, Pille) für ein minimalistisches Layout.
+ 
+ ### v2.10.16 (2025-12-23)
 *   **Cleanup:** Entfernung von Debug-Elementen im Frontend (Test-Email Button, Countdown-Pille), um das Design schlichter zu halten.
 *   **Fix:** Sprüche aus der Konfiguration werden nun priorisiert (Failsafe gelockert).
 
