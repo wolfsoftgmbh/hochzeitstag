@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.11.0
+ * Version: 2.11.1
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.11.0</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.11.1</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -309,9 +309,9 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
         // Look 2 years ahead ~ 63 million seconds
         $max_lookahead_sec = $age_seconds + (63 * 1000000); 
         
-        // Millions: 1,000,000; 50,000,000...
-        // Step: 1,000,000
-        $milestones_sec = $get_round_numbers($age_seconds + 1, $max_lookahead_sec, 1000000);
+        // Millions: 10,000,000; 20,000,000...
+        // Step: 10,000,000
+        $milestones_sec = $get_round_numbers($age_seconds + 1, $max_lookahead_sec, 10000000);
         
         // Schnapszahlen Seconds (e.g. 111,111,111 ~ 3.5 years)
         // Ranges: 100,000,000 (9 digits) to 999,999,999 (31 years)
@@ -327,11 +327,11 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
             $d->modify("+$s_num seconds");
             
             if ($d >= $now_precise) {
-                // Check if it's "round" (million)
-                $is_million = ($s_num % 1000000 == 0);
+                // Check if it's "round" (10 million)
+                $is_million = ($s_num % 10000000 == 0);
                 $is_schnaps = in_array($s_num, $schnaps_sec);
                 
-                // Only show "Round Millions" or "Schnapszahlen"
+                // Only show "Round 10-Millions" or "Schnapszahlen"
                 if ($is_million || $is_schnaps) {
                     $label = number_format($s_num, 0, ',', '.') . ". Sekunde";
                     if ($is_schnaps) $label .= " (Schnapszahl!)";

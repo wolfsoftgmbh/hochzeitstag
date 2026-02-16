@@ -1,6 +1,9 @@
 ## 📅 Changelog
- 
- ### v2.10.17 (2025-12-23)
+
+### v2.11.1 (2026-02-16)
+*   **Feature:** Sekunden-Meilensteine auf 10-Millionen-Schritte reduziert, um die Anzahl der E-Mails zu verringern.
+
+### v2.10.17 (2025-12-23)
  *   **Design:** Entfernung des Header-Bildes und weiterer Footer-Elemente (Serverzeit, Pille) für ein minimalistisches Layout.
  
  ### v2.10.16 (2025-12-23)
