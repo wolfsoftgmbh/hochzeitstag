@@ -1,5 +1,9 @@
 ## 📅 Changelog
 
+### v2.13.1 (2026-02-16)
+*   **Fix:** Benutzerdefinierte Events (JSON) werden jetzt nur noch am exakten Datum angezeigt und nicht mehr jährlich wiederholt.
+*   **Verbesserung:** Klarere Trennung zwischen jährlichen Fixpunkten (Geburtstage, Hochzeitstage) und einmaligen Terminen.
+
 ### v2.13.0 (2026-02-16)
 *   **Feature:** Granulare Steuerung für Schnapszahlen (separat für Tage, Stunden und Sekunden schaltbar).
 *   **Verbesserung:** Bereinigte Meilenstein-Konfiguration im Admin-Bereich.

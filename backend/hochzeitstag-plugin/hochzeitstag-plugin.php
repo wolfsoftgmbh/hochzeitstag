@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.13.0
+ * Version: 2.13.1
  * Author: Gemini
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-define( 'HOCHZEITSTAG_VERSION', '2.13.0' );
+define( 'HOCHZEITSTAG_VERSION', '2.13.1' );
 define( 'HOCHZEITSTAG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'HOCHZEITSTAG_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 
@@ -235,8 +235,15 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
             $add_annual($date, "Geburtstag " . ucfirst($name));
         }
 
+        // Custom Events are now ONE-TIME (only on the specific date provided)
         foreach ($cfg['customEvents'] as $ce) {
-            if(isset($ce['date'])) $add_annual($ce['date'], $ce['label'], false);
+            if(isset($ce['date'])) {
+                $evt_date = new DateTime($ce['date']);
+                $evt_date->setTime(0,0,0);
+                if ($evt_date >= $today) {
+                    $upcoming_events[] = ['label' => $ce['label'], 'date' => $evt_date, 'type' => 'custom'];
+                }
+            }
         }
     }
 
