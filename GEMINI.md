@@ -38,6 +38,10 @@ configuration is primarily handled within the `frontend/wedding.html` file:
 
 ## WordPress Plugin (Backend)
 The `backend/hochzeitstag-plugin` is a full WordPress plugin that wraps the frontend logic and adds server-side email notifications.
-*   **Version:** 2.5
+*   **Version:** 2.12.3
+*   **Versioning Standard:** 
+    *   Version is managed via the `HOCHZEITSTAG_VERSION` constant in `hochzeitstag-plugin.php`.
+    *   The version number MUST be updated in the plugin header, the constant, the `<h1>` of the admin page, and the `<h1>` of the frontend page.
+    *   Always increment by 0.0.1 for fixes and 0.1.0 for features.
 *   **Email Logic:** Sends emails on configured days before an event (default: 7, 1, and 0/Today).
 *   **Cron:** Runs daily. If configured time is in the past for the current day, it runs immediately upon saving settings.

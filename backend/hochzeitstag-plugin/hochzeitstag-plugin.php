@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.12.2
+ * Version: 2.12.3
  * Author: Gemini
  */
 
@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
+define( 'HOCHZEITSTAG_VERSION', '2.12.3' );
 define( 'HOCHZEITSTAG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'HOCHZEITSTAG_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 
@@ -47,7 +48,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.12.2</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v<?php echo HOCHZEITSTAG_VERSION; ?></span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );

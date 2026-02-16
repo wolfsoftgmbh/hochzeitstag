@@ -26,7 +26,7 @@ Eine romantische Anwendung und WordPress-Plugin, um die Zeit seit dem Hochzeitst
 
 ## 🚀 Installation (WordPress)
  
- 1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.12.2.zip` herunter.
+ 1.  **Download:** Laden Sie die Datei `backend/hochzeitstag-plugin_v2.12.3.zip` herunter.
  2.  **Hochladen:** Gehen Sie in Ihr WordPress-Dashboard zu **Plugins -> Installieren -> Plugin hochladen**. Wählen Sie die ZIP-Datei aus und installieren Sie sie.
  3.  **Aktivieren:** Aktivieren Sie das Plugin.
 4.  **Setup (Optional):**

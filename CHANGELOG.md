@@ -1,5 +1,10 @@
 ## 📅 Changelog
 
+### v2.12.3 (2026-02-16)
+*   **Fix:** Zentrale Versionierung über `HOCHZEITSTAG_VERSION` Konstante.
+*   **UX:** Versionsnummer wird nun konsistent im Admin-Bereich und auf der Hochzeitsseite angezeigt.
+*   **UX:** Entfernung des schwer auffindbaren Einstellungs-Links im Footer.
+
 ### v2.12.2 (2026-02-16)
 *   **UX:** Rückkehr zum separaten Admin-Menü mit Herz-Icon (Wunsch des Nutzers).
 *   **UX:** Einstellungs-Link im Footer bleibt als zusätzliche Option erhalten.
