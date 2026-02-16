@@ -1,5 +1,9 @@
 ## 📅 Changelog
 
+### v2.12.1 (2026-02-16)
+*   **UX:** Menü unter "Einstellungen > Hochzeitstag" verschoben.
+*   **UX:** Direkter Einstellungs-Link im Footer der Hochzeitstag-Seite (nur für Admins sichtbar).
+
 ### v2.12.0 (2026-02-16)
 *   **Feature:** Vollständig konfigurierbare Meilensteine (Sekunden, Stunden, Tage, Schnapszahlen ein-/ausschaltbar).
 *   **Feature:** Einstellbare Schrittweiten für alle Meilenstein-Typen.

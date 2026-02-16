@@ -75,6 +75,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <footer class="footer-info">
                 <div id="wedding-date-display" class="start-date"></div>
+                <?php if (current_user_can('manage_options')) : ?>
+                    <p style="margin-top: 15px; text-align: center;"><a href="<?php echo admin_url('options-general.php?page=hochzeitstag-settings'); ?>" style="color: rgba(0,0,0,0.4); text-decoration: none; font-size: 0.8em; border: 1px solid rgba(0,0,0,0.2); padding: 3px 8px; border-radius: 4px; display: inline-block;">⚙️ Einstellungen</a></p>
+                <?php endif; ?>
             </footer>
             
         </div>
