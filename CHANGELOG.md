@@ -1,5 +1,9 @@
 ## 📅 Changelog
 
+### v2.13.0 (2026-02-16)
+*   **Feature:** Granulare Steuerung für Schnapszahlen (separat für Tage, Stunden und Sekunden schaltbar).
+*   **Verbesserung:** Bereinigte Meilenstein-Konfiguration im Admin-Bereich.
+
 ### v2.12.3 (2026-02-16)
 *   **Fix:** Zentrale Versionierung über `HOCHZEITSTAG_VERSION` Konstante.
 *   **UX:** Versionsnummer wird nun konsistent im Admin-Bereich und auf der Hochzeitsseite angezeigt.

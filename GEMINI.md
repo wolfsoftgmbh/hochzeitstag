@@ -38,7 +38,7 @@ configuration is primarily handled within the `frontend/wedding.html` file:
 
 ## WordPress Plugin (Backend)
 The `backend/hochzeitstag-plugin` is a full WordPress plugin that wraps the frontend logic and adds server-side email notifications.
-*   **Version:** 2.12.3
+*   **Version:** 2.13.0
 *   **Versioning Standard:** 
     *   Version is managed via the `HOCHZEITSTAG_VERSION` constant in `hochzeitstag-plugin.php`.
     *   The version number MUST be updated in the plugin header, the constant, the `<h1>` of the admin page, and the `<h1>` of the frontend page.
