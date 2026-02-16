@@ -1,5 +1,9 @@
 ## 📅 Changelog
 
+### v2.12.2 (2026-02-16)
+*   **UX:** Rückkehr zum separaten Admin-Menü mit Herz-Icon (Wunsch des Nutzers).
+*   **UX:** Einstellungs-Link im Footer bleibt als zusätzliche Option erhalten.
+
 ### v2.12.1 (2026-02-16)
 *   **UX:** Menü unter "Einstellungen > Hochzeitstag" verschoben.
 *   **UX:** Direkter Einstellungs-Link im Footer der Hochzeitstag-Seite (nur für Admins sichtbar).
