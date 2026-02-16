@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Hochzeitstag Countdown
  * Description: A romantic countdown to your wedding anniversary. Available at /hochzeit/
- * Version: 2.11.1
+ * Version: 2.12.0
  * Author: Gemini
  */
 
@@ -47,7 +47,7 @@ function hochzeitstag_add_admin_menu() {
 function hochzeitstag_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.11.1</span></h1>
+        <h1>Hochzeitstag Konfiguration <span style="font-size: 0.5em; color: #666; vertical-align: middle;">v2.12.0</span></h1>
         <form action="options.php" method="post">
             <?php
             settings_fields( 'hochzeitstagPlugin' );
@@ -117,6 +117,24 @@ function hochzeitstag_settings_init() {
     ] );
 
     add_settings_section(
+        'hochzeitstag_section_milestones',
+        'Meilenstein-Konfiguration (Was soll gefeiert werden?)',
+        'hochzeitstag_section_milestones_callback',
+        'hochzeitstagPlugin'
+    );
+    add_settings_field( 'ms_annual_active', 'Jährliche Ereignisse', 'hochzeitstag_checkbox_render', 'hochzeitstagPlugin', 'hochzeitstag_section_milestones', ['id' => 'ms_annual_active', 'desc' => 'Hochzeitstage, Geburtstage, Jahrestage.'] );
+    add_settings_field( 'ms_schnaps_active', 'Schnapszahlen', 'hochzeitstag_checkbox_render', 'hochzeitstagPlugin', 'hochzeitstag_section_milestones', ['id' => 'ms_schnaps_active', 'desc' => 'Zahlen wie 1.111, 2.222 etc.'] );
+    
+    add_settings_field( 'ms_day_active', 'Tages-Meilensteine', 'hochzeitstag_checkbox_render', 'hochzeitstagPlugin', 'hochzeitstag_section_milestones', ['id' => 'ms_day_active'] );
+    add_settings_field( 'ms_day_step', 'Schrittweite Tage', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_milestones', ['id' => 'ms_day_step', 'desc' => 'Standard: 1000'] );
+    
+    add_settings_field( 'ms_hour_active', 'Stunden-Meilensteine', 'hochzeitstag_checkbox_render', 'hochzeitstagPlugin', 'hochzeitstag_section_milestones', ['id' => 'ms_hour_active'] );
+    add_settings_field( 'ms_hour_step', 'Schrittweite Stunden', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_milestones', ['id' => 'ms_hour_step', 'desc' => 'Standard: 5000'] );
+    
+    add_settings_field( 'ms_sec_active', 'Sekunden-Meilensteine', 'hochzeitstag_checkbox_render', 'hochzeitstagPlugin', 'hochzeitstag_section_milestones', ['id' => 'ms_sec_active'] );
+    add_settings_field( 'ms_sec_step', 'Schrittweite Sekunden', 'hochzeitstag_text_render', 'hochzeitstagPlugin', 'hochzeitstag_section_milestones', ['id' => 'ms_sec_step', 'desc' => 'Standard: 10000000'] );
+
+    add_settings_section(
         'hochzeitstag_section_content',
         'Inhalte (Zufallstexte)',
         'hochzeitstag_section_content_callback',
@@ -150,6 +168,14 @@ function hochzeitstag_get_defaults() {
         'email_inner_bg_color' => '#ffffff',
         'reminder_days' => '7, 1, 0',
         'email_send_time' => '09:00',
+        'ms_annual_active' => true,
+        'ms_day_active' => true,
+        'ms_day_step' => 1000,
+        'ms_hour_active' => true,
+        'ms_hour_step' => 5000,
+        'ms_sec_active' => true,
+        'ms_sec_step' => 10000000,
+        'ms_schnaps_active' => true,
         'quotes' => "Liebe ist: zu zweit albern sein.\nWir passen, wie Topf und Deckel.\nEhe: Streit um Fernbedienung, endet mit Lachen.\nZusammen sind wir besser, wie Kaffee & Kuchen.\nMein Lieblingsmensch, trotz letztem Keks.\nLiebe: Das Einzige, was mehr wird, wenn man es verschwendet.\nMit dir wird jeder Einkauf zum Abenteuer.\nEchte Liebe erträgt auch Schnarchen.\nMein Anker im Sturm, mein Konfetti im Alltag.\nZuhause ist, wo du bist (und WLAN).\nWir: Ein Team für Chaos und Ordnung.\nLiebe heißt: immer wieder vertragen.\nMit dir: Jeder Tag ein Feiertag.\nDu bist der Grund für mein Handy-Lächeln.\nUnsere Liebe: guter Wein, wird besser mit Jahren.\nDanke, dass du meine Macken magst.\nWir zwei gegen den Rest der Welt (und Abwasch).\nDu bringst mich zum Lachen, auch mürrisch.\nGlück ist: herrlich albern sein.\nDu bist der Zucker in meinem Kaffee.\nEgal wohin, Hauptsache zusammen.\nMit dir macht sogar Nichtstun Spaß.\nDu bist mein Happy Place.\nLiebe ist: blind verstehen.\nIch mag dich mehr als Pizza.\nDu und ich – das passt.\nMein Herz schlägt im Takt von deinem.\nDeine Umarmung: mein Lieblingsort.\nZusammen ist man weniger allein.\nDu bist mein Lieblings-Nervzwerg.\nIch liebe dich mehr als Kaffee (sag's nicht).\nWir sind wie Pech und Schwefel, nur hübscher.\nDu hast den Schlüssel zum Herzen (und Kühlschrank).\nLiebe: Du lässt mir die letzte Schokolade.\nDu bist der Grund, warum ich aufstehe (meistens).\nMit dir ist sogar der Abwasch erträglich.\nWir sind das perfekte Chaos.\nDu bist mein liebster Zeitvertreib.\nIch liebe dich, auch wenn du hungrig bist.\nDu bist mein persönlicher Superheld (ohne Umhang).\nZusammen sind wir unschlagbar (im Faulenzen).\nDu bist mein Lieblingsmensch, Punkt.\nLiebe ist: schweigend anschreien können.\nDu bist süßer als Zuckerwatte.\nIch würde mein Handy für dich weglegen.\nDu bist der Käse auf meiner Pizza.\nWir passen zusammen wie Pommes und Ketchup.\nDu bist mein Einhorn in Pferdeherde.\nLiebe ist: gemeinsam dick werden.\nDu bist der Grund für mein Dauergrinsen.\nIch liebe dich mehr als gestern (weniger als morgen).\nDu bist meine bessere, vernünftigere Hälfte.\nMit dir kann man Pferde stehlen (und Ponys).\nDu bist mein Lieblings-Kuscheltier.\nLiebe: Decke teilen (widerwillig).\nDu bist der Hit in meinen Charts.\nIch folge dir (außer aufs Klo).\nDu bist mein Highlight des Tages.\nWir sind Bonnie & Clyde, ohne Banküberfall.\nDu bist mein 6er im Lotto.\nIch liebe dich bis zur Unendlichkeit.\nDu bist mein Fels and mein Kissen.\nMit dir wird's nie langweilig.\nDu bist mein Lieblings-Abenteuer.\nLiebe ist: blind vertrauen (trotzdem Google Maps checken).\nDu bist mein Sternenhimmel.\nIch hab dich zum Fressen gern.\nDu bist mein Lieblings-Gedanke vor dem Einschlafen.\nWir sind ein Dream-Team.\nDu bist mein Sonnenschein, auch nachts.\nIch liebe dich mehr als Schokolade.\nDu bist mein Herzblatt.\nMit dir ist das Leben ein Ponyhof.\nDu bist mein allerliebster Lieblingsmensch.\nLiebe ist: gegenseitig Sätze beenden.\nDu bist der Grund, warum ich glücklich bin.\nIch bin süchtig nach dir.\nDu bist mein Zuhause.\nWir sind einfach füreinander gemacht.\nZwei Herzen, ein Beat, unser Rhythmus.\nLiebe ist: den anderen in Jogginghose lieben.\nDu bist mein Happy End, jeden Tag.\nUnsere Liebe: mehr als tausend Worte.\nEin Blick sagt mehr als jede Rede.\nMit dir ist jeder Moment Gold wert.\nDu machst mein Leben heller.\nUnsere Herzen tanzen im Gleichklang.\nDu bist mein Traum, der wahr wurde.\nEin Leben ohne dich? Undenkbar!\nLiebe ist die schönste Reise.\nDu bist das Puzzleteil, das fehlte.\nJeder Tag mit dir ist ein Geschenk.\nDu gibst meinem Leben Sinn.\nDu bist mein Anker, mein Halt.\nUnsere Liebe: ein unendliches Band.\nDu bist mein größtes Abenteuer.\nMit dir ist alles leichter.\nDu bist mein Lächeln, meine Freude.\nUnsere Liebe wächst jeden Tag.\nDu bist mein Herz, meine Seele.\nDu bist der Grund für mein Glück.\nEin Kuss von dir: mein Lieblingsgefühl.\nDu bist mein Zuhause, wo immer wir sind.\nUnsere Liebe: stärker als alles.\nDu bist mein Wunsch, der in Erfüllung ging.\nMit dir ist jeder Tag ein Gedicht.\nDu bist mein Held, mein Retter.\nUnsere Liebe: ein ewiges Feuer.\nDu bist mein Schatz, mein größter Gewinn.\nDu machst mich komplett.\nUnsere Herzen sind verbunden.\nDu bist mein Glück, mein Schicksal.\nMit dir ist jeder Weg das Ziel.\nDu bist mein Stern, der leuchtet.\nUnsere Liebe: unendlich und rein.\nDu bist mein Leben, mein Atem.\nDu bist mein Licht, meine Sonne.\nUnsere Liebe: ein Wunder, das bleibt.\nDu bist mein Alles, mein Nichts.\nDu bist meine Ewigkeit.",
         'surprise_ideas' => "Frühstück am Bett servieren\nEinen handgeschriebenen Liebesbrief verstecken\nEin Picknick im Wohnzimmer veranstalten\nEinen Überraschungs-Wochenendtrip planen\nDas Lieblingsessen kochen\nEin entspannendes Massage-Abend mit Duftöl\nEin Fotoalbum mit gemeinsamen Erinnerungen erstellen\nEine kleine Schatzsuche durch die Wohnung organisieren\nKinokarten für den neuesten Film besorgen\nEin gemeinsames Bad mit Kerzenschein und Musik vorbereiten\nEinfach mal ohne Grund Blumen mitbringen\nEin Kompliment im Vorbeigehen flüstern\nEinen Stern nach dem Partner benennen\nEine Playlist mit 'unseren' Liedern erstellen\nDen Partner von der Arbeit abholen\nEinen gemeinsamen Kochkurs besuchen\nEin Schloss an einer Brücke anbringen\nEinen Liebesbrief per Post schicken\nEinen Wellness-Tag zu Hause einlegen\nZusammen den Sonnenaufgang anschauen\nEin Überraschungs-Date im Lieblingsrestaurant\nDie Lieblingsserie zusammen schauen (auch wenn man sie nicht mag)\nEinen Abend lang alle Hausarbeiten übernehmen\nEin kleines Geschenk ohne Anlass kaufen\nGemeinsam ein neues Hobby ausprobieren\nEinen Brief für die Zukunft schreiben\nEin Kompliment auf den Badezimmerspiegel schreiben\nEin gerahmtes Foto von einem besonderen Moment schenken\nEinen Tanzabend im Wohnzimmer machen\nZusammen Schlittschuhlaufen oder Rollschuhfahren gehen\nEinen Drachen steigen lassen\nGemeinsam in den Zoo oder Botanischen Garten gehen\nEinen Spieleabend mit den Lieblingsspielen organisieren\nEine Massage-Gutschein basteln\nEinen Korb mit Lieblings-Snacks zusammenstellen\nEin privates Fotoshooting machen\nEinen Baum zusammen pflanzen\nEinfach mal 'Ich liebe dich' sagen, wenn es niemand erwartet\nEine Nacht unter freiem Himmel schlafen\nEin Boot mieten und über einen See rudern\nEinen Flohmarktbummel machen\nZusammen ein Puzzle lösen\nEine Flaschenpost vorbereiten\nDen Partner mit einem warmen Handtuch nach dem Duschen überraschen\nEinen Liebes-Post-it am Kühlschrank hinterlassen\nZusammen alte Kinderfotos anschauen\nEin Lied für den Partner singen (oder rappen)\nEinen Ausflug an den Ort des ersten Treffens machen\nGemeinsam ein Museum besuchen\nEine Weinprobe zu Hause machen\nEinen Karaoke-Abend veranstalten\nEin gemeinsames Vision-Board für die Zukunft erstellen\nEinen Malkurs für Paare besuchen\nZusammen in eine Therme gehen\nEinen Kuss im Regen genießen\nEinen Spaziergang im Mondschein machen\nEin Frühstück im Freien (Balkon/Garten)\nEinen gemeinsamen Sportkurs belegen\nEinander vorlesen\nEinen Tag lang das Handy ausschalten und Zeit genießen\nEin DIY-Projekt zusammen starten\nEinen Städtetrip in eine unbekannte Stadt\nZusammen ein Konzert besuchen\nEin Überraschungs-Kaffeetrinken organisieren\nEinander die Haare waschen oder kämmen\nEinen Gutschein für eine Autowäsche schenken\nEinen Tag lang 'Ja' zu allen Wünschen des Partners sagen\nEinen gemeinsamen Back-Abend\nEine Zeitkapsel vergraben\nZusammen in den Zirkus oder Varieté gehen\nEinen Wanderurlaub planen\nEin kleines Gedicht schreiben\nDie Bettwäsche frisch beziehen und mit Blüten bestreuen\nEin Eis essen gehen\nZusammen Tretboot fahren\nEinen Sonnenuntergang am Strand/See beobachten\nEinander massieren (Nacken, Füße)\nEinen gemeinsamen Tanzkurs machen\nEinen Plan für das nächste Jahr schmieden\nEinen Brief schreiben, warum man dankbar ist\nEin Überraschungs-BBQ im Garten\nZusammen eine Sternwarte besuchen\nEinander ein Hobby erklären und ausprobieren lassen\nEinen Roadtrip ohne festes Ziel machen\nEine Nacht im Hotel in der eigenen Stadt buchen\nEinander beim Anziehen helfen\nEinen gemeinsam Garten oder Balkonkasten bepflanzen\nEin Kompliment vor Freunden machen\nZusammen einen Freizeitpark besuchen\nEin gemeinsames Bad mit Badebombe\nEinen Abend lang nur Musik hören und reden\nEin Foto von sich selbst in das Portemonnaie des Partners schleichen\nEinen besonderen Tee oder Kaffee kochen\nEinen kleinen Glücksbringer schenken\nEinen Video-Clip mit gemeinsamen Momenten schneiden\nZusammen die Sterne beobachten und Sternbilder suchen\nEinander etwas Neues beibringen\nEine heiße Schokolade mit Sahne an einem kalten Tag\nEinen Kuss auf die Stirn geben\nGemeinsam alt werden (als Plan)"
     ];
@@ -175,35 +201,37 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
     $upcoming_events = [];
     
     // --- 1. ANNUAL EVENTS ---
-    $add_annual = function($date_str, $label_base, $show_year = true) use ($today, &$upcoming_events) {
-        if (!$date_str) return;
-        $base_date = new DateTime($date_str);
-        $base_date->setTime(0,0,0);
-        $current_year = $today->format('Y');
-        // Look ahead 2 years
-        for ($y = $current_year; $y <= $current_year + 2; $y++) {
-            $evt_date = clone $base_date;
-            $evt_date->setDate($y, $base_date->format('m'), $base_date->format('d'));
-            
-            // Only add if it's today or future
-            if ($evt_date >= $today) {
-                $years = $y - $base_date->format('Y');
-                $label = ($show_year && $years > 0) ? "{$years}. {$label_base}" : $label_base;
-                $upcoming_events[] = array('label' => $label, 'date' => $evt_date, 'type' => 'annual');
+    if ($cfg['ms']['annual']) {
+        $add_annual = function($date_str, $label_base, $show_year = true) use ($today, &$upcoming_events) {
+            if (!$date_str) return;
+            $base_date = new DateTime($date_str);
+            $base_date->setTime(0,0,0);
+            $current_year = $today->format('Y');
+            // Look ahead 2 years
+            for ($y = $current_year; $y <= $current_year + 2; $y++) {
+                $evt_date = clone $base_date;
+                $evt_date->setDate($y, $base_date->format('m'), $base_date->format('d'));
+                
+                // Only add if it's today or future
+                if ($evt_date >= $today) {
+                    $years = $y - $base_date->format('Y');
+                    $label = ($show_year && $years > 0) ? "{$years}. {$label_base}" : $label_base;
+                    $upcoming_events[] = array('label' => $label, 'date' => $evt_date, 'type' => 'annual');
+                }
             }
+        };
+
+        $add_annual($cfg['dates']['wedding'], "Hochzeitstag");
+        $add_annual($cfg['dates']['contact'], "Jahrestag (Erster Kontakt)");
+        $add_annual($cfg['dates']['meet'], "Jahrestag (Zusammen)");
+
+        foreach ($cfg['birthdays'] as $name => $date) {
+            $add_annual($date, "Geburtstag " . ucfirst($name));
         }
-    };
 
-    $add_annual($cfg['dates']['wedding'], "Hochzeitstag");
-    $add_annual($cfg['dates']['contact'], "Jahrestag (Erster Kontakt)");
-    $add_annual($cfg['dates']['meet'], "Jahrestag (Zusammen)");
-
-    foreach ($cfg['birthdays'] as $name => $date) {
-        $add_annual($date, "Geburtstag " . ucfirst($name));
-    }
-
-    foreach ($cfg['customEvents'] as $ce) {
-        if(isset($ce['date'])) $add_annual($ce['date'], $ce['label'], false);
+        foreach ($cfg['customEvents'] as $ce) {
+            if(isset($ce['date'])) $add_annual($ce['date'], $ce['label'], false);
+        }
     }
 
     // --- MILESTONE CALCULATOR HELPERS ---
@@ -228,6 +256,7 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
 
     // Generator for Round Numbers (1000, 2000, 10000, 50000...)
     $get_round_numbers = function($min, $max, $step) {
+        if ($step <= 0) return [];
         $nums = [];
         $start = ceil($min / $step) * $step;
         for ($i = $start; $i <= $max; $i += $step) {
@@ -237,25 +266,19 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
     };
 
     // --- 2. DAY MILESTONES ---
-    $diff_days = $today->diff($wedding_date_day)->days; // Absolute diff
-    // Re-verify direction: if wedding is in future (negative age), milestones don't make sense yet.
-    if ($wedding_date_day <= $today) {
-        $max_lookahead_days = $diff_days + 3650; // Look 10 years ahead max
+    if ($wedding_date_day <= $today && ($cfg['ms']['day_active'] || $cfg['ms']['schnaps'])) {
+        $diff_days = $today->diff($wedding_date_day)->days;
+        $max_lookahead_days = $diff_days + 3650; 
         
-        // 1000er Steps
-        $milestones_days = $get_round_numbers($diff_days + 1, $max_lookahead_days, 1000);
+        $milestones_days = $cfg['ms']['day_active'] ? $get_round_numbers($diff_days + 1, $max_lookahead_days, $cfg['ms']['day_step']) : [];
+        $schnaps_days = $cfg['ms']['schnaps'] ? $get_schnapszahlen($diff_days + 1, 99999) : [];
         
-        // Schnapszahlen (e.g. 1111 - 99999)
-        $schnaps_days = $get_schnapszahlen($diff_days + 1, 99999);
-        
-        $all_day_milestones = array_merge($milestones_days, $schnaps_days);
-        $all_day_milestones = array_unique($all_day_milestones);
+        $all_day_milestones = array_unique(array_merge($milestones_days, $schnaps_days));
         sort($all_day_milestones);
 
         foreach ($all_day_milestones as $d_num) {
             $d = clone $wedding_date_day;
             $d->modify("+$d_num days");
-            // Only add if within reasonable future (already filtered by min start, but double check)
             if ($d >= $today) {
                 $label = number_format($d_num, 0, ',', '.') . ". Tag gemeinsam";
                 if (in_array($d_num, $schnaps_days)) $label .= " (Schnapszahl!)";
@@ -265,61 +288,37 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
     }
 
     // --- 3. HOUR MILESTONES ---
-    // Diff in Hours
-    // $diff_hours = ($now_precise->getTimestamp() - $wedding_date_precise->getTimestamp()) / 3600;
-    // Easier: Just look for milestones > current hours age
-    if ($wedding_date_precise <= $now_precise) {
+    if ($wedding_date_precise <= $now_precise && ($cfg['ms']['hour_active'] || $cfg['ms']['schnaps'])) {
         $age_seconds = $now_precise->getTimestamp() - $wedding_date_precise->getTimestamp();
         $age_hours = floor($age_seconds / 3600);
+        $max_lookahead_hours = $age_hours + (365 * 24 * 2); 
         
-        $max_lookahead_hours = $age_hours + (365 * 24 * 2); // Look 2 years ahead
+        $milestones_hours = $cfg['ms']['hour_active'] ? $get_round_numbers($age_hours + 1, $max_lookahead_hours, $cfg['ms']['hour_step']) : [];
+        $schnaps_hours = $cfg['ms']['schnaps'] ? $get_schnapszahlen($age_hours + 1, 999999) : [];
         
-        // Round: Every 10,000 hours? Or 1,000? 
-        // 1 year ~ 8760 hours. 
-        // Let's do every 5,000 and 10,000 and 100,000
-        // Simplification: Every 5,000
-        $milestones_hours = $get_round_numbers($age_hours + 1, $max_lookahead_hours, 5000);
-        
-        // Schnapszahlen Hours (e.g. 11111 hours ~ 1.2 years)
-        $schnaps_hours = $get_schnapszahlen($age_hours + 1, 999999);
-        
-        $all_hour_milestones = array_merge($milestones_hours, $schnaps_hours);
-        $all_hour_milestones = array_unique($all_hour_milestones);
+        $all_hour_milestones = array_unique(array_merge($milestones_hours, $schnaps_hours));
         sort($all_hour_milestones);
         
         foreach ($all_hour_milestones as $h_num) {
             $d = clone $wedding_date_precise;
-            // modify expects minutes/days/hours. "+X hours"
             $d->modify("+$h_num hours");
             if ($d >= $now_precise) {
                 $label = number_format($h_num, 0, ',', '.') . ". Stunde gemeinsam";
                 if (in_array($h_num, $schnaps_hours)) $label .= " (Schnapszahl!)";
-                // Only keeping Date part for display/sorting usually, but for hours/seconds we want precision?
-                // The email logic uses diff in Days mostly. 
-                // Let's keep precise date.
                 $upcoming_events[] = ['label' => $label, 'date' => $d, 'type' => 'hour'];
             }
         }
     }
 
     // --- 4. SECOND MILESTONES ---
-    if ($wedding_date_precise <= $now_precise) {
+    if ($wedding_date_precise <= $now_precise && ($cfg['ms']['sec_active'] || $cfg['ms']['schnaps'])) {
         $age_seconds = $now_precise->getTimestamp() - $wedding_date_precise->getTimestamp();
-        
-        // Look 2 years ahead ~ 63 million seconds
         $max_lookahead_sec = $age_seconds + (63 * 1000000); 
         
-        // Millions: 10,000,000; 20,000,000...
-        // Step: 10,000,000
-        $milestones_sec = $get_round_numbers($age_seconds + 1, $max_lookahead_sec, 10000000);
+        $milestones_sec = $cfg['ms']['sec_active'] ? $get_round_numbers($age_seconds + 1, $max_lookahead_sec, $cfg['ms']['sec_step']) : [];
+        $schnaps_sec = $cfg['ms']['schnaps'] ? $get_schnapszahlen($age_seconds + 1, 9999999999) : []; 
         
-        // Schnapszahlen Seconds (e.g. 111,111,111 ~ 3.5 years)
-        // Ranges: 100,000,000 (9 digits) to 999,999,999 (31 years)
-        // Maybe also 8 digits (11,111,111 ~ 4 months)
-        $schnaps_sec = $get_schnapszahlen($age_seconds + 1, 9999999999); 
-        
-        $all_sec_milestones = array_merge($milestones_sec, $schnaps_sec);
-        $all_sec_milestones = array_unique($all_sec_milestones);
+        $all_sec_milestones = array_unique(array_merge($milestones_sec, $schnaps_sec));
         sort($all_sec_milestones);
         
         foreach ($all_sec_milestones as $s_num) {
@@ -327,11 +326,9 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
             $d->modify("+$s_num seconds");
             
             if ($d >= $now_precise) {
-                // Check if it's "round" (10 million)
-                $is_million = ($s_num % 10000000 == 0);
-                $is_schnaps = in_array($s_num, $schnaps_sec);
+                $is_million = ($cfg['ms']['sec_active'] && $s_num % $cfg['ms']['sec_step'] == 0);
+                $is_schnaps = ($cfg['ms']['schnaps'] && in_array($s_num, $schnaps_sec));
                 
-                // Only show "Round 10-Millions" or "Schnapszahlen"
                 if ($is_million || $is_schnaps) {
                     $label = number_format($s_num, 0, ',', '.') . ". Sekunde";
                     if ($is_schnaps) $label .= " (Schnapszahl!)";
@@ -352,17 +349,46 @@ function hochzeitstag_get_upcoming_events($limit = 20) {
     return array_slice($upcoming_events, 0, $limit);
 }
 
+function hochzeitstag_section_milestones_callback() { 
+    echo '<p>Hier können Sie festlegen, welche Arten von Meilensteinen berechnet und per E-Mail versendet werden sollen.</p>';
+}
+
 function hochzeitstag_upcoming_list_render() {
-    $events = hochzeitstag_get_upcoming_events(20);
+    $events = hochzeitstag_get_upcoming_events(100); // Fetch more for stats
+    $cfg = hochzeitstag_get_config();
     
+    // Stats calculation
+    $one_year_later = new DateTime();
+    $one_year_later->modify('+1 year');
+    $count_year = 0;
+    foreach ($events as $e) {
+        if ($e['date'] <= $one_year_later) $count_year++;
+    }
+
+    $reminder_count = count($cfg['reminderDays']);
+    $total_mails_est = $count_year * $reminder_count;
+
+    echo '<div style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 800px; margin-bottom: 20px;">';
+    echo '<h3>Vorschau-Statistik</h3>';
+    echo '<p>Basierend auf deinen Einstellungen:</p>';
+    echo '<ul>';
+    echo '<li>Ereignisse in den nächsten 12 Monaten: <strong>' . $count_year . '</strong></li>';
+    echo '<li>Erinnerungen pro Ereignis: <strong>' . $reminder_count . '</strong> (Tage: ' . implode(', ', $cfg['reminderDays']) . ')</li>';
+    echo '<li><strong>Geschätzte E-Mails pro Jahr: <span style="color: #d81b60; font-size: 1.2em;">ca. ' . $total_mails_est . '</span></strong></li>';
+    echo '</ul>';
+    echo '<p style="font-size: 0.9em; color: #666;"><i>Hinweis: Diese Zahl variiert leicht je nach Schnapszahlen und Schaltjahren.</i></p>';
+    echo '</div>';
+
     echo '<div style="background: #fff; padding: 15px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 800px;">';
+    echo '<h3>Die nächsten Ereignisse</h3>';
     if (empty($events)) {
         echo '<p>Keine anstehenden Ereignisse gefunden.</p>';
     } else {
         echo '<table class="widefat striped">';
         echo '<thead><tr><th>Datum & Uhrzeit</th><th>Ereignis</th><th>Typ</th></tr></thead>';
         echo '<tbody>';
-        foreach ($events as $evt) {
+        $display_events = array_slice($events, 0, 20);
+        foreach ($display_events as $evt) {
             $date_fmt = 'd.m.Y';
             // Show time for seconds/hours events
             if (in_array($evt['type'], ['second', 'hour'])) {
@@ -396,6 +422,12 @@ function hochzeitstag_get_config() {
         // shortcode_atts would have filled it with the default (true).
         if ( ! isset( $options['active_husband'] ) ) $config['active_husband'] = false;
         if ( ! isset( $options['active_wife'] ) )    $config['active_wife'] = false;
+        
+        $config['ms_annual_active'] = isset( $options['ms_annual_active'] );
+        $config['ms_schnaps_active'] = isset( $options['ms_schnaps_active'] );
+        $config['ms_day_active'] = isset( $options['ms_day_active'] );
+        $config['ms_hour_active'] = isset( $options['ms_hour_active'] );
+        $config['ms_sec_active'] = isset( $options['ms_sec_active'] );
     }
     
     // Process Arrays
@@ -435,7 +467,17 @@ function hochzeitstag_get_config() {
         'customEvents' => $custom_events,
         'reminderDays' => $reminder_days,
         'quotes' => $quotes,
-        'surpriseIdeas' => $surprise_ideas
+        'surpriseIdeas' => $surprise_ideas,
+        'ms' => [
+            'annual' => $config['ms_annual_active'],
+            'schnaps' => $config['ms_schnaps_active'],
+            'day_active' => $config['ms_day_active'],
+            'day_step' => (int)$config['ms_day_step'],
+            'hour_active' => $config['ms_hour_active'],
+            'hour_step' => (int)$config['ms_hour_step'],
+            'sec_active' => $config['ms_sec_active'],
+            'sec_step' => (int)$config['ms_sec_step']
+        ]
     ];
 }
 

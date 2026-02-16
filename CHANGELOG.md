@@ -1,5 +1,11 @@
 ## 📅 Changelog
 
+### v2.12.0 (2026-02-16)
+*   **Feature:** Vollständig konfigurierbare Meilensteine (Sekunden, Stunden, Tage, Schnapszahlen ein-/ausschaltbar).
+*   **Feature:** Einstellbare Schrittweiten für alle Meilenstein-Typen.
+*   **Feature:** E-Mail-Frequenz-Vorschau in den Einstellungen (berechnet geschätzte Mails pro Jahr).
+*   **Verbesserung:** Optimierte Berechnungslogik für stabilere Performance.
+
 ### v2.11.1 (2026-02-16)
 *   **Feature:** Sekunden-Meilensteine auf 10-Millionen-Schritte reduziert, um die Anzahl der E-Mails zu verringern.
 
